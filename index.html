@@ -1,0 +1,707 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Enter your body measurements to see which sports and team positions your build naturally suits, and what limits your fit.">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Built For</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Source+Sans+3:wght@400;600;700&display=swap">
+<style>
+:root{
+  --bg:#F2F3F0; --surface:#FFFFFF; --surface-2:#F7F8F6; --ink:#141B2D; --muted:#5A6275; --line:#DADDE3;
+  --tape:#F2C12E; --tape-deep:#D9A60F; --tick:rgba(30,24,0,.55);
+  --good:#1D8657; --warn:#A96E12; --bad:#BE3B35; --accent:#2346B8;
+  --display:'Barlow Condensed','Arial Narrow',system-ui,sans-serif;
+  --body:'Source Sans 3',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#0E121A; --surface:#161C28; --surface-2:#1B2230; --ink:#E8EBF2; --muted:#98A1B3; --line:#2A3243;
+    --tape:#F0C03A; --tape-deep:#C99A14; --tick:rgba(30,24,0,.6);
+    --good:#3CC48A; --warn:#E3AA4C; --bad:#F0736C; --accent:#86A2FF;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0E121A; --surface:#161C28; --surface-2:#1B2230; --ink:#E8EBF2; --muted:#98A1B3; --line:#2A3243;
+  --tape:#F0C03A; --tape-deep:#C99A14; --tick:rgba(30,24,0,.6);
+  --good:#3CC48A; --warn:#E3AA4C; --bad:#F0736C; --accent:#86A2FF;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 var(--body);}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:20px;padding-block:20px 56px}
+h1,h2,h3{font-family:var(--display);font-weight:700;letter-spacing:.01em;text-wrap:balance;margin:0;line-height:1.05}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.eyebrow{font-size:12px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);font-weight:600}
+button,input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* header */
+.top{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:16px;padding-bottom:18px;margin-bottom:24px;border-bottom:1px solid var(--line)}
+.brand{display:flex;flex-direction:column;gap:6px}
+.brand h1{font-size:clamp(34px,5vw,52px);text-transform:uppercase}
+.brand h1 span{background:var(--tape);color:#1E1800;padding:0 .18em;box-decoration-break:clone}
+.brand p{margin:0;color:var(--muted);max-width:56ch}
+
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--surface)}
+.seg input{position:absolute;opacity:0;pointer-events:none}
+.seg label{padding:6px 12px;cursor:pointer;font-weight:600;font-size:13px;color:var(--muted)}
+.seg input:checked + label{background:var(--ink);color:var(--bg)}
+.seg input:focus-visible + label{outline:2px solid var(--accent);outline-offset:-2px}
+
+.grid{display:grid;grid-template-columns:330px minmax(0,1fr);gap:28px;align-items:start}
+@media (max-width:880px){.grid{grid-template-columns:1fr}}
+
+/* form */
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px}
+aside.panel{position:sticky;top:calc(env(safe-area-inset-top,0px) + 16px);display:flex;flex-direction:column;gap:16px}
+@media (max-width:880px){aside.panel{position:static}}
+.row2{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.fields{display:flex;flex-direction:column;gap:12px}
+.field{display:grid;grid-template-columns:1fr 118px;gap:2px 10px;align-items:center}
+.field label{font-weight:600}
+.field .hint{grid-column:1 / -1;font-size:12.5px;color:var(--muted);line-height:1.35}
+.field .opt{font-weight:400;color:var(--muted);font-size:12px;margin-left:4px}
+.inbox{display:flex;align-items:center;border:1px solid var(--line);border-radius:6px;background:var(--surface-2);overflow:hidden}
+.inbox:focus-within{border-color:var(--accent)}
+.inbox input{width:100%;min-width:0;border:0;background:transparent;padding:7px 4px 7px 9px;font-family:var(--mono);font-size:14px;outline:none}
+.inbox span{padding-right:9px;font-size:12px;color:var(--muted);font-family:var(--mono)}
+.divider{height:1px;background:var(--line)}
+.presets{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--line);background:var(--surface-2);border-radius:999px;padding:4px 10px;font-size:13px;cursor:pointer}
+.chip:hover{border-color:var(--ink)}
+.linkbtn{background:none;border:0;padding:0;color:var(--accent);cursor:pointer;font-size:13px;text-decoration:underline;text-underline-offset:2px}
+
+/* results */
+.results{display:flex;flex-direction:column;gap:22px;min-width:0}
+.banner{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:var(--surface);border:1px dashed var(--tape-deep);border-radius:8px;padding:10px 14px;font-size:14px}
+.banner b{font-weight:700}
+.tag{display:inline-block;font-size:11px;text-transform:uppercase;letter-spacing:.08em;font-weight:700;color:var(--muted)}
+
+.podium{display:grid;grid-template-columns:1.25fr 1fr 1fr;gap:14px}
+@media (max-width:640px){.podium{grid-template-columns:1fr}}
+.pcard{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:10px;position:relative;overflow:hidden}
+.pcard.first{border-color:var(--tape-deep);box-shadow:0 0 0 1px var(--tape-deep) inset}
+.pcard .rank{font-family:var(--display);font-weight:600;font-size:14px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+.pcard h3{font-size:30px;text-transform:uppercase}
+.pcard.first h3{font-size:36px}
+.pcard .pct{font-family:var(--display);font-size:44px;font-weight:700;line-height:1}
+.pcard .pct small{font-size:18px;color:var(--muted);font-weight:600;margin-left:2px}
+.pcard p{margin:0;color:var(--muted);font-size:14px}
+.pcard .fit{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+
+.crits{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:5px}
+.crits li{display:grid;grid-template-columns:16px minmax(0,1fr) auto;gap:8px;align-items:baseline;font-size:13.5px}
+.crits .mk{font-size:11px;text-align:center}
+.crits .mk.good{color:var(--good)} .crits .mk.ok{color:var(--warn)} .crits .mk.bad{color:var(--bad)} .crits .mk.na{color:var(--muted)}
+.crits .v{font-family:var(--mono);font-size:12.5px;color:var(--muted);text-align:right;white-space:nowrap}
+.crits .na-row{color:var(--muted)}
+
+.section-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.section-head h2{font-size:26px;text-transform:uppercase}
+.section-head p{margin:0;color:var(--muted);font-size:14px}
+
+.profile{display:grid;grid-template-columns:300px minmax(0,1fr);gap:22px;align-items:center}
+@media (max-width:1000px){.profile{grid-template-columns:1fr}}
+.figure svg{width:100%;max-width:340px;height:auto;display:block;margin:0 auto}
+.fig-ink{fill:var(--ink)} .fig-stroke{stroke:var(--ink)} .fig-dim{stroke:var(--muted);fill:none} .fig-txt{fill:var(--muted);font-family:var(--mono);font-size:10.5px}
+.fig-ghost{stroke:var(--accent);fill:none} .fig-ground{stroke:var(--line)}
+.legend{font-size:12px;color:var(--muted);text-align:center;margin-top:6px}
+.legend i{display:inline-block;width:18px;border-top:2px dashed var(--accent);vertical-align:middle;margin-right:6px}
+
+.gauges{display:flex;flex-direction:column;gap:13px}
+.gauge .gtop{display:flex;justify-content:space-between;gap:10px;font-size:14px;margin-bottom:4px}
+.gauge .gtop b{font-weight:600}
+.gauge .gtop span{font-family:var(--mono);font-size:12.5px;color:var(--muted);text-align:right}
+.tape{position:relative;height:20px;border-radius:3px;background-color:var(--tape);
+  background-image:
+    repeating-linear-gradient(90deg,var(--tick) 0 1px,transparent 1px 10%),
+    repeating-linear-gradient(90deg,var(--tick) 0 1px,transparent 1px 2%);
+  background-size:100% 55%,100% 28%;background-repeat:no-repeat;background-position:0 0,0 0}
+.tape.off{background-color:var(--line)}
+.tape .mark{position:absolute;top:-4px;bottom:-4px;width:3px;margin-left:-1.5px;background:var(--ink);border-radius:2px}
+.tape .mark::after{content:"";position:absolute;left:50%;bottom:-5px;transform:translateX(-50%);border:5px solid transparent;border-bottom-color:var(--ink);border-bottom-width:0;border-top-color:var(--ink)}
+.tape .avg{position:absolute;top:0;bottom:0;left:50%;border-left:1px dashed rgba(30,24,0,.7)}
+.scale{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10.5px;color:var(--muted);margin-top:3px}
+.standout{margin:0 0 14px;font-size:15px}
+
+/* ranked list */
+.list{display:flex;flex-direction:column;border-top:1px solid var(--line)}
+.list details{border-bottom:1px solid var(--line)}
+.list summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:34px minmax(0,1.3fr) minmax(80px,2fr) 52px 14px;gap:12px;align-items:center;padding:10px 4px}
+.list summary::-webkit-details-marker{display:none}
+.list summary:hover{background:var(--surface)}
+.list .n{font-family:var(--mono);color:var(--muted);font-size:13px}
+.list .nm{font-family:var(--display);font-weight:600;font-size:20px;text-transform:uppercase;line-height:1.1}
+.list .nm small{display:block;font-family:var(--body);font-size:11px;letter-spacing:.08em;color:var(--muted);font-weight:600}
+.bar{height:10px;background:var(--line);border-radius:5px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--tape-deep);border-radius:5px}
+.list .p{font-family:var(--mono);text-align:right;font-weight:500}
+.list .chev{color:var(--muted);transition:transform .15s}
+.list details[open] .chev{transform:rotate(90deg)}
+.list .body{padding:4px 4px 16px 50px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:18px}
+.list .body p{margin:0;color:var(--muted);font-size:14px}
+@media (max-width:640px){
+  .list summary{grid-template-columns:26px minmax(0,1fr) 60px 46px 10px;gap:8px}
+  .list .body{padding-left:4px;grid-template-columns:1fr}
+}
+.lowconf{font-size:12px;color:var(--warn);margin-top:6px}
+.note{font-size:13.5px;color:var(--muted);max-width:72ch;line-height:1.55}
+.note b{color:var(--ink)}
+.empty{padding:30px;text-align:center;color:var(--muted)}
+
+/* single-sport check */
+.check{display:flex;flex-direction:column;gap:18px}
+.pick{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.pick label{font-weight:600}
+.pick select{font:inherit;font-size:15px;padding:7px 10px;border:1px solid var(--line);border-radius:6px;background:var(--surface-2);color:var(--ink);min-width:0;max-width:100%}
+.verdict{display:flex;gap:20px;align-items:center;flex-wrap:wrap}
+.verdict .big{font-family:var(--display);font-weight:700;font-size:64px;line-height:.9}
+.verdict .big small{font-size:22px;color:var(--muted);margin-left:2px}
+.verdict .vtext{display:flex;flex-direction:column;gap:5px;flex:1 1 280px;min-width:0}
+.verdict .vtext p{margin:0;color:var(--muted);font-size:14px}
+.pill{align-self:flex-start;border-radius:999px;padding:3px 10px;font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.06em}
+.pill.good{color:var(--good);background:color-mix(in srgb,var(--good) 14%,transparent)}
+.pill.ok{color:var(--warn);background:color-mix(in srgb,var(--warn) 14%,transparent)}
+.pill.bad{color:var(--bad);background:color-mix(in srgb,var(--bad) 14%,transparent)}
+.check h3{font-size:19px;text-transform:uppercase;margin-bottom:8px}
+.limits{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;border-top:1px solid var(--line)}
+.limits li{display:grid;grid-template-columns:minmax(0,1fr) 110px;gap:4px 16px;padding:11px 0;border-bottom:1px solid var(--line);align-items:start}
+.limits .lt{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.limits .lt b{font-weight:700}
+.limits .lt .v{font-family:var(--mono);font-size:12.5px;color:var(--muted)}
+.limits .gap{grid-column:1;font-size:14px}
+.limits .adv{grid-column:1;font-size:13px;color:var(--muted)}
+.limits .cost{grid-column:2;grid-row:1 / span 3;text-align:right;display:flex;flex-direction:column;gap:5px;align-items:flex-end}
+.limits .cost span{font-family:var(--mono);font-weight:500;color:var(--bad)}
+.limits .cost .bar{width:100%}
+.limits .cost .bar i{background:var(--bad)}
+.kind{font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;font-weight:700;padding:1px 7px;border-radius:4px;border:1px solid var(--line);color:var(--muted)}
+.kind.chg{border-color:var(--accent);color:var(--accent)}
+.okmsg{margin:0;font-size:14px}
+.whatif{background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:10px 14px;font-size:14px}
+.checkbtn{margin-top:10px}
+/* positions */
+.as{font-size:14px;color:var(--muted);margin-top:-6px}
+.as b{color:var(--ink)}
+.postable{display:flex;flex-direction:column;border-top:1px solid var(--line)}
+.posrow{appearance:none;background:none;border:0;border-bottom:1px solid var(--line);text-align:left;cursor:pointer;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(70px,1fr) 44px minmax(0,1.3fr);gap:12px;align-items:center;padding:9px 8px;width:100%}
+.posrow:hover{background:var(--surface-2)}
+.posrow.on{background:var(--surface-2)}
+.posrow.on .pn{font-weight:700}
+.posrow.on .pn::before{content:"\25B8 ";color:var(--tape-deep)}
+.posrow .pn{font-weight:600}
+.posrow .pp{font-family:var(--mono);text-align:right}
+.posrow .pl{font-size:13px;color:var(--muted)}
+.posdetail{border:1px solid var(--line);border-radius:8px;padding:14px 16px;gap:12px!important}
+.posh{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.minipos{list-style:none;padding:0;margin:10px 0 0;display:flex;flex-direction:column;gap:2px;font-size:13.5px;max-width:320px}
+.minipos li{display:flex;justify-content:space-between;gap:10px}
+@media (max-width:640px){.posrow{grid-template-columns:minmax(0,1fr) 64px 40px}.posrow .pl{grid-column:1 / -1;margin-top:-6px}}
+@media (max-width:640px){
+  .panel{padding:14px}
+  .limits li{grid-template-columns:1fr}
+  .limits .cost{grid-column:1;grid-row:2;flex-direction:row;align-items:center;gap:10px;text-align:left}
+  .limits .cost .bar{flex:1;max-width:160px}
+  .posdetail{padding:12px}
+  .verdict .big{font-size:52px}
+}
+.jump{display:none;border:0;border-radius:8px;background:var(--ink);color:var(--bg);font-weight:700;padding:11px 14px;cursor:pointer;width:100%}
+@media (max-width:880px){.jump{display:block}}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <span class="eyebrow">Anthropometric sport fit</span>
+      <h1>What is your body <span>built for?</span></h1>
+      <p>Enter your measurements. Each sport is scored against the body proportions its elite athletes tend to share.</p>
+    </div>
+    <div class="seg" role="radiogroup" aria-label="Units">
+      <input type="radio" name="units" id="u-metric" value="metric" checked><label for="u-metric">cm · kg</label>
+      <input type="radio" name="units" id="u-imp" value="imperial"><label for="u-imp">in · lb</label>
+    </div>
+  </header>
+
+  <div class="grid">
+    <aside class="panel" aria-label="Your measurements">
+      <div class="row2">
+        <h2 style="font-size:22px;text-transform:uppercase">Your measurements</h2>
+      </div>
+      <div class="row2">
+        <span class="eyebrow">Compare against</span>
+        <div class="seg" role="radiogroup" aria-label="Sex">
+          <input type="radio" name="sex" id="s-m" value="m" checked><label for="s-m">Men</label>
+          <input type="radio" name="sex" id="s-f" value="f"><label for="s-f">Women</label>
+        </div>
+      </div>
+      <form class="fields" id="form" autocomplete="off">
+        <div class="field"><label for="height">Height</label><div class="inbox"><input id="height" inputmode="decimal"><span class="u-len">cm</span></div>
+          <div class="hint">Barefoot, standing against a wall.</div></div>
+        <div class="field"><label for="weight">Weight</label><div class="inbox"><input id="weight" inputmode="decimal"><span class="u-wt">kg</span></div></div>
+        <div class="field"><label for="span">Arm span<span class="opt">optional</span></label><div class="inbox"><input id="span" inputmode="decimal"><span class="u-len">cm</span></div>
+          <div class="hint">Arms straight out to the sides, fingertip to fingertip.</div></div>
+        <div class="field"><label for="sit">Sitting height<span class="opt">optional</span></label><div class="inbox"><input id="sit" inputmode="decimal"><span class="u-len">cm</span></div>
+          <div class="hint">Sit on a flat bench against a wall; bench to top of head. Used to work out leg length.</div></div>
+        <div class="field"><label for="hand">Hand length<span class="opt">optional</span></label><div class="inbox"><input id="hand" inputmode="decimal"><span class="u-len">cm</span></div>
+          <div class="hint">Wrist crease to tip of the middle finger.</div></div>
+        <div class="field"><label for="foot">Foot length<span class="opt">optional</span></label><div class="inbox"><input id="foot" inputmode="decimal"><span class="u-len">cm</span></div>
+          <div class="hint">Heel to longest toe.</div></div>
+        <div class="field"><label for="shoulder">Shoulder width<span class="opt">optional</span></label><div class="inbox"><input id="shoulder" inputmode="decimal"><span class="u-len">cm</span></div>
+          <div class="hint">Between the bony tips of the shoulders (biacromial).</div></div>
+      </form>
+      <div class="divider"></div>
+      <div>
+        <div class="eyebrow" style="margin-bottom:8px">Try an example build</div>
+        <div class="presets" id="presets"></div>
+      </div>
+      <div><button class="linkbtn" id="clear" type="button">Clear all fields</button></div>
+      <button class="jump" id="jump" type="button">See my results \u2193</button>
+    </aside>
+
+    <main class="results" id="results">
+      <div class="banner" id="banner"><span class="tag">Example</span><span id="bannerText"></span></div>
+      <div id="out"></div>
+      <section class="panel check" id="check" aria-label="Check one sport">
+        <div class="section-head" style="margin:0"><h2>Check a sport</h2><p>See how your build fits one sport and what limits it.</p></div>
+        <div class="pick"><label for="sportSel">Sport</label><select id="sportSel"></select></div>
+        <div id="checkOut" class="check"></div>
+      </section>
+      <div id="rest" class="results"></div>
+    </main>
+  </div>
+</div>
+
+<script>
+(function(){
+const $=s=>document.querySelector(s);
+const ok=v=>typeof v==='number'&&isFinite(v);
+
+// Adult population reference values (approximate, from anthropometric surveys). [mean, sd]
+const NORMS={
+  m:{h:[175.5,7.3],ape:[1.02,.025],shr:[.522,.013],hand:[19.2,.95],foot:[26.5,1.2],shoulder:[40.0,2.0]},
+  f:{h:[162.0,6.9],ape:[1.00,.025],shr:[.527,.013],hand:[17.5,.9],foot:[24.1,1.1],shoulder:[36.0,1.8]}
+};
+
+// Criterion: [trait, direction, target, tolerance, weight]
+// Traits h/ape/shr/hand/foot/shoulder use z-scores vs. the same sex; bmi and w are absolute.
+// hi = at or above target is ideal; lo = at or below; mid = close to target.
+const SPORTS=[
+ {n:'Basketball',cat:'Court',why:'Height and reach shorten the distance to the rim. Big hands palm and protect the ball.',pos:[
+   {n:'Point guard',why:'Runs the offence and handles the ball most. Quickness and handling matter more than size, but guards are still tall.',c:[['h','hi',1.2,1.2,2],['ape','hi',.6,1.2,1],['hand','hi',.5,1.2,1],['bmi','mid',{m:23.5,f:22},2,1.5]]},
+   {n:'Wing',why:'Shooting guards and small forwards shoot over defenders and guard several positions. Length is what counts.',c:[['h','hi',1.8,1.2,3],['ape','hi',1,1.2,2],['hand','hi',.8,1.2,1],['bmi','mid',{m:24,f:22.5},2.5,1]]},
+   {n:'Big (forward / centre)',why:'Protects the rim and rebounds. These are the tallest, longest players on the court.',c:[['h','hi',2.5,1.2,3],['ape','hi',1.4,1.2,2],['hand','hi',1.2,1.2,1],['shoulder','hi',1,1.2,1],['bmi','mid',{m:25.5,f:24},3,1]]}]},
+ {n:'Volleyball',cat:'Court',why:'Blocks and spikes happen above the net. Long legs add jump height.',pos:[
+   {n:'Setter',why:'Sets from above the net. A tall setter can also tip the ball over and block.',c:[['h','hi',1.2,1.2,2],['hand','hi',.6,1.2,1],['bmi','mid',{m:22.5,f:21},2,1]]},
+   {n:'Outside hitter',why:'Attacks from the left and passes serve. Needs height and a long-legged jump.',c:[['h','hi',1.8,1.2,3],['ape','hi',.8,1.2,1.5],['shr','lo',-.5,1.2,1],['bmi','mid',{m:23,f:21.5},2.5,1]]},
+   {n:'Opposite',why:'The main attacker on the right side, often the team’s top scorer.',c:[['h','hi',2.0,1.2,3],['ape','hi',1,1.2,1.5],['shr','lo',-.4,1.2,1],['bmi','mid',{m:24,f:22.5},2.5,1]]},
+   {n:'Middle blocker',why:'Blocks at every attack point. Usually the tallest players on the team.',c:[['h','hi',2.3,1.2,3],['ape','hi',1.2,1.2,2],['shr','lo',-.5,1.2,1],['bmi','mid',{m:23.5,f:22},2.5,1]]},
+   {n:'Libero',why:'Back-row defensive specialist. A low centre of gravity helps with digs, and height brings no advantage.',c:[['h','mid',-.2,1.3,1],['bmi','mid',{m:22,f:20.5},1.8,1.5],['shr','hi',.2,1.3,.5]]}]},
+ {n:'Swimming',cat:'Water',why:'Long arms, big hands and big feet work as paddles and fins. A long torso makes a longer hull, which is faster.',c:[['h','hi',1.2,1.2,2],['ape','hi',1.2,1.2,2],['shr','hi',.5,1.2,1],['foot','hi',1.2,1.2,1],['hand','hi',1,1.2,1],['shoulder','hi',1,1.2,1],['bmi','mid',{m:23,f:21.5},2.5,1]]},
+ {n:'Water polo',cat:'Water',why:'Players tread water while wrestling for position. Height, reach and broad shoulders win that fight; big hands grip the ball.',c:[['h','hi',1.2,1.2,2],['ape','hi',1,1.2,1.5],['hand','hi',1,1.2,1],['shoulder','hi',1,1.2,1],['bmi','mid',{m:25.5,f:23.5},3,1]]},
+ {n:'Rowing',cat:'Water',why:'Longer levers give a longer stroke, and heavyweight boats reward mass.',c:[['h','hi',1.6,1.2,3],['ape','hi',.8,1.2,1.5],['bmi','mid',{m:24.5,f:23},2.5,1],['shoulder','hi',.8,1.2,.5]]},
+ {n:'Coxswain',cat:'Water',why:'The cox steers and calls the race but adds no power. Minimum weights are 55 kg for men and 50 kg for women, and anything above that slows the boat.',c:[['w','lo',{m:55,f:50},5,3],['h','lo',-1.2,1,1]]},
+ {n:'Distance running',cat:'Track & field',why:'Every kilogram is carried for 42 km, and small bodies shed heat well. Long, light legs are cheap to swing.',c:[['bmi','mid',{m:20,f:19},1.4,3],['h','mid',-.3,1.3,1],['shr','lo',-.6,1.2,1.5]]},
+ {n:'Sprinting',cat:'Track & field',why:'Sprinters need muscle to produce force, and enough height for a long stride without slowing turnover.',c:[['bmi','mid',{m:23.8,f:21.5},1.8,2],['h','mid',.6,1.2,1.5],['shr','lo',-.5,1.2,1]]},
+ {n:'High jump',cat:'Track & field',why:'A high centre of mass and long legs start you closer to the bar. Low mass is easier to lift.',c:[['h','hi',1.5,1.2,2],['shr','lo',-1,1.1,2],['bmi','mid',{m:21.5,f:19.8},1.5,1.5]]},
+ {n:'Long & triple jump',cat:'Track & field',why:'Long legs and sprint speed without extra mass.',c:[['shr','lo',-.8,1.2,1.5],['h','mid',.6,1.2,1],['bmi','mid',{m:22.3,f:20.5},1.5,1.5]]},
+ {n:'Shot put & discus',cat:'Track & field',why:'Mass and long levers put more momentum into the implement.',c:[['h','hi',1.2,1.2,2],['bmi','hi',{m:31,f:28},3.5,2.5],['ape','hi',.8,1.2,1],['hand','hi',.6,1.2,.5],['shoulder','hi',1,1.2,1]]},
+ {n:'Gymnastics',cat:'Acrobatic',why:'Short limbs rotate faster, and strength relative to body weight drops as size grows. Most podiums are well below average height.',c:[['h','lo',-1.2,1,3],['bmi','mid',{m:23,f:20.5},2,1.5],['shr','hi',.5,1.2,1],['ape','mid',0,1.3,.5]]},
+ {n:'Diving',cat:'Acrobatic',why:'Compact bodies tuck and spin faster, and a smaller diver makes a smaller splash.',c:[['h','lo',-.8,1.1,2],['bmi','mid',{m:22,f:20},1.8,1.5]]},
+ {n:'Figure skating',cat:'Acrobatic',why:'Light, compact skaters spin faster and land jumps with less load on the joints.',c:[['h','lo',-.7,1.1,1.5],['bmi','lo',{m:21,f:19.5},1.6,2]]},
+ {n:'Ski jumping',cat:'Acrobatic',why:'Light jumpers fly further. Minimum-BMI rules limit how light they are allowed to be.',c:[['bmi','lo',{m:20,f:19},1.1,2.5],['h','mid',.4,1.3,1],['shr','lo',-.5,1.2,1]]},
+ {n:'Weightlifting',cat:'Strength',why:'Short arms and legs shorten the bar path. A long torso relative to the legs keeps the squat upright.',c:[['h','lo',-.8,1.2,1.5],['shr','hi',.8,1.2,2],['ape','lo',-.3,1.2,1.5],['bmi','hi',{m:26,f:24},3,1.5]]},
+ {n:'Sumo',cat:'Strength',why:'Mass is hard to move, and a low centre of gravity keeps you inside the ring.',c:[['w','hi',{m:140,f:100},30,2.5],['bmi','hi',{m:36,f:32},5,2],['shr','hi',.4,1.2,1]]},
+ {n:'Rugby union',cat:'Field',why:'Fifteen players with very different builds, from 130 kg props to light, fast wings.',pos:[
+   {n:'Prop',why:'Anchors the scrum. Needs mass, width and a short, stable torso-to-leg ratio.',c:[['bmi','hi',{m:32,f:29},3.5,3],['shoulder','hi',1.2,1.2,1.5],['shr','hi',.5,1.2,1],['h','mid',.5,1.3,1]]},
+   {n:'Hooker',why:'Hooks the ball in the scrum and throws in at lineouts. Heavy, but more mobile than a prop.',c:[['bmi','hi',{m:30,f:27},3,2.5],['h','mid',0,1.3,1],['shoulder','hi',1,1.2,1]]},
+   {n:'Lock',why:'The lineout jumpers. Locks are usually the tallest players on the pitch, often 198 cm or more.',c:[['h','hi',2.2,1.2,3],['bmi','hi',{m:29,f:26.5},3,1.5],['ape','hi',.8,1.2,1.5]]},
+   {n:'Back row',why:'Flankers and number 8s tackle, carry and fight for the ball at the breakdown. Big and mobile.',c:[['h','hi',1.2,1.2,1.5],['bmi','mid',{m:28,f:25.5},2.5,2],['shoulder','hi',.8,1.2,1]]},
+   {n:'Scrum-half',why:'Links forwards and backs. Small, quick and low to the ground at the base of rucks.',c:[['h','lo',-.7,1.1,2],['bmi','mid',{m:25,f:23},2.2,1.5]]},
+   {n:'Fly-half & centre',why:'Playmakers and midfield ball-carriers with a balanced, powerful frame.',c:[['h','mid',.5,1.3,1],['bmi','mid',{m:26,f:24},2.2,2]]},
+   {n:'Wing & fullback',why:'Finishers and counter-attackers. Sprint speed with enough size to break tackles.',c:[['h','mid',.8,1.3,1],['bmi','mid',{m:25,f:23},2,2],['shr','lo',-.5,1.2,1.5]]}]},
+ {n:'American football',cat:'Field',why:'Positions range from 140 kg linemen to lean receivers, so almost any big or fast build has a home.',pos:[
+   {n:'Lineman',why:'Offensive and defensive linemen average around 140 kg. Long arms keep opponents off your body.',c:[['bmi','hi',{m:36,f:32},4,3],['h','hi',1.2,1.2,2],['ape','hi',.8,1.2,1],['shoulder','hi',1,1.2,1]]},
+   {n:'Quarterback',why:'Height helps a quarterback see over the line. Scouts measure hand size because it predicts ball security.',c:[['h','hi',1.3,1.2,2.5],['hand','hi',1,1.2,2],['bmi','mid',{m:27.5,f:25},2.5,1]]},
+   {n:'Running back',why:'A compact, dense frame with a low centre of gravity breaks tackles.',c:[['h','lo',-.3,1.1,1.5],['bmi','mid',{m:29,f:26},2.5,2],['shr','hi',.4,1.2,1]]},
+   {n:'Wide receiver',why:'Height, reach and big hands win contested catches. Long legs add speed.',c:[['h','mid',1.2,1.3,1.5],['ape','hi',.8,1.2,1.5],['hand','hi',.8,1.2,1],['bmi','mid',{m:25.5,f:23},2,1.5],['shr','lo',-.4,1.2,1]]},
+   {n:'Linebacker',why:'Stops the run and covers the middle of the field. Heavy, but fast enough to chase.',c:[['bmi','mid',{m:31,f:28},2.5,2.5],['h','mid',1,1.2,1],['shoulder','hi',.8,1.2,1]]},
+   {n:'Defensive back',why:'Cornerbacks and safeties mirror receivers. Arm length breaks up passes.',c:[['bmi','mid',{m:25.5,f:23},2,2],['h','mid',.6,1.2,1],['ape','hi',.8,1.2,1.5],['shr','lo',-.5,1.2,1]]}]},
+ {n:'Wrestling & judo',cat:'Combat',why:'A low centre of mass and a broad frame are harder to throw or turn.',c:[['shr','hi',.4,1.2,2],['bmi','mid',{m:25.5,f:23.5},3,1.5],['shoulder','hi',.8,1.2,1],['h','mid',-.2,1.5,.5]]},
+ {n:'Boxing',cat:'Combat',why:'Reach lets you land punches from outside your opponent’s range.',c:[['ape','hi',1.4,1.1,3],['h','mid',.5,1.3,1],['bmi','mid',{m:24,f:22},3,1]]},
+ {n:'Fencing',cat:'Combat',why:'Longer arms and a long lunge reach the target first.',c:[['h','hi',.9,1.2,1.5],['ape','hi',1,1.2,2],['shr','lo',-.3,1.2,1],['bmi','mid',{m:22.8,f:21},2,1]]},
+ {n:'Rock climbing',cat:'Endurance',why:'A positive ape index extends reach between holds, and low body mass keeps the load on the fingers small.',c:[['ape','hi',1.2,1.1,2.5],['bmi','lo',{m:21.3,f:20},1.5,2.5],['h','mid',0,1.5,.5]]},
+ {n:'Road cycling (climbing)',cat:'Endurance',why:'Uphill speed comes down to watts per kilogram, so light riders win the mountains.',c:[['bmi','lo',{m:20.5,f:19.5},1.2,3],['h','mid',-.2,1.4,.5],['shr','lo',-.3,1.2,.5]]},
+ {n:'Tennis',cat:'Court',why:'Height steepens the serve. The very tallest players lose some court speed.',c:[['h','mid',1.0,1.2,2],['ape','hi',.5,1.2,1],['bmi','mid',{m:23,f:21},2.5,1]]},
+ {n:'Badminton',cat:'Court',why:'A light, mid-height frame with good reach covers the court fastest.',c:[['h','mid',.5,1.3,1],['ape','hi',.5,1.2,1],['bmi','mid',{m:22,f:21},2,2]]},
+ {n:'Handball',cat:'Court',why:'Big hands grip and fake with the ball. Height helps shooting over the block.',c:[['h','hi',1.3,1.2,2],['hand','hi',1.5,1.1,2],['ape','hi',.6,1.2,1],['bmi','mid',{m:25.5,f:23},3,1]]},
+ {n:'Football (soccer)',cat:'Field',why:'Positions ask for very different bodies, from 190 cm goalkeepers to compact, quick wingers.',pos:[
+   {n:'Goalkeeper',why:'Height and arm span cover more of a 7.32 m by 2.44 m goal. Big hands hold the ball.',c:[['h','hi',1.6,1.2,3],['ape','hi',1,1.2,2],['hand','hi',.8,1.2,1],['bmi','mid',{m:24,f:22.5},2.5,.5]]},
+   {n:'Centre-back',why:'Wins headers and physical duels. Elite centre-backs average around 188 cm.',c:[['h','hi',1.3,1.2,3],['bmi','mid',{m:24,f:22.5},2,1.5],['shoulder','hi',.5,1.2,.5]]},
+   {n:'Full-back',why:'Runs the whole flank in attack and defence. Speed and repeated sprints matter more than size.',c:[['h','mid',0,1.2,1.5],['bmi','mid',{m:22.5,f:21},1.6,2],['shr','lo',-.3,1.2,1]]},
+   {n:'Defensive midfielder',why:'Screens the defence and wins loose balls. Suits a solid, fairly tall frame.',c:[['h','mid',.6,1.3,1.5],['bmi','mid',{m:23.5,f:22},1.8,1.5],['shoulder','hi',.3,1.2,.5]]},
+   {n:'Central midfielder',why:'Covers the most ground of any position, often 11–13 km a match, so a light frame pays off.',c:[['h','mid',0,1.3,1],['bmi','mid',{m:22.5,f:21},1.5,2.5]]},
+   {n:'Attacking midfielder',why:'Turns in tight spaces between the lines, where a low centre of gravity helps.',c:[['h','mid',-.5,1.3,1.5],['bmi','mid',{m:22.5,f:21},1.6,1.5],['shr','hi',.2,1.3,.5]]},
+   {n:'Winger',why:'Beats full-backs with acceleration and sharp changes of direction. Shorter, lighter players dominate.',c:[['h','mid',-.4,1.2,1.5],['bmi','mid',{m:22.3,f:20.8},1.5,2],['shr','lo',-.3,1.2,1]]},
+   {n:'Target striker',why:'Holds the ball up with their back to goal and wins headers.',c:[['h','hi',1.3,1.2,2.5],['bmi','mid',{m:25,f:23},2,1.5],['shoulder','hi',.8,1.2,1]]},
+   {n:'Pacey striker',why:'Runs in behind the defence. Sprint speed counts for more than size.',c:[['h','mid',0,1.3,1],['bmi','mid',{m:23,f:21.5},1.6,2],['shr','lo',-.4,1.2,1]]}]},
+ {n:'Baseball pitcher',cat:'Field',why:'Tall pitchers release closer to the plate and throw on a steeper angle. Long arms and big hands add velocity and grip.',c:[['h','hi',1.4,1.2,2],['ape','hi',.8,1.2,1.5],['hand','hi',.8,1.2,1],['bmi','mid',{m:26.5,f:24},3,1]]},
+ {n:'Horse racing jockey',cat:'Other',why:'Race weights including the saddle sit around 52–58 kg, so jockeys are light and usually well below average height.',c:[['w','lo',54,5,3],['h','lo',-1.5,1,1.5]]}
+];
+
+const PRESETS=[
+ {k:'example',label:'Example build',sex:'m',h:183,w:77,span:190,sit:95,hand:19.8,foot:27.5,shoulder:41.5},
+ {k:'swim',label:'Swimmer',sex:'m',h:193,w:88,span:203,sit:102,hand:21,foot:29.5,shoulder:44},
+ {k:'run',label:'Marathoner',sex:'m',h:170,w:56,span:172,sit:86,hand:18.5,foot:26,shoulder:38},
+ {k:'gym',label:'Gymnast',sex:'m',h:163,w:62,span:164,sit:87,hand:18,foot:25,shoulder:40},
+ {k:'line',label:'Lineman',sex:'m',h:191,w:140,span:198,sit:101,hand:21,foot:30,shoulder:46},
+ {k:'vb',label:'Volleyball (W)',sex:'f',h:188,w:75,span:192,sit:95,hand:19,foot:26.5,shoulder:39},
+ {k:'climb',label:'Climber (W)',sex:'f',h:163,w:52,span:170,sit:85,hand:17.5,foot:23.5,shoulder:35.5}
+];
+
+const IDS=['height','weight','span','sit','hand','foot','shoulder'];
+const KEYS={height:'h',weight:'w',span:'span',sit:'sit',hand:'hand',foot:'foot',shoulder:'shoulder'};
+let units='metric', example='example', pick='Football (soccer)', pickPos=null;
+
+// ---------- math ----------
+function erf(x){const s=Math.sign(x);x=Math.abs(x);const t=1/(1+.3275911*x);
+  const y=1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-.284496736)*t+.254829592)*t*Math.exp(-x*x);return s*y}
+const cdf=z=>.5*(1+erf(z/Math.SQRT2));
+const zOf=(sex,tr,x)=>(x-NORMS[sex][tr][0])/NORMS[sex][tr][1];
+const val=(sex,tr,z)=>NORMS[sex][tr][0]+z*NORMS[sex][tr][1];
+const tg=(t,sex)=>typeof t==='object'?t[sex]:t;
+
+// ---------- formatting ----------
+function fmtL(cm){if(!ok(cm))return '—';return units==='metric'?`${Math.round(cm)} cm`:`${(cm/2.54).toFixed(1)} in`}
+function fmtH(cm){if(!ok(cm))return '—';if(units==='metric')return `${Math.round(cm)} cm`;
+  let i=Math.round(cm/2.54);return `${Math.floor(i/12)}′${i%12}″`}
+function fmtW(kg){if(!ok(kg))return '—';return units==='metric'?`${Math.round(kg)} kg`:`${Math.round(kg/0.45359237)} lb`}
+function ord(n){const s=['th','st','nd','rd'],v=n%100;return n+(s[(v-20)%10]||s[v]||s[0])}
+const lc=s=>s==='BMI'?s:s.toLowerCase();
+const pctl=z=>Math.min(99,Math.max(1,Math.round(cdf(z)*100)));
+
+// ---------- read / write inputs ----------
+function num(id){const v=parseFloat($('#'+id).value);return isFinite(v)?v:NaN}
+function readMetric(){
+  const k=units==='metric'?1:2.54, kw=units==='metric'?1:0.45359237;
+  const m={sex:document.querySelector('input[name=sex]:checked').value};
+  IDS.forEach(id=>{m[KEYS[id]]=num(id)*(id==='weight'?kw:k)});
+  return m;
+}
+function writeMetric(m){
+  const k=units==='metric'?1:2.54, kw=units==='metric'?1:0.45359237;
+  IDS.forEach(id=>{const v=m[KEYS[id]];
+    $('#'+id).value=ok(v)?String(+(v/(id==='weight'?kw:k)).toFixed(1)):''});
+  if(m.sex) document.getElementById(m.sex==='f'?'s-f':'s-m').checked=true;
+}
+function save(){try{localStorage.setItem('builtfor',JSON.stringify({units,example,pick,pickPos,m:readMetric()}))}catch(e){}}
+function load(){try{return JSON.parse(localStorage.getItem('builtfor')||'null')}catch(e){return null}}
+
+// ---------- scoring ----------
+function traits(m){
+  const s=m.sex,t={};
+  if(ok(m.h))t.h=zOf(s,'h',m.h);
+  if(ok(m.w))t.w=m.w;
+  if(ok(m.h)&&ok(m.w))t.bmi=m.w/((m.h/100)**2);
+  if(ok(m.h)&&ok(m.span))t.ape=zOf(s,'ape',m.span/m.h);
+  if(ok(m.h)&&ok(m.sit))t.shr=zOf(s,'shr',m.sit/m.h);
+  ['hand','foot','shoulder'].forEach(k=>{if(ok(m[k]))t[k]=zOf(s,k,m[k])});
+  return t;
+}
+function critScore(x,dir,t,tol){
+  if(dir==='hi'&&x>=t)return 1; if(dir==='lo'&&x<=t)return 1;
+  const d=(x-t)/tol;return Math.exp(-.5*d*d);
+}
+function scoreSport(sp,T,sex){
+  let sw=0,sum=0,tot=0;const rows=[];
+  sp.c.forEach(([tr,dir,t,tol,w])=>{
+    tot+=w;const target=tg(t,sex);
+    if(T[tr]===undefined){rows.push({tr,dir,target,w,s:null});return}
+    const s=critScore(T[tr],dir,target,tol);sw+=w;sum+=w*s;rows.push({tr,dir,target,w,s});
+  });
+  const cov=sw/tot, raw=sw?sum/sw:.5;
+  return {score:raw*cov+.5*(1-cov),cov,rows};
+}
+// A team sport scores as its best-fitting position
+function scoreEntry(sp,T,sex){
+  if(!sp.pos)return {sp,why:sp.why,...scoreSport(sp,T,sex)};
+  const positions=sp.pos.map(p=>({p,why:p.why,...scoreSport(p,T,sex)})).sort((a,b)=>b.score-a.score);
+  const b=positions[0];
+  return {sp,why:b.why,score:b.score,cov:b.cov,rows:b.rows,best:b.p.n,positions};
+}
+
+// Human-readable view of one criterion
+function describe(r,m){
+  const s=m.sex;const sym={hi:'≥',lo:'≤',mid:'≈'};
+  let label,cur,target,dir=r.dir;
+  switch(r.tr){
+    case 'h':label='Height';cur=fmtH(m.h);target=fmtH(val(s,'h',r.target));break;
+    case 'w':label='Body weight';cur=fmtW(m.w);target=fmtW(r.target);break;
+    case 'bmi':label='BMI';cur=ok(m.w)&&ok(m.h)?(m.w/((m.h/100)**2)).toFixed(1):'—';target=r.target.toFixed(1);break;
+    case 'ape':label='Arm span';cur=fmtL(m.span);target=ok(m.h)?fmtL(val(s,'ape',r.target)*m.h):'—';break;
+    case 'shr':label='Leg length';cur=ok(m.sit)?fmtL(m.h-m.sit):'—';
+      target=ok(m.h)?fmtL(m.h*(1-val(s,'shr',r.target))):'—';dir=dir==='hi'?'lo':dir==='lo'?'hi':dir;break;
+    case 'hand':label='Hand length';cur=fmtL(m.hand);target=fmtL(val(s,'hand',r.target));break;
+    case 'foot':label='Foot length';cur=fmtL(m.foot);target=fmtL(val(s,'foot',r.target));break;
+    case 'shoulder':label='Shoulder width';cur=fmtL(m.shoulder);target=fmtL(val(s,'shoulder',r.target));break;
+  }
+  return {label,cur,target:`${sym[dir]} ${target}`};
+}
+function critList(rows,m){
+  return '<ul class="crits">'+rows.slice().sort((a,b)=>b.w-a.w).map(r=>{
+    const d=describe(r,m);
+    if(r.s===null)return `<li class="na-row"><span class="mk na">○</span><span>${d.label} <small>(not entered)</small></span><span class="v">ideal ${d.target}</span></li>`;
+    const cls=r.s>=.75?'good':r.s>=.4?'ok':'bad', mk=r.s>=.75?'▲':r.s>=.4?'●':'▼';
+    const title=r.s>=.75?'helps':r.s>=.4?'close':'works against you';
+    return `<li><span class="mk ${cls}" title="${title}">${mk}</span><span>${d.label} <b>${d.cur}</b></span><span class="v">ideal ${d.target}</span></li>`;
+  }).join('')+'</ul>';
+}
+
+// ---------- body figure ----------
+function figure(m){
+  const s=m.sex,N=NORMS[s],H=m.h;
+  const S=ok(m.sit)?m.sit:H*N.shr[0], W=ok(m.span)?m.span:H*N.ape[0], SW=ok(m.shoulder)?m.shoulder:N.shoulder[0];
+  const sc=Math.min(215/H,270/W), g=276, cx=170, top=g-H*sc;
+  const headR=H*.062*sc, shY=top+H*.175*sc, hipY=g-(H-S)*sc;
+  const sw=SW*sc, armW=Math.max(4,H*.045*sc), legW=Math.max(6,SW*.2*sc);
+  const aL=cx-W/2*sc, aR=cx+W/2*sc;
+  const avgW=H*N.ape[0], avgHip=g-(H-H*N.shr[0])*sc;
+  const gL=cx-avgW/2*sc, gR=cx+avgW/2*sc;
+  const f=v=>v.toFixed(1);
+  return `<svg viewBox="0 0 340 300" role="img" aria-label="Body proportions diagram">
+  <line class="fig-ground" x1="20" x2="320" y1="${g}" y2="${g}" stroke-width="1.5"/>
+  <line class="fig-stroke" x1="${f(aL+armW/2)}" x2="${f(aR-armW/2)}" y1="${f(shY+armW/2)}" y2="${f(shY+armW/2)}" stroke-width="${f(armW)}" stroke-linecap="round"/>
+  <polygon class="fig-ink" points="${f(cx-sw/2)},${f(shY)} ${f(cx+sw/2)},${f(shY)} ${f(cx+sw*.36)},${f(hipY)} ${f(cx-sw*.36)},${f(hipY)}"/>
+  <line class="fig-stroke" x1="${f(cx-sw*.2)}" x2="${f(cx-sw*.26)}" y1="${f(hipY)}" y2="${f(g-legW/2)}" stroke-width="${f(legW)}" stroke-linecap="round"/>
+  <line class="fig-stroke" x1="${f(cx+sw*.2)}" x2="${f(cx+sw*.26)}" y1="${f(hipY)}" y2="${f(g-legW/2)}" stroke-width="${f(legW)}" stroke-linecap="round"/>
+  <rect class="fig-ink" x="${f(cx-headR*.35)}" y="${f(top+headR*1.8)}" width="${f(headR*.7)}" height="${f(shY-top-headR*1.8+1)}"/>
+  <circle class="fig-ink" cx="${cx}" cy="${f(top+headR)}" r="${f(headR)}"/>
+  <g class="fig-ghost" stroke-width="1.5" stroke-dasharray="3 3">
+    <line x1="${f(gL)}" x2="${f(gL)}" y1="${f(shY-8)}" y2="${f(shY+armW+8)}"/>
+    <line x1="${f(gR)}" x2="${f(gR)}" y1="${f(shY-8)}" y2="${f(shY+armW+8)}"/>
+    <line x1="${f(cx-sw*.7)}" x2="${f(cx+sw*.7)}" y1="${f(avgHip)}" y2="${f(avgHip)}"/>
+  </g>
+  <g class="fig-dim" stroke-width="1">
+    <line x1="24" x2="24" y1="${f(top)}" y2="${g}"/><line x1="19" x2="29" y1="${f(top)}" y2="${f(top)}"/>
+    <line x1="${f(aL)}" x2="${f(aR)}" y1="16" y2="16"/><line x1="${f(aL)}" x2="${f(aL)}" y1="11" y2="${f(shY)}" stroke-dasharray="1 3"/><line x1="${f(aR)}" x2="${f(aR)}" y1="11" y2="${f(shY)}" stroke-dasharray="1 3"/>
+    <line x1="316" x2="316" y1="${f(hipY)}" y2="${g}"/><line x1="311" x2="321" y1="${f(hipY)}" y2="${f(hipY)}"/><line x1="${f(cx+sw*.4)}" x2="316" y1="${f(hipY)}" y2="${f(hipY)}" stroke-dasharray="1 3"/>
+  </g>
+  <text class="fig-txt" x="14" y="${f((top+g)/2)}" transform="rotate(-90 14 ${f((top+g)/2)})" text-anchor="middle">height ${fmtH(H)}</text>
+  <text class="fig-txt" x="${cx}" y="10" text-anchor="middle">arm span ${fmtL(W)}${ok(m.span)?'':' (avg)'}</text>
+  <text class="fig-txt" x="330" y="${f((hipY+g)/2)}" transform="rotate(90 330 ${f((hipY+g)/2)})" text-anchor="middle">legs ${fmtL(H-S)}${ok(m.sit)?'':' (avg)'}</text>
+  </svg><div class="legend"><i></i>average proportions at your height</div>`;
+}
+
+function gauge(label,z,detail){
+  if(z===undefined)return `<div class="gauge"><div class="gtop"><b>${label}</b><span>not entered</span></div><div class="tape off"></div></div>`;
+  const p=cdf(z)*100;
+  return `<div class="gauge"><div class="gtop"><b>${label}</b><span>${detail} · ${ord(pctl(z))} pct</span></div>
+    <div class="tape"><div class="avg"></div><div class="mark" style="left:${Math.min(99.5,Math.max(.5,p)).toFixed(1)}%"></div></div></div>`;
+}
+
+// ---------- single-sport check ----------
+function fmtLd(cm){return units==='metric'?(cm<10?`${cm.toFixed(1)} cm`:`${Math.round(cm)} cm`):`${(cm/2.54).toFixed(1)} in`}
+// Current and ideal values in natural units; dir is flipped for leg length (a low sitting ratio means long legs).
+function numeric(r,m){
+  const s=m.sex,flip=d=>d==='hi'?'lo':d==='lo'?'hi':d;
+  switch(r.tr){
+    case 'h':return {cur:m.h,tgt:val(s,'h',r.target),u:'L',dir:r.dir};
+    case 'w':return {cur:m.w,tgt:r.target,u:'W',dir:r.dir};
+    case 'bmi':return {cur:m.w/((m.h/100)**2),tgt:r.target,u:'B',dir:r.dir};
+    case 'ape':return {cur:m.span,tgt:val(s,'ape',r.target)*m.h,u:'L',dir:r.dir};
+    case 'shr':return {cur:m.h-m.sit,tgt:m.h*(1-val(s,'shr',r.target)),u:'L',dir:flip(r.dir)};
+    default:return {cur:m[r.tr],tgt:val(s,r.tr,r.target),u:'L',dir:r.dir};
+  }
+}
+const CHANGEABLE={w:1,bmi:1};
+const FIX_ADVICE={
+  h:'Height is set once you stop growing. Positions or events that reward a different height are the usual workaround.',
+  ape:'Arm length is skeletal. Flexibility and technique can recover some reach.',
+  shr:'Leg-to-torso proportions are skeletal. Technique and event choice matter more here.',
+  hand:'Hand size is fixed. Grip strength and ball-handling technique can partly compensate.',
+  foot:'Foot size is fixed. Ankle mobility and kick technique matter more.',
+  shoulder:'Shoulder width is set by bone. Upper-back and shoulder muscle can add some breadth.'
+};
+function gapText(n,m){
+  const d=n.tgt-n.cur, a=Math.abs(d);
+  const amt=n.u==='L'?fmtLd(a):n.u==='W'?fmtW(a):`${a.toFixed(1)} BMI points (about ${fmtW(a*(m.h/100)**2)})`;
+  if(n.dir==='hi')return `${amt} below the ideal`;
+  if(n.dir==='lo')return `${amt} above the ideal`;
+  return `${amt} ${d>0?'below':'above'} the ideal range`;
+}
+function changeAdvice(n){
+  const up=n.tgt>n.cur;
+  return up?'Can shift with training. Adding muscle mass raises this over months.':'Can shift with training and diet. Losing fat lowers this over months.';
+}
+const verdictOf=P=>P>=75?['good','Strong natural fit']:P>=60?['good','Good fit']:P>=45?['ok','Workable']:['bad','Built against it'];
+function analyse(r){
+  const known=r.rows.filter(x=>x.s!==null), sw=known.reduce((a,x)=>a+x.w,0);
+  const loss=x=>r.cov*x.w*(1-x.s)/sw*100;
+  return {
+    limits:known.filter(x=>x.s<.75).map(x=>({...x,pts:loss(x)})).sort((a,b)=>b.pts-a.pts),
+    helps:known.filter(x=>x.s>=.75),
+    missing:r.rows.filter(x=>x.s===null)
+  };
+}
+function renderCheck(m,T,res){
+  const sel=$('#sportSel');
+  if(!SPORTS.some(s=>s.n===pick))pick=res[0].sp.n;
+  sel.value=pick;
+  const idx=res.findIndex(r=>r.sp.n===pick), r=res[idx], P=Math.round(r.score*100);
+  const [cls,verdict]=verdictOf(P);
+  const head=`<div class="verdict">
+      <div class="big">${P}<small>%</small></div>
+      <div class="vtext"><span class="pill ${cls}">${verdict}</span>
+        <div>${r.sp.n} ranks <b>#${idx+1} of ${res.length}</b> for your build${r.best?`. Your best position is <b>${r.best}</b>`:''}.</div>
+        <p>${r.sp.why}</p></div>
+    </div>`;
+  if(!r.positions){$('#checkOut').innerHTML=head+factorBlock(r,m,r.sp.n);return}
+
+  if(!r.positions.some(p=>p.p.n===pickPos))pickPos=r.best;
+  const cur=r.positions.find(p=>p.p.n===pickPos), Pc=Math.round(cur.score*100), [cc,cv]=verdictOf(Pc);
+  const table=`<div><h3>Position compatibility</h3><div class="postable">${r.positions.map(p=>{
+      const pp=Math.round(p.score*100), top=analyse(p).limits[0], on=p.p.n===pickPos;
+      return `<button type="button" class="posrow${on?' on':''}" data-pos="${p.p.n}" aria-pressed="${on}">
+        <span class="pn">${p.p.n}</span><span class="bar"><i style="width:${pp}%"></i></span><span class="pp">${pp}%</span>
+        <span class="pl">${top?`Limited by ${lc(describe(top,m).label)}`:'No major limits'}</span></button>`}).join('')}</div>
+      <div class="lowconf" style="color:var(--muted)">Select a position to see its limiting factors.</div></div>`;
+  $('#checkOut').innerHTML=head+table+`<div class="posdetail check">
+      <div class="posh"><h3 style="margin:0">${cur.p.n}: ${Pc}%</h3><span class="pill ${cc}">${cv}</span></div>
+      <p class="okmsg" style="color:var(--muted)">${cur.p.why}</p>
+      ${factorBlock(cur,m,cur.p.n)}</div>`;
+}
+function factorBlock(r,m,name){
+  const P=Math.round(r.score*100), {limits,helps,missing}=analyse(r);
+
+  const limitHtml=limits.length?`<ul class="limits">${limits.map(x=>{
+      const d=describe(x,m), n=numeric(x,m), chg=CHANGEABLE[x.tr];
+      return `<li><div class="lt"><b>${d.label}</b><span class="v">${d.cur} → ideal ${d.target}</span>
+          <span class="kind${chg?' chg':''}">${chg?'Changeable':'Fixed'}</span></div>
+        <div class="gap">${gapText(n,m)}.</div>
+        <div class="adv">${chg?changeAdvice(n):FIX_ADVICE[x.tr]}</div>
+        <div class="cost"><span>−${Math.max(1,Math.round(x.pts))} pts</span><div class="bar"><i style="width:${Math.min(100,x.pts*2.5)}%"></i></div></div></li>`}).join('')}</ul>`
+    :`<p class="okmsg">None. Every measurement you entered is at or near the ideal for ${name.toLowerCase()}.</p>`;
+
+  // What the score becomes if every changeable factor hit its ideal
+  let whatif='';
+  const chgLimits=limits.filter(x=>CHANGEABLE[x.tr]);
+  if(chgLimits.length){
+    const gain=chgLimits.reduce((a,x)=>a+x.pts,0), fixedLeft=limits.length-chgLimits.length;
+    whatif=`<div class="whatif">If you reached the ideal ${chgLimits.map(x=>lc(describe(x,m).label)).join(' and ')}, your match would rise to about <b>${Math.min(100,Math.round(P+gain))}%</b>.${fixedLeft?` The rest of the gap comes from fixed proportions.`:''}</div>`;
+  }
+
+  return `
+    <div><h3>Limiting factors${limits.length?` (${limits.length})`:''}</h3>${limitHtml}</div>
+    ${whatif}
+    ${helps.length?`<div><h3>Working for you</h3>${critList(helps,m)}</div>`:''}
+    ${missing.length?`<div class="lowconf">Not measured: ${missing.map(x=>lc(describe(x,m).label)).join(', ')}. Add ${missing.length>1?'them':'it'} to complete this check. Missing measurements count as neutral and cost ${Math.round(50*(1-r.cov))} pts of certainty.</div>`:''}`;
+}
+
+// ---------- render ----------
+function render(){
+  const m=readMetric(), out=$('#out');
+  const banner=$('#banner');
+  banner.hidden=!example;
+  if(example){const p=PRESETS.find(p=>p.k===example);
+    $('#bannerText').innerHTML=`Showing the <b>${p.label.toLowerCase()}</b> measurements. Type your own to replace them.`}
+  const valid=ok(m.h)&&ok(m.w)&&m.h>=120&&m.h<=245&&m.w>=30&&m.w<=250;
+  $('#check').hidden=!valid;
+  if(!valid){
+    out.innerHTML='<div class="panel empty">Enter your height and weight to see which sports suit your build. The optional measurements make the result sharper.</div>';$('#rest').innerHTML='';return}
+  const T=traits(m), sexWord=m.sex==='f'?'women':'men';
+  const res=SPORTS.map(sp=>scoreEntry(sp,T,m.sex)).sort((a,b)=>b.score-a.score);
+  const P=x=>Math.round(x*100);
+
+  const pod=res.slice(0,3).map((r,i)=>`<article class="pcard${i===0?' first':''}">
+      <div class="fit"><span class="rank">${['Best fit','Second','Third'][i]} · ${r.sp.cat}</span></div>
+      <h3>${r.sp.n}</h3>${r.best?`<div class="as">Best as <b>${r.best}</b></div>`:''}
+      <div class="pct">${P(r.score)}<small>% match</small></div>
+      <p>${r.why}</p>${critList(r.rows,m)}
+      ${r.cov<.99?`<div class="lowconf">Based on ${Math.round(r.cov*100)}% of the measurements this sport uses.</div>`:''}
+    </article>`).join('');
+
+  // profile
+  const L=T.shr===undefined?undefined:-T.shr;
+  const std=[['height',T.h],['arm span',T.ape],['leg length',L],['hand size',T.hand],['foot size',T.foot],['shoulder width',T.shoulder]]
+    .filter(x=>x[1]!==undefined).sort((a,b)=>Math.abs(b[1])-Math.abs(a[1])).slice(0,2);
+  const stdTxt=std.length?`Your most distinctive traits: `+std.map(([k,z])=>`<b>${k}</b> (${ord(pctl(z))} percentile)`).join(' and ')+`, compared with adult ${sexWord}.`:'';
+  const ape=ok(m.span)?m.span-m.h:NaN;
+  const bmi=T.bmi, bmiPos=Math.min(99.5,Math.max(.5,(bmi-15)/25*100));
+  const gauges=[
+    gauge('Height',T.h,fmtH(m.h)),
+    gauge('Arm span vs height',T.ape,ok(ape)?`${ape>=0?'+':'−'}${fmtL(Math.abs(ape))}`:''),
+    gauge('Leg length vs height',L,ok(m.sit)?fmtL(m.h-m.sit):''),
+    gauge('Hand length',T.hand,fmtL(m.hand)),
+    gauge('Foot length',T.foot,fmtL(m.foot)),
+    gauge('Shoulder width',T.shoulder,fmtL(m.shoulder)),
+    `<div class="gauge"><div class="gtop"><b>BMI</b><span>${bmi.toFixed(1)}</span></div>
+      <div class="tape" style="background-image:none;background:linear-gradient(90deg,var(--line) 0 14%,var(--tape) 14% 40%,var(--tape-deep) 40% 60%,var(--line) 60%)"><div class="mark" style="left:${bmiPos.toFixed(1)}%"></div></div>
+      <div class="scale"><span>15</span><span>lean endurance</span><span>power</span><span>40</span></div></div>`
+  ].join('');
+
+  const list=res.map((r,i)=>`<details><summary>
+      <span class="n">${String(i+1).padStart(2,'0')}</span>
+      <span class="nm">${r.sp.n}<small>${r.sp.cat}${r.best?` \u00B7 best as ${r.best}`:''}</small></span>
+      <span class="bar"><i style="width:${P(r.score)}%"></i></span>
+      <span class="p">${P(r.score)}%</span><span class="chev">›</span></summary>
+      <div class="body"><div><p>${r.best?`As ${r.best.toLowerCase()}: ${r.why}`:r.why}</p>${r.positions?`<ul class="minipos">${r.positions.map(p=>`<li><span>${p.p.n}</span><span class="mono">${P(p.score)}%</span></li>`).join('')}</ul>`:''}${r.cov<.99?`<div class="lowconf">Based on ${Math.round(r.cov*100)}% of the measurements this sport uses. Missing ones count as neutral.</div>`:''}
+        <button type="button" class="linkbtn checkbtn" data-check="${r.sp.n}">See limiting factors for ${r.sp.n.toLowerCase()}</button></div>${critList(r.rows,m)}</div>
+    </details>`).join('');
+
+  out.innerHTML=`<section><div class="podium">${pod}</div></section>`;
+  renderCheck(m,T,res);
+  $('#rest').innerHTML=`
+    <section class="panel">
+      <div class="section-head"><h2>Your build</h2><p>Percentiles compared with adult ${sexWord}. Dashed line = average.</p></div>
+      ${stdTxt?`<p class="standout">${stdTxt}</p>`:''}
+      <div class="profile"><div class="figure">${figure(m)}</div><div class="gauges">${gauges}</div></div>
+    </section>
+    <section>
+      <div class="section-head"><h2>All ${SPORTS.length} sports ranked</h2><p>Open a row to see which measurements help and which hold you back.</p></div>
+      <div class="list">${list}</div>
+    </section>
+    <p class="note"><b>How to read this.</b> Scores compare your proportions with the typical build of elite athletes in each sport. Build is one factor among many. Training, skill, aerobic capacity, muscle fibre type, coordination and nerve matter far more for most people, and plenty of champions have the "wrong" body for their sport. Population norms are approximate adult averages; if you are still growing, treat the results loosely.</p>`;
+}
+
+// ---------- wiring ----------
+$('#presets').innerHTML=PRESETS.map(p=>`<button type="button" class="chip" data-k="${p.k}">${p.label}</button>`).join('');
+$('#presets').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+  const p=PRESETS.find(p=>p.k===b.dataset.k);example=p.k;writeMetric(p);render();save()});
+$('#form').addEventListener('input',()=>{example=null;render();save()});
+$('#form').addEventListener('submit',e=>e.preventDefault());
+document.querySelectorAll('input[name=sex]').forEach(r=>r.addEventListener('change',()=>{render();save()}));
+document.querySelectorAll('input[name=units]').forEach(r=>r.addEventListener('change',()=>{
+  const m=readMetric();units=r.value;
+  document.querySelectorAll('.u-len').forEach(e=>e.textContent=units==='metric'?'cm':'in');
+  document.querySelectorAll('.u-wt').forEach(e=>e.textContent=units==='metric'?'kg':'lb');
+  writeMetric(m);render();save()}));
+const cats=[...new Set(SPORTS.map(s=>s.cat))];
+$('#sportSel').innerHTML=cats.map(c=>`<optgroup label="${c}">${SPORTS.filter(s=>s.cat===c).map(s=>`<option value="${s.n}">${s.n}</option>`).join('')}</optgroup>`).join('');
+$('#sportSel').addEventListener('change',e=>{pick=e.target.value;pickPos=null;render();save()});
+$('#checkOut').addEventListener('click',e=>{const b=e.target.closest('[data-pos]');if(!b)return;
+  pickPos=b.dataset.pos;render();save();const nb=document.querySelector(`[data-pos="${CSS.escape(pickPos)}"]`);if(nb)nb.focus({preventScroll:true})});
+$('#rest').addEventListener('click',e=>{const b=e.target.closest('[data-check]');if(!b)return;
+  pick=b.dataset.check;pickPos=null;render();save();$('#check').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'})});
+$('#jump').addEventListener('click',()=>$('#results').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'}));
+$('#clear').addEventListener('click',()=>{IDS.forEach(id=>$('#'+id).value='');example=null;render();save();$('#height').focus()});
+
+const saved=load();
+if(saved&&saved.m){
+  if(saved.units==='imperial'){units='imperial';$('#u-imp').checked=true;
+    document.querySelectorAll('.u-len').forEach(e=>e.textContent='in');document.querySelectorAll('.u-wt').forEach(e=>e.textContent='lb')}
+  example=saved.example||null;if(saved.pick)pick=saved.pick;pickPos=saved.pickPos||null;writeMetric(saved.m);
+}else writeMetric(PRESETS[0]);
+render();
+})();
+</script>
+
+</body>
+</html>
