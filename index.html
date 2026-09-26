@@ -209,9 +209,22 @@ dialog#photoDlg::backdrop{background:rgba(10,14,22,.62)}
 .pstatus{font-size:14px;color:var(--muted);margin:6px 0}
 .pstatus.err{color:var(--bad)}
 .fine{font-size:12px;color:var(--muted);margin:8px 0 0}
-.share{display:flex;gap:12px;align-items:center;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:14px}
+.share{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
 #shareTxt{width:100%;min-height:130px;font:13px/1.5 var(--mono);border:1px solid var(--line);border-radius:8px;background:var(--surface-2);color:var(--ink);padding:10px}
 
+
+/* per-sport next steps */
+.podium{align-items:start}
+.nextd{border-top:1px solid var(--line)}
+.nextd summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0 2px;font-weight:700;color:var(--accent);font-size:14px}
+.nextd summary::-webkit-details-marker{display:none}
+.nextd summary .chev{transition:transform .15s;font-size:16px}
+.nextd[open] summary .chev{transform:rotate(90deg)}
+.nextd .next-grid{padding-top:10px}
+.pcard .next-grid,.list .next-grid{grid-template-columns:1fr}
+@media (min-width:1000px){.list .next-grid{grid-template-columns:1fr 1fr}}
+.ncol h4{font-family:var(--display);font-size:16px;text-transform:uppercase;letter-spacing:.02em;margin:0 0 6px}
+.nextwrap{grid-column:1 / -1}
 /* how-to-measure popovers */
 .legmode{grid-column:1 / -1;justify-self:start;margin-top:6px}
 .legmode label{padding:4px 10px;font-size:12px}
@@ -434,24 +447,11 @@ dialog#photoDlg::backdrop{background:rgba(10,14,22,.62)}
     <main class="results" id="results">
       <div class="banner" id="banner"><span class="tag">Example</span><span id="bannerText"></span></div>
       <div id="out"></div>
+      <div class="share" id="shareBar"><button type="button" class="btn" id="shareBtn">Share my results</button><span id="shareMsg" class="nmuted" role="status"></span><textarea id="shareTxt" hidden readonly aria-label="Results to copy"></textarea></div>
       <section class="panel check" id="check" aria-label="Check one sport">
         <div class="section-head" style="margin:0"><h2>Check a sport</h2><p>See how your build fits one sport and what limits it.</p></div>
         <div class="pick"><label for="sportSel">Sport</label><select id="sportSel"></select></div>
         <div id="checkOut" class="check"></div>
-      </section>
-      <section class="panel" id="next" aria-label="Next steps">
-        <div class="section-head" style="margin:0"><h2>Next steps</h2><p id="nextSub"></p></div>
-        <div class="next-grid">
-          <div class="ncol" id="startOut"></div>
-          <div class="ncol">
-            <h3>Places near you</h3>
-            <p class="nmuted">Clubs, courts and venues for <span id="placeSport"></span>.</p>
-            <div class="nbtns"><button type="button" class="btn primary" id="findPlaces">Use my location</button><a class="btn" id="mapsLink" href="https://www.google.com/maps" target="_blank" rel="noopener">Search Google Maps</a></div>
-            <div id="placesOut"></div>
-            <p class="fine">Your approximate location (rounded to about 100 m) is sent to OpenStreetMap’s Overpass service to run the search. This app doesn’t store it.</p>
-          </div>
-        </div>
-        <div class="share"><button type="button" class="btn" id="shareBtn">Share my results</button><span id="shareMsg" class="nmuted" role="status"></span><textarea id="shareTxt" hidden readonly aria-label="Results to copy"></textarea></div>
       </section>
       <div id="rest" class="results"></div>
     </main>
@@ -781,7 +781,7 @@ function renderCheck(m,T,res){
         <div>${r.sp.n} ranks <b>#${idx+1} of ${res.length}</b> for your build${r.best?`. Your best position is <b>${r.best}</b>`:''}.</div>
         <p>${r.sp.why}</p></div>
     </div>`;
-  if(!r.positions){$('#checkOut').innerHTML=head+factorBlock(r,m,r.sp.n);return}
+  if(!r.positions){$('#checkOut').innerHTML=head+factorBlock(r,m,r.sp.n)+nextHTML('check:'+r.sp.n,r,r,m,res,true);return}
 
   if(!r.positions.some(p=>p.p.n===pickPos))pickPos=r.best;
   const cur=r.positions.find(p=>p.p.n===pickPos), Pc=Math.round(cur.score*100), [cc,cv]=verdictOf(Pc);
@@ -794,7 +794,7 @@ function renderCheck(m,T,res){
   $('#checkOut').innerHTML=head+table+`<div class="posdetail check">
       <div class="posh"><h3 style="margin:0">${cur.p.n}: ${Pc}%</h3><span class="pill ${cc}">${cv}</span></div>
       <p class="okmsg" style="color:var(--muted)">${cur.p.why}</p>
-      ${factorBlock(cur,m,cur.p.n)}</div>`;
+      ${factorBlock(cur,m,cur.p.n)}</div>`+nextHTML('check:'+r.sp.n+':'+cur.p.n,r,cur,m,res,true);
 }
 function factorBlock(r,m,name){
   const P=Math.round(r.score*100), {limits,helps,missing}=analyse(r);
@@ -955,31 +955,38 @@ const START={
  'Horse racing jockey':{s:['Take lessons at a riding school to build a secure seat.','Look into racing-school courses. They are the usual route to a licence.','Work in a racing yard to gain experience riding out.'],g:'Riding helmet, boots and a body protector.',q:'riding school',f:[T('equestrian|horse_racing')]}
 };
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let lastRes=null, placesKey=null;
-function renderNext(m,res){
-  lastRes=res;
-  const r=res.find(x=>x.sp.n===pick); if(!r)return;
-  const cur=r.positions?(r.positions.find(p=>p.p.n===pickPos)||r.positions[0]):r;
-  const S=START[r.sp.n], name=r.positions?`${r.sp.n} (${cur.p.n.toLowerCase()})`:r.sp.n, Pc=Math.round(cur.score*100);
-  $('#nextSub').textContent=`For ${name}. Pick another sport above to change this.`;
-  const {limits}=analyse(cur);
+let lastRes=null, lastCoords=null;
+const placesCache={}, nextState=new Map();
+function focusText(r,cur,m,res){
+  const {limits}=analyse(cur), Pc=Math.round(cur.score*100);
   const chg=limits.find(x=>CHANGEABLE[x.tr]), fix=limits.find(x=>!CHANGEABLE[x.tr]&&x.pts>=8);
-  let focus;
   if(fix&&r.positions){
     const alt=r.positions.find(p=>p!==cur&&p.score>cur.score+.05);
-    focus=alt?`Your ${lc(describe(fix,m).label)} is the main limit for ${cur.p.n.toLowerCase()}. ${alt.p.n} (${Math.round(alt.score*100)}%) suits your build better and is worth trying when you start.`
-             :`Your ${lc(describe(fix,m).label)} is the main limit here. ${FIX_ADVICE[fix.tr]}`;
-  }else if(fix){
+    return alt?`Your ${lc(describe(fix,m).label)} is the main limit for ${cur.p.n.toLowerCase()}. ${alt.p.n} (${Math.round(alt.score*100)}%) suits your build better and is worth trying when you start.`
+              :`Your ${lc(describe(fix,m).label)} is the main limit here. ${FIX_ADVICE[fix.tr]}`;
+  }
+  if(fix){
     const alts=res.filter(x=>x!==r&&x.sp.cat===r.sp.cat&&x.score>r.score).slice(0,2);
-    focus=`Your ${lc(describe(fix,m).label)} is the main limit here. ${FIX_ADVICE[fix.tr]}`+(alts.length?` Similar sports that suit you better: ${alts.map(a=>`${a.sp.n} (${Math.round(a.score*100)}%)`).join(', ')}.`:'');
-  }else if(chg){
-    const n=numeric(chg,m);focus=`Your ${lc(describe(chg,m).label)} is ${gapText(n,m)}. ${changeAdvice(n)}`;
-  }else focus=`Nothing in your build holds you back at ${Pc}%. Your progress will come down to skill and training.`;
-  $('#startOut').innerHTML=`<h3>How to get started</h3><ol>${S.s.map(x=>`<li>${x}</li>`).join('')}</ol>
-    <p class="gear"><b>Gear:</b> ${S.g}</p><div class="focus"><b>Your first focus</b><p>${focus}</p></div>`;
-  $('#placeSport').textContent=r.sp.n.toLowerCase();
-  $('#mapsLink').href=`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(S.q+' near me')}`;
-  if(placesKey!==r.sp.n){placesKey=r.sp.n;$('#placesOut').innerHTML=''}
+    return `Your ${lc(describe(fix,m).label)} is the main limit here. ${FIX_ADVICE[fix.tr]}`+(alts.length?` Similar sports that suit you better: ${alts.map(a=>`${a.sp.n} (${Math.round(a.score*100)}%)`).join(', ')}.`:'');
+  }
+  if(chg){const n=numeric(chg,m);return `Your ${lc(describe(chg,m).label)} is ${gapText(n,m)}. ${changeAdvice(n)}`}
+  return `Nothing in your build holds you back at ${Pc}%. Your progress will come down to skill and training.`;
+}
+// Collapsible "Next steps" block for one sport (and position, for team sports)
+function nextHTML(key,r,cur,m,res,defOpen){
+  const S=START[r.sp.n], sport=esc(r.sp.n);
+  const open=nextState.has(key)?nextState.get(key):!!defOpen;
+  return `<details class="nextd" data-key="${esc(key)}"${open?' open':''}>
+    <summary><span>Next steps${r.positions?` as ${esc(cur.p.n.toLowerCase())}`:''}</span><span class="chev">›</span></summary>
+    <div class="next-grid">
+      <div class="ncol"><h4>How to get started</h4><ol>${S.s.map(x=>`<li>${x}</li>`).join('')}</ol>
+        <p class="gear"><b>Gear:</b> ${S.g}</p><div class="focus"><b>Your first focus</b><p>${focusText(r,cur,m,res)}</p></div></div>
+      <div class="ncol"><h4>Places near you</h4>
+        <div class="nbtns"><button type="button" class="btn primary" data-places="${sport}">Find places near me</button>
+          <a class="btn" href="https://www.google.com/maps/search/?api=1&amp;query=${encodeURIComponent(S.q+' near me')}" target="_blank" rel="noopener">Search Google Maps</a></div>
+        <div class="placesOut" data-sport="${sport}">${placesCache[r.sp.n]||''}</div>
+        <p class="fine">Your approximate location (rounded to about 100 m) is sent to OpenStreetMap’s Overpass service to run the search. This app doesn’t store it.</p></div>
+    </div></details>`;
 }
 async function overpass(filters,lat,lon,rad){
   const q=`[out:json][timeout:20];(${filters.map(f=>`${f}(around:${rad},${lat},${lon});`).join('')});out center tags 80;`;
@@ -991,18 +998,24 @@ async function overpass(filters,lat,lon,rad){
 function km(a,b,c,d){const R=6371,r=x=>x*Math.PI/180,dl=r(c-a),dn=r(d-b);
   const h=Math.sin(dl/2)**2+Math.cos(r(a))*Math.cos(r(c))*Math.sin(dn/2)**2;return 2*R*Math.asin(Math.sqrt(h))}
 const KIND={pitch:'Pitch or court',sports_centre:'Sports centre',stadium:'Stadium',track:'Track',swimming_pool:'Pool',fitness_centre:'Gym',ice_rink:'Ice rink',sports_hall:'Sports hall'};
-async function findPlaces(){
-  const sport=pick, S=START[sport], out=$('#placesOut'), btn=$('#findPlaces');
-  const st=(msg,err)=>{out.innerHTML=`<p class="pstatus${err?' err':''}">${msg}</p>`};
-  btn.disabled=true;st('Finding your location…');
+async function findPlaces(sport){
+  const S=START[sport];
+  const sel=`[data-sport="${CSS.escape(sport)}"]`, bsel=`[data-places="${CSS.escape(sport)}"]`;
+  const put=html=>{placesCache[sport]=html;document.querySelectorAll('.placesOut'+sel).forEach(o=>o.innerHTML=html)};
+  const st=(msg,err)=>put(`<p class="pstatus${err?' err':''}">${msg}</p>`);
+  const busy=b=>document.querySelectorAll(bsel).forEach(x=>x.disabled=b);
+  busy(true);
   try{
-    const pos=await new Promise((res,rej)=>{if(!navigator.geolocation)return rej({code:9});
-      navigator.geolocation.getCurrentPosition(res,rej,{timeout:12000,maximumAge:600000})});
-    const lat=+pos.coords.latitude.toFixed(3), lon=+pos.coords.longitude.toFixed(3);
+    if(!lastCoords){
+      st('Finding your location…');
+      const pos=await new Promise((res,rej)=>{if(!navigator.geolocation)return rej({code:9});
+        navigator.geolocation.getCurrentPosition(res,rej,{timeout:12000,maximumAge:600000})});
+      lastCoords={lat:+pos.coords.latitude.toFixed(3),lon:+pos.coords.longitude.toFixed(3)};
+    }
+    const {lat,lon}=lastCoords;
     st('Searching OpenStreetMap…');
     let els=await overpass(S.f,lat,lon,8000);
     if(els.length<3)els=await overpass(S.f,lat,lon,25000);
-    if(pick!==sport)return;
     const seen=new Set();let unnamed=0;
     const list=els.map(e=>{const la=e.lat??e.center?.lat, lo=e.lon??e.center?.lon, t=e.tags||{};
         const kind=KIND[t.leisure]||(t.club?'Club':t.shop==='bicycle'?'Bike shop':'Venue');
@@ -1012,16 +1025,16 @@ async function findPlaces(){
       .filter(p=>{const k=(p.name||'')+p.la.toFixed(3)+p.lo.toFixed(3);if(seen.has(k))return false;seen.add(k);
         if(!p.name){if(unnamed>=3)return false;unnamed++}return true})
       .slice(0,8);
-    if(!list.length){st(`No ${sport.toLowerCase()} places are mapped within 25 km in OpenStreetMap. Try the Google Maps search.`);return}
+    if(!list.length){st(`No ${esc(sport.toLowerCase())} places are mapped within 25 km in OpenStreetMap. Try the Google Maps search.`);return}
     const fd=k=>units==='metric'?(k<1?`${Math.round(k*1000)} m`:`${k.toFixed(1)} km`):`${(k*.621).toFixed(1)} mi`;
-    out.innerHTML=`<ol class="places">${list.map(p=>`<li><div><b>${esc(p.name||'Unnamed '+p.kind.toLowerCase())}</b><span>${p.kind} · ${fd(p.dist)} away</span></div>
-      <a href="https://www.google.com/maps/dir/?api=1&destination=${p.la.toFixed(5)},${p.lo.toFixed(5)}" target="_blank" rel="noopener">Directions</a></li>`).join('')}</ol>
-      <p class="fine">From OpenStreetMap. Check opening times and membership with the venue.</p>`;
+    put(`<ol class="places">${list.map(p=>`<li><div><b>${esc(p.name||'Unnamed '+p.kind.toLowerCase())}</b><span>${p.kind} · ${fd(p.dist)} away</span></div>
+      <a href="https://www.google.com/maps/dir/?api=1&amp;destination=${p.la.toFixed(5)},${p.lo.toFixed(5)}" target="_blank" rel="noopener">Directions</a></li>`).join('')}</ol>
+      <p class="fine">From OpenStreetMap. Check opening times and membership with the venue.</p>`);
   }catch(err){
     if(err&&err.code===1)st('Location access is blocked. Allow location for this site and try again, or use the Google Maps search.',true);
     else if(err&&(err.code===2||err.code===3||err.code===9))st('Couldn’t get your location. Use the Google Maps search instead.',true);
     else st('Couldn’t reach OpenStreetMap right now. Use the Google Maps search instead.',true);
-  }finally{btn.disabled=false}
+  }finally{busy(false)}
 }
 async function shareResults(){
   const res=lastRes;if(!res)return;
@@ -1044,7 +1057,7 @@ function render(){
   if(example){const p=PRESETS.find(p=>p.k===example);
     $('#bannerText').innerHTML=`Showing the <b>${p.label.toLowerCase()}</b> measurements. Type your own to replace them.`}
   const valid=ok(m.h)&&ok(m.w)&&m.h>=120&&m.h<=245&&m.w>=30&&m.w<=250;
-  $('#check').hidden=!valid;$('#next').hidden=!valid;
+  $('#check').hidden=!valid;$('#shareBar').hidden=!valid;
   if(!valid){
     out.innerHTML='<div class="panel empty">Enter your height and weight to see which sports suit your build. The optional measurements make the result sharper.</div>';$('#rest').innerHTML='';return}
   const T=traits(m), sexWord=m.sex==='f'?'women':'men';
@@ -1057,6 +1070,7 @@ function render(){
       <div class="pct">${P(r.score)}<small>% match</small></div>
       <p>${r.why}</p>${critList(r.rows,m)}
       ${r.cov<.99?`<div class="lowconf">Based on ${Math.round(r.cov*100)}% of the measurements this sport uses.</div>`:''}
+      ${nextHTML('pod:'+r.sp.n,r,r.positions?r.positions[0]:r,m,res)}
     </article>`).join('');
 
   // profile
@@ -1084,12 +1098,13 @@ function render(){
       <span class="bar"><i style="width:${P(r.score)}%"></i></span>
       <span class="p">${P(r.score)}%</span><span class="chev">›</span></summary>
       <div class="body"><div><p>${r.best?`As ${r.best.toLowerCase()}: ${r.why}`:r.why}</p>${r.positions?`<ul class="minipos">${r.positions.map(p=>`<li><span>${p.p.n}</span><span class="mono">${P(p.score)}%</span></li>`).join('')}</ul>`:''}${r.cov<.99?`<div class="lowconf">Based on ${Math.round(r.cov*100)}% of the measurements this sport uses. Missing ones count as neutral.</div>`:''}
-        <button type="button" class="linkbtn checkbtn" data-check="${r.sp.n}">See limiting factors for ${r.sp.n.toLowerCase()}</button></div>${critList(r.rows,m)}</div>
+        <button type="button" class="linkbtn checkbtn" data-check="${r.sp.n}">See limiting factors for ${r.sp.n.toLowerCase()}</button></div>${critList(r.rows,m)}
+        <div class="nextwrap">${nextHTML('list:'+r.sp.n,r,r.positions?r.positions[0]:r,m,res)}</div></div>
     </details>`).join('');
 
   out.innerHTML=`<section><div class="podium">${pod}</div></section>`;
   renderCheck(m,T,res);
-  renderNext(m,res);
+  lastRes=res;
   $('#rest').innerHTML=`
     <section class="panel">
       <div class="section-head"><h2>Your build</h2><p>Percentiles compared with adult ${sexWord}. Dashed line = average.</p></div>
@@ -1113,7 +1128,8 @@ $('#photoClose').addEventListener('click',()=>$('#photoDlg').close());
 $('#photoDlg').addEventListener('click',e=>{if(e.target.id==='photoDlg')e.target.close()});
 $('#photoFile').addEventListener('change',e=>{const f=e.target.files&&e.target.files[0];if(f)analysePhoto(f)});
 $('#estUse').addEventListener('click',useEstimate);
-$('#findPlaces').addEventListener('click',findPlaces);
+document.addEventListener('click',e=>{const b=e.target.closest('[data-places]');if(b)findPlaces(b.dataset.places)});
+document.addEventListener('toggle',e=>{const d=e.target;if(d.matches&&d.matches('details.nextd'))nextState.set(d.dataset.key,d.open)},true);
 $('#shareBtn').addEventListener('click',shareResults);
 $('#form').addEventListener('submit',e=>e.preventDefault());
 document.querySelectorAll('input[name=sex]').forEach(r=>r.addEventListener('change',()=>{render();save()}));
