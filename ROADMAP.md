@@ -33,9 +33,9 @@ Source: *120 years of Olympic history* (`athlete_events.csv`, 271k rows, 1896–
 - [x] Per sport × sex: sample size, median and spread of height, weight and BMI
 - [x] Emit `data/olympic_fit.json`; keep sports with n ≥ 40 per sex, flag the rest
 - [x] Replace hand-set height and BMI targets with fitted ones (target = median, tolerance from the spread); keep literature targets for traits the data lacks (arm span, legs, hands, feet, shoulders) and for sports not in the data (climbing, sumo, jockey, American football, rugby union positions)
-- [ ] Fix score saturation: an athletic build should no longer hit 99–100% in many sports at once
-  - Finding: Olympic height/BMI ranges overlap heavily for most sports (football, tennis, sprinting, fencing all sit near 180 cm, BMI 23), so a "how typical are you" match % can't separate them
-  - Proposal (awaiting decision): rank by **advantage** = how over-represented your build is among a sport's Olympians vs the general population (likelihood ratio, e.g. "7× more common among Olympic rowers"); keep match % as the secondary number
+- [x] Fix score saturation: rank by **advantage ratio** ("6.6× more common among Olympic badminton players than among men in general"), match % secondary. See [DECISIONS.md](DECISIONS.md) #002
+- [ ] Population selector for "people in general": Western norms (current) vs India (men ~166 cm, women ~153 cm) vs global; default from the browser's region
+- [ ] Model height–BMI correlation instead of treating them as independent
 - [x] Show "compared with N Olympic athletes" on sports that use fitted data
 - [x] Regression check: the example builds (swimmer, marathoner, gymnast, lineman, volleyball, climber) still rank their own sport near the top
 

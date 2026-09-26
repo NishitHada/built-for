@@ -217,6 +217,13 @@ dialog#photoDlg::backdrop{background:rgba(10,14,22,.62)}
 .podium{align-items:start}
 .nextd{border-top:1px solid var(--line)}
 .olynote{font-size:12px;color:var(--muted)}
+.explain{margin:0;font-size:13.5px;color:var(--muted);max-width:80ch}
+.explain b{color:var(--ink)}
+.pcard .advline{color:var(--ink)}
+@media (min-width:641px){
+  .posrow{grid-template-columns:minmax(0,1.1fr) minmax(70px,1fr) 58px minmax(0,1.3fr)}
+  .list summary{grid-template-columns:34px minmax(0,1.3fr) minmax(80px,2fr) 60px 14px}
+}
 .nextd summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0 2px;font-weight:700;color:var(--accent);font-size:14px}
 .nextd summary::-webkit-details-marker{display:none}
 .nextd summary .chev{transition:transform .15s;font-size:16px}
@@ -664,7 +671,7 @@ function load(){try{return JSON.parse(localStorage.getItem('builtfor')||'null')}
 // ---------- scoring ----------
 function traits(m){
   const s=m.sex,t={};
-  if(ok(m.h))t.h=zOf(s,'h',m.h);
+  if(ok(m.h)){t.h=zOf(s,'h',m.h);t.hcm=m.h}
   if(ok(m.w))t.w=m.w;
   if(ok(m.h)&&ok(m.w))t.bmi=m.w/((m.h/100)**2);
   if(ok(m.h)&&ok(m.span))t.ape=zOf(s,'ape',m.span/m.h);
@@ -678,22 +685,50 @@ function critScore(x,dir,t,tol,mode){
   if(dir==='hi'&&x>=t)return 1; if(dir==='lo'&&x<=t)return 1;
   const d=(x-t)/tol;return mode==='o'?Math.min(1,4*(1-cdf(Math.abs(d)))):Math.exp(-.5*d*d);
 }
+// ---- advantage: how over-represented your build is among the sport's athletes vs the population ----
+// Adult BMI is right-skewed, so the population is modelled as log-normal.
+const BMI_POP={m:[Math.log(25.2),.16],f:[Math.log(24.7),.2]};
+const npdf=(x,mu,sd)=>Math.exp(-.5*((x-mu)/sd)**2)/(sd*2.5066282746);
+const lnBmiPop=(b,sex)=>Math.log(npdf(Math.log(b),...BMI_POP[sex])/b);
+function logRatio(tr,dir,x,t,tol,sex,T){
+  // The athletes' real spread decides here; "taller is better" applies to match %, not to how
+  // common your build is among them (a 200 cm player is rare among 186 cm centre-backs).
+  const xa=x, sd=tr==='h'||tr==='bmi'||tr==='w'?tol:.8;
+  let v;
+  if(tr==='h')v=Math.log(npdf(xa,t,sd))-Math.log(npdf(x,0,1));
+  else if(tr==='bmi')v=Math.log(npdf(xa,t,sd))-lnBmiPop(x,sex);
+  else if(tr==='w'){const h2=(T.hcm/100)**2;v=Math.log(npdf(xa,t,sd))-(lnBmiPop(x/h2,sex)-Math.log(h2))}
+  else v=.5*(Math.log(npdf(xa,t,sd))-Math.log(npdf(x,0,1)));   // literature targets: half strength
+  // Outside the athletes' normal range (beyond 2 spreads), two thin tails give a meaningless ratio:
+  // being there can count against you, never for you.
+  if(Math.abs(xa-t)/sd>2)v=Math.min(0,v);
+  // Height, BMI and weight are the data-backed signals, so they get a wider cap than the rest
+  const cap=sd===.8?3:6;
+  return Math.max(-cap,Math.min(cap,v));
+}
 function scoreSport(sp,T,sex){
-  let sw=0,sum=0,tot=0;const rows=[];
+  let sw=0,sum=0,tot=0,lr=0;const rows=[],other=[];
+  const hasBmi=sp.c.some(c=>c[0]==='bmi');
   sp.c.forEach(([tr,dir,t,tol,w,mode])=>{
     tot+=w;const target=tg(t,sex), md=mode&&mode[sex];
     if(T[tr]===undefined){rows.push({tr,dir,target,w,s:null});return}
     const s=critScore(T[tr],dir,target,tg(tol,sex),md);sw+=w;sum+=w*s;rows.push({tr,dir,target,w,s,oly:md==='o'});
+    if(tr==='w'&&hasBmi)return;   // weight and BMI carry the same information at a given height
+    const v=logRatio(tr,dir,T[tr],target,tg(tol,sex),sex,T);
+    if(tr==='h'||tr==='bmi'||tr==='w')lr+=v;else other.push(v);
   });
+  // Arm span, legs, hands, feet and shoulders all track body size, so they're averaged into one factor
+  if(other.length)lr+=other.reduce((a,b)=>a+b,0)/other.length;
   const cov=sw/tot, raw=sw?sum/sw:.5;
-  return {score:raw*cov+.5*(1-cov),cov,rows};
+  return {score:raw*cov+.5*(1-cov),cov,rows,adv:Math.exp(lr)};
 }
+const byAdv=(a,b)=>b.adv-a.adv||b.score-a.score;
 // A team sport scores as its best-fitting position
 function scoreEntry(sp,T,sex){
   if(!sp.pos)return {sp,why:sp.why,...scoreSport(sp,T,sex)};
-  const positions=sp.pos.map(p=>({p,why:p.why,...scoreSport(p,T,sex)})).sort((a,b)=>b.score-a.score);
+  const positions=sp.pos.map(p=>({p,why:p.why,...scoreSport(p,T,sex)})).sort(byAdv);
   const b=positions[0];
-  return {sp,why:b.why,score:b.score,cov:b.cov,rows:b.rows,best:b.p.n,positions};
+  return {sp,why:b.why,score:b.score,cov:b.cov,rows:b.rows,adv:b.adv,best:b.p.n,positions};
 }
 
 // Human-readable view of one criterion
@@ -800,7 +835,17 @@ function changeAdvice(n){
   return up?'Can shift with training. Adding muscle mass raises this over months.':'Can shift with training and diet. Losing fat lowers this over months.';
 }
 const olyNote=(sp,sex)=>sp.oly&&sp.oly[sex]?`<div class="olynote">Height and BMI compared with ${sp.oly[sex].n.toLocaleString()} Olympic ${sex==='f'?'women':'men'} (1992\u20132016).</div>`:'';
-const verdictOf=P=>P>=75?['good','Strong natural fit']:P>=60?['good','Good fit']:P>=45?['ok','Workable']:['bad','Built against it'];
+const fmtAdv=a=>a>=99?'99\u00D7+':a>=10?`${Math.round(a)}\u00D7`:a<.1?'<0.1\u00D7':`${a.toFixed(1)}\u00D7`;
+const advVerdict=a=>a>=3?['good','Strong natural advantage']:a>=1.5?['good','Some advantage']:a>=.67?['ok','No clear advantage']:['bad','Built against it'];
+const advBar=a=>Math.max(3,Math.min(100,(Math.log2(a)+3)/7*100)).toFixed(0);
+const NOUN={'Basketball':'basketball players','Volleyball':'volleyball players','Swimming':'swimmers','Water polo':'water polo players','Rowing':'rowers','Coxswain':'coxswains','Distance running':'distance runners','Sprinting':'sprinters','High jump':'high jumpers','Long & triple jump':'long and triple jumpers','Shot put & discus':'shot and discus throwers','Gymnastics':'gymnasts','Diving':'divers','Figure skating':'figure skaters','Ski jumping':'ski jumpers','Weightlifting':'weightlifters','Sumo':'sumo wrestlers','Rugby union':'rugby players','American football':'American football players','Wrestling & judo':'wrestlers and judoka','Boxing':'boxers','Fencing':'fencers','Rock climbing':'climbers','Road cycling (climbing)':'road cyclists','Tennis':'tennis players','Badminton':'badminton players','Handball':'handball players','Football (soccer)':'footballers','Baseball pitcher':'baseball pitchers','Horse racing jockey':'jockeys'};
+function advSentence(sp,pos,a,sex){
+  const who=sex==='f'?'Women':'Men', gen=sex==='f'?'women':'men';
+  const pre=!pos&&sp.oly&&sp.oly[sex]?'Olympic ':'elite ', noun=pre+NOUN[sp.n]+(pos?` playing ${pos.toLowerCase()}`:'');
+  if(a>=1.25)return `${who} with your build are ${fmtAdv(a)} more common among ${noun} than among ${gen} in general.`;
+  if(a<=.8)return `${who} with your build are ${fmtAdv(1/a)} less common among ${noun} than among ${gen} in general.`;
+  return `${who} with your build are about as common among ${noun} as among ${gen} in general.`;
+}
 function analyse(r){
   const known=r.rows.filter(x=>x.s!==null), sw=known.reduce((a,x)=>a+x.w,0);
   const loss=x=>r.cov*x.w*(1-x.s)/sw*100;
@@ -815,25 +860,27 @@ function renderCheck(m,T,res){
   if(!SPORTS.some(s=>s.n===pick))pick=res[0].sp.n;
   sel.value=pick;
   const idx=res.findIndex(r=>r.sp.n===pick), r=res[idx], P=Math.round(r.score*100);
-  const [cls,verdict]=verdictOf(P);
+  const [cls,verdict]=advVerdict(r.adv);
   const head=`<div class="verdict">
-      <div class="big">${P}<small>%</small></div>
+      <div class="big">${fmtAdv(r.adv)}<small> advantage</small></div>
       <div class="vtext"><span class="pill ${cls}">${verdict}</span>
         <div>${r.sp.n} ranks <b>#${idx+1} of ${res.length}</b> for your build${r.best?`. Your best position is <b>${r.best}</b>`:''}.</div>
+        <p>${advSentence(r.sp,r.best,r.adv,m.sex)} Match ${P}%.</p>
         <p>${r.sp.why}</p>${olyNote(r.sp,m.sex)}</div>
     </div>`;
   if(!r.positions){$('#checkOut').innerHTML=head+factorBlock(r,m,r.sp.n)+nextHTML('check:'+r.sp.n,r,r,m,res,true);return}
 
   if(!r.positions.some(p=>p.p.n===pickPos))pickPos=r.best;
-  const cur=r.positions.find(p=>p.p.n===pickPos), Pc=Math.round(cur.score*100), [cc,cv]=verdictOf(Pc);
+  const cur=r.positions.find(p=>p.p.n===pickPos), Pc=Math.round(cur.score*100), [cc,cv]=advVerdict(cur.adv);
   const table=`<div><h3>Position compatibility</h3><div class="postable">${r.positions.map(p=>{
-      const pp=Math.round(p.score*100), top=analyse(p).limits[0], on=p.p.n===pickPos;
+      const top=analyse(p).limits[0], on=p.p.n===pickPos;
       return `<button type="button" class="posrow${on?' on':''}" data-pos="${p.p.n}" aria-pressed="${on}">
-        <span class="pn">${p.p.n}</span><span class="bar"><i style="width:${pp}%"></i></span><span class="pp">${pp}%</span>
+        <span class="pn">${p.p.n}</span><span class="bar"><i style="width:${advBar(p.adv)}%"></i></span><span class="pp">${fmtAdv(p.adv)}</span>
         <span class="pl">${top?`Limited by ${lc(describe(top,m).label)}`:'No major limits'}</span></button>`}).join('')}</div>
       <div class="lowconf" style="color:var(--muted)">Select a position to see its limiting factors.</div></div>`;
   $('#checkOut').innerHTML=head+table+`<div class="posdetail check">
-      <div class="posh"><h3 style="margin:0">${cur.p.n}: ${Pc}%</h3><span class="pill ${cc}">${cv}</span></div>
+      <div class="posh"><h3 style="margin:0">${cur.p.n}: ${fmtAdv(cur.adv)}</h3><span class="pill ${cc}">${cv}</span></div>
+      <p class="okmsg">${advSentence(r.sp,cur.p.n,cur.adv,m.sex)} Match ${Pc}%.</p>
       <p class="okmsg" style="color:var(--muted)">${cur.p.why}</p>
       ${factorBlock(cur,m,cur.p.n)}</div>`+nextHTML('check:'+r.sp.n+':'+cur.p.n,r,cur,m,res,true);
 }
@@ -1080,9 +1127,9 @@ async function findPlaces(sport){
 async function shareResults(){
   const res=lastRes;if(!res)return;
   const url='https://nishithada.github.io/built-for/';
-  const top=res.slice(0,3).map((r,i)=>`${i+1}. ${r.sp.n}${r.best?` (${r.best.toLowerCase()})`:''}: ${Math.round(r.score*100)}%`).join('\n');
+  const top=res.slice(0,3).map((r,i)=>`${i+1}. ${r.sp.n}${r.best?` (${r.best.toLowerCase()})`:''}: ${fmtAdv(r.adv)} advantage`).join('\n');
   const c=res.find(x=>x.sp.n===pick), cur=c&&c.positions?(c.positions.find(p=>p.p.n===pickPos)||c.positions[0]):null;
-  const chk=c&&!res.slice(0,3).includes(c)?`\nAlso checked ${c.sp.n}${cur?` as ${cur.p.n.toLowerCase()}`:''}: ${Math.round((cur||c).score*100)}%`:'';
+  const chk=c&&!res.slice(0,3).includes(c)?`\nAlso checked ${c.sp.n}${cur?` as ${cur.p.n.toLowerCase()}`:''}: ${fmtAdv((cur||c).adv)} advantage`:'';
   const text=`My body is built for:\n${top}${chk}\n\nFind yours:`;
   const msg=$('#shareMsg'), ta=$('#shareTxt');
   if(navigator.share){try{await navigator.share({title:'Built For',text,url});msg.textContent='Shared.';return}catch(e){if(e&&e.name==='AbortError')return}}
@@ -1102,13 +1149,14 @@ function render(){
   if(!valid){
     out.innerHTML='<div class="panel empty">Enter your height and weight to see which sports suit your build. The optional measurements make the result sharper.</div>';$('#rest').innerHTML='';return}
   const T=traits(m), sexWord=m.sex==='f'?'women':'men';
-  const res=SPORTS.map(sp=>scoreEntry(sp,T,m.sex)).sort((a,b)=>b.score-a.score);
+  const res=SPORTS.map(sp=>scoreEntry(sp,T,m.sex)).sort(byAdv);
   const P=x=>Math.round(x*100);
 
   const pod=res.slice(0,3).map((r,i)=>`<article class="pcard${i===0?' first':''}">
       <div class="fit"><span class="rank">${['Best fit','Second','Third'][i]} · ${r.sp.cat}</span></div>
       <h3>${r.sp.n}</h3>${r.best?`<div class="as">Best as <b>${r.best}</b></div>`:''}
-      <div class="pct">${P(r.score)}<small>% match</small></div>
+      <div class="pct">${fmtAdv(r.adv)}<small> advantage</small></div>
+      <p class="advline">${advSentence(r.sp,r.best,r.adv,m.sex)} <b>Match ${P(r.score)}%.</b></p>
       <p>${r.why}</p>${critList(r.rows,m)}
       ${r.cov<.99?`<div class="lowconf">Based on ${Math.round(r.cov*100)}% of the measurements this sport uses.</div>`:''}
       ${olyNote(r.sp,m.sex)}
@@ -1137,14 +1185,14 @@ function render(){
   const list=res.map((r,i)=>`<details><summary>
       <span class="n">${String(i+1).padStart(2,'0')}</span>
       <span class="nm">${r.sp.n}<small>${r.sp.cat}${r.best?` \u00B7 best as ${r.best}`:''}</small></span>
-      <span class="bar"><i style="width:${P(r.score)}%"></i></span>
-      <span class="p">${P(r.score)}%</span><span class="chev">›</span></summary>
-      <div class="body"><div><p>${r.best?`As ${r.best.toLowerCase()}: ${r.why}`:r.why}</p>${r.positions?`<ul class="minipos">${r.positions.map(p=>`<li><span>${p.p.n}</span><span class="mono">${P(p.score)}%</span></li>`).join('')}</ul>`:''}${r.cov<.99?`<div class="lowconf">Based on ${Math.round(r.cov*100)}% of the measurements this sport uses. Missing ones count as neutral.</div>`:''}
+      <span class="bar"><i style="width:${advBar(r.adv)}%"></i></span>
+      <span class="p">${fmtAdv(r.adv)}</span><span class="chev">›</span></summary>
+      <div class="body"><div><p>${r.best?`As ${r.best.toLowerCase()}: ${r.why}`:r.why}</p>${r.positions?`<ul class="minipos">${r.positions.map(p=>`<li><span>${p.p.n}</span><span class="mono">${fmtAdv(p.adv)} \u00B7 ${P(p.score)}%</span></li>`).join('')}</ul>`:''}${r.cov<.99?`<div class="lowconf">Based on ${Math.round(r.cov*100)}% of the measurements this sport uses. Missing ones count as neutral.</div>`:''}
         <button type="button" class="linkbtn checkbtn" data-check="${r.sp.n}">See limiting factors for ${r.sp.n.toLowerCase()}</button></div>${critList(r.rows,m)}
         <div class="nextwrap">${nextHTML('list:'+r.sp.n,r,r.positions?r.positions[0]:r,m,res)}</div></div>
     </details>`).join('');
 
-  out.innerHTML=`<section><div class="podium">${pod}</div></section>`;
+  out.innerHTML=`<p class="explain"><b>Advantage</b> is how much more common your build is among a sport\u2019s elite athletes than among ${sexWord} in general. <b>Match</b> is how closely you fit their typical build.</p><section><div class="podium">${pod}</div></section>`;
   renderCheck(m,T,res);
   lastRes=res;
   $('#rest').innerHTML=`

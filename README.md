@@ -18,6 +18,8 @@ Inputs: height and weight (required); arm span, sitting height or inseam, hand l
 
 ## How scoring works
 
+Sports are ranked by **advantage**: how much more common your build is among a sport's elite athletes than in the general population (e.g. "6.6× more common among Olympic badminton players than among men in general"). **Match %** (how closely you fit their typical build) is shown alongside and drives the limiting factors. Method and trade-offs: [DECISIONS.md](DECISIONS.md).
+
 Each measurement is converted to a percentile against approximate adult population norms for the chosen sex. Arm span and leg length are taken relative to height. Each sport or position has target values with a direction (more is better, less is better, or a sweet spot), a tolerance and a weight. Missing measurements count as neutral. A team sport scores as its best position.
 
 Height and BMI targets for 24 sports are fitted on Olympic athletes 1992–2016 (the *120 years of Olympic history* dataset, github.com/rgriff23/Olympic_history) by `scripts/fit_olympic.py`; within an athlete's middle half scores full marks. Team-sport positions keep literature offsets around the sport's real median. Arm span, leg, hand, foot and shoulder targets, and sports without Olympic data (climbing, sumo, jockey, coxswain, rugby union, American football), still use approximations from sports-science literature. To refit: download `athlete_events.csv` into `data/raw/` and run `python3 scripts/fit_olympic.py`. Body shape is one factor among many; training, skill and physiology matter more.
