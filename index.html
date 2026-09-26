@@ -85,6 +85,9 @@ aside.panel{position:sticky;top:calc(env(safe-area-inset-top,0px) + 16px);displa
 
 .podium{display:grid;grid-template-columns:1.25fr 1fr 1fr;gap:14px}
 @media (max-width:640px){.podium{grid-template-columns:1fr}}
+@media (min-width:881px) and (max-width:1180px){.podium{grid-template-columns:1fr 1fr}.pcard.first{grid-column:1 / -1}}
+.pcard .crits li{grid-template-columns:16px minmax(0,1fr)}
+.pcard .crits .v{grid-column:2;text-align:left;margin-top:-4px}
 .pcard{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:10px;position:relative;overflow:hidden}
 .pcard.first{border-color:var(--tape-deep);box-shadow:0 0 0 1px var(--tape-deep) inset}
 .pcard .rank{font-family:var(--display);font-weight:600;font-size:14px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
