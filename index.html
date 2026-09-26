@@ -158,6 +158,8 @@ aside.panel{position:sticky;top:calc(env(safe-area-inset-top,0px) + 16px);displa
 .note b{color:var(--ink)}
 .empty{padding:30px;text-align:center;color:var(--muted)}
 /* how-to-measure popovers */
+.legmode{grid-column:1 / -1;justify-self:start;margin-top:6px}
+.legmode label{padding:4px 10px;font-size:12px}
 .lab{display:flex;align-items:center;gap:6px;min-width:0}
 .info{flex:none;width:20px;height:20px;border-radius:50%;border:1.5px solid var(--accent);background:none;color:var(--accent);font:italic 700 12px/1 Georgia,'Times New Roman',serif;cursor:pointer;display:inline-grid;place-items:center;padding:0}
 .info[aria-expanded="true"]{background:var(--accent);color:var(--surface)}
@@ -269,8 +271,37 @@ aside.panel{position:sticky;top:calc(env(safe-area-inset-top,0px) + 16px);displa
         <div class="field"><label for="weight">Weight</label><div class="inbox"><input id="weight" inputmode="decimal"><span class="u-wt">kg</span></div></div>
         <div class="field"><label for="span">Arm span<span class="opt">optional</span></label><div class="inbox"><input id="span" inputmode="decimal"><span class="u-len">cm</span></div>
           <div class="hint">Arms straight out to the sides, fingertip to fingertip.</div></div>
-        <div class="field"><div class="lab"><label for="sit">Sitting height<span class="opt">optional</span></label><button type="button" class="info" aria-expanded="false" aria-controls="how-sit" aria-label="How to measure sitting height">i</button></div><div class="inbox"><input id="sit" inputmode="decimal"><span class="u-len">cm</span></div>
-          <div class="hint">Seat to the top of your head, sitting against a wall.</div>
+        <div class="field"><div class="lab"><label for="sit"><span id="sitLabel">Sitting height</span><span class="opt">optional</span></label><button type="button" class="info" id="sitInfo" aria-expanded="false" aria-controls="how-sit" aria-label="How to measure sitting height">i</button></div><div class="inbox"><input id="sit" inputmode="decimal"><span class="u-len">cm</span></div>
+          <div class="seg legmode" role="radiogroup" aria-label="How to give leg length">
+            <input type="radio" name="legmode" id="lm-sit" value="sit" checked><label for="lm-sit">Sitting height</label>
+            <input type="radio" name="legmode" id="lm-ins" value="inseam"><label for="lm-ins">Inseam</label>
+          </div>
+          <div class="hint" id="sitHint">Seat to the top of your head, sitting against a wall.</div>
+          <div class="howto" id="how-inseam" hidden>
+            <svg viewBox="0 0 260 205" role="img" aria-label="Front view of the legs. Inseam is measured from the floor up to a book pressed level against the crotch.">
+              <line class="hw-line" x1="30" y1="196" x2="230" y2="196"/>
+              <path class="hw-body" d="M76 72 Q102 94 128 94 L118 188 L90 188 Q82 130 76 72 Z"/>
+              <path class="hw-body" d="M184 72 Q158 94 132 94 L142 188 L170 188 Q178 130 184 72 Z"/>
+              <path class="hw-body" d="M84 8 L176 8 L184 72 Q158 94 130 94 Q102 94 76 72 Z"/>
+              <path class="hw-body" d="M86 188 L120 188 L122 196 L80 196 Z"/>
+              <path class="hw-body" d="M140 188 L174 188 L180 196 L138 196 Z"/>
+              <rect class="hw-solid" x="112" y="94" width="36" height="7"/>
+              <line class="hw-ext" x1="149" y1="94" x2="212" y2="94"/>
+              <line class="hw-ext" x1="182" y1="196" x2="212" y2="196"/>
+              <line class="hw-meas" x1="206" y1="94" x2="206" y2="196"/>
+              <line class="hw-meas" x1="199" y1="94" x2="213" y2="94"/>
+              <line class="hw-meas" x1="199" y1="196" x2="213" y2="196"/>
+              <text class="hw-txt" x="214" y="150">inseam</text>
+              <line class="hw-ext" x1="74" y1="126" x2="111" y2="100" stroke="var(--muted)" stroke-dasharray="none"/><text class="hw-note" x="70" y="134" text-anchor="end">book, level</text>
+              <text class="hw-note" x="8" y="18">front view</text>
+            </svg>
+            <ol>
+              <li>Stand barefoot with your back to a wall and feet about 15 cm apart.</li>
+              <li>Hold a hardback book level between your legs, spine up, and raise it firmly to your crotch.</li>
+              <li>Mark the wall at the top of the book and measure from the <b>floor</b> to the mark.</li>
+            </ol>
+            <p>Measured this way, inseam closely matches your leg length, so no adjustment is needed. The inseam on a trouser label is usually a little shorter and will understate your legs.</p>
+          </div>
           <div class="howto" id="how-sit" hidden>
             <svg viewBox="0 0 270 205" role="img" aria-label="Side view of a person sitting on a bench against a wall. Sitting height is measured from the seat surface to the top of the head.">
               <line class="hw-line" x1="40" y1="8" x2="40" y2="194"/>
@@ -443,7 +474,7 @@ const PRESETS=[
 
 const IDS=['height','weight','span','sit','hand','foot','shoulder'];
 const KEYS={height:'h',weight:'w',span:'span',sit:'sit',hand:'hand',foot:'foot',shoulder:'shoulder'};
-let units='metric', example='example', pick='Football (soccer)', pickPos=null;
+let units='metric', example='example', pick='Football (soccer)', pickPos=null, legMode='sit';
 
 // ---------- math ----------
 function erf(x){const s=Math.sign(x);x=Math.abs(x);const t=1/(1+.3275911*x);
@@ -468,15 +499,18 @@ function readMetric(){
   const k=units==='metric'?1:2.54, kw=units==='metric'?1:0.45359237;
   const m={sex:document.querySelector('input[name=sex]:checked').value};
   IDS.forEach(id=>{m[KEYS[id]]=num(id)*(id==='weight'?kw:k)});
+  // Barefoot inseam ≈ height − sitting height (ANSUR II means agree within ~1 cm)
+  if(legMode==='inseam')m.sit=m.h-m.sit;
   return m;
 }
 function writeMetric(m){
   const k=units==='metric'?1:2.54, kw=units==='metric'?1:0.45359237;
-  IDS.forEach(id=>{const v=m[KEYS[id]];
+  IDS.forEach(id=>{let v=m[KEYS[id]];
+    if(id==='sit'&&legMode==='inseam')v=ok(m.sit)&&ok(m.h)?m.h-m.sit:NaN;
     $('#'+id).value=ok(v)?String(+(v/(id==='weight'?kw:k)).toFixed(1)):''});
   if(m.sex) document.getElementById(m.sex==='f'?'s-f':'s-m').checked=true;
 }
-function save(){try{localStorage.setItem('builtfor',JSON.stringify({units,example,pick,pickPos,m:readMetric()}))}catch(e){}}
+function save(){try{localStorage.setItem('builtfor',JSON.stringify({units,example,pick,pickPos,legMode,m:readMetric()}))}catch(e){}}
 function load(){try{return JSON.parse(localStorage.getItem('builtfor')||'null')}catch(e){return null}}
 
 // ---------- scoring ----------
@@ -486,7 +520,7 @@ function traits(m){
   if(ok(m.w))t.w=m.w;
   if(ok(m.h)&&ok(m.w))t.bmi=m.w/((m.h/100)**2);
   if(ok(m.h)&&ok(m.span))t.ape=zOf(s,'ape',m.span/m.h);
-  if(ok(m.h)&&ok(m.sit))t.shr=zOf(s,'shr',m.sit/m.h);
+  if(ok(m.h)&&ok(m.sit)&&m.sit/m.h>.42&&m.sit/m.h<.62)t.shr=zOf(s,'shr',m.sit/m.h);
   ['hand','foot','shoulder'].forEach(k=>{if(ok(m[k]))t[k]=zOf(s,k,m[k])});
   return t;
 }
@@ -764,6 +798,18 @@ $('#checkOut').addEventListener('click',e=>{const b=e.target.closest('[data-pos]
   pickPos=b.dataset.pos;render();save();const nb=document.querySelector(`[data-pos="${CSS.escape(pickPos)}"]`);if(nb)nb.focus({preventScroll:true})});
 $('#rest').addEventListener('click',e=>{const b=e.target.closest('[data-check]');if(!b)return;
   pick=b.dataset.check;pickPos=null;render();save();$('#check').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'})});
+function applyLegMode(){
+  const ins=legMode==='inseam';
+  document.getElementById(ins?'lm-ins':'lm-sit').checked=true;
+  $('#sitLabel').textContent=ins?'Inseam':'Sitting height';
+  $('#sitHint').textContent=ins?'Barefoot, from the floor up to your crotch.':'Seat to the top of your head, sitting against a wall.';
+  const b=$('#sitInfo');b.setAttribute('aria-controls',ins?'how-inseam':'how-sit');
+  b.setAttribute('aria-label',`How to measure ${ins?'inseam':'sitting height'}`);
+  const open=!$('#how-sit').hidden||!$('#how-inseam').hidden;
+  $('#how-sit').hidden=ins||!open;$('#how-inseam').hidden=!ins||!open;
+}
+document.querySelectorAll('input[name=legmode]').forEach(x=>x.addEventListener('change',()=>{
+  const m=readMetric();legMode=x.value;applyLegMode();writeMetric(m);render();save()}));
 document.querySelectorAll('.info').forEach(b=>b.addEventListener('click',()=>{
   const p=document.getElementById(b.getAttribute('aria-controls'));p.hidden=!p.hidden;b.setAttribute('aria-expanded',String(!p.hidden))}));
 $('#jump').addEventListener('click',()=>$('#results').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'}));
@@ -773,7 +819,7 @@ const saved=load();
 if(saved&&saved.m){
   if(saved.units==='imperial'){units='imperial';$('#u-imp').checked=true;
     document.querySelectorAll('.u-len').forEach(e=>e.textContent='in');document.querySelectorAll('.u-wt').forEach(e=>e.textContent='lb')}
-  example=saved.example||null;if(saved.pick)pick=saved.pick;pickPos=saved.pickPos||null;writeMetric(saved.m);
+  example=saved.example||null;if(saved.pick)pick=saved.pick;if(saved.legMode==='inseam'){legMode='inseam';applyLegMode()}pickPos=saved.pickPos||null;writeMetric(saved.m);
 }else writeMetric(PRESETS[0]);
 render();
 })();
