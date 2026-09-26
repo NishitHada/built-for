@@ -179,6 +179,12 @@ dialog#photoDlg::backdrop{background:rgba(10,14,22,.62)}
 .dlg ol{margin:0;padding-left:20px;font-size:14px;display:flex;flex-direction:column;gap:6px}
 .dlg svg{width:100%;max-width:320px;height:auto;display:block;margin:0 auto}
 .dlg .fine{margin:0}
+.dlg-h{display:flex;flex-direction:column;gap:8px;border:1px solid var(--line);border-radius:8px;padding:12px;background:var(--surface-2)}
+.dlg-h .row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.dlg-h .inbox{width:130px;flex:none;background:var(--surface)}
+.dlg-step{font-family:var(--display);text-transform:uppercase;font-weight:700;font-size:16px;letter-spacing:.03em}
+.btn.off{opacity:.45;pointer-events:none}
+#pickHint{font-size:13px;color:var(--warn)}
 .dlg-status{font-size:14px;padding:10px 12px;border-radius:8px;background:var(--surface-2);border:1px solid var(--line)}
 .dlg-status.err{border-color:var(--bad);color:var(--bad)}
 #photoCanvas{width:100%;height:auto;border-radius:8px;display:block;background:var(--surface-2)}
@@ -341,14 +347,14 @@ dialog#photoDlg::backdrop{background:rgba(10,14,22,.62)}
           <input type="radio" name="sex" id="s-f" value="f"><label for="s-f">Women</label>
         </div>
       </div>
-      <div class="photo-cta">
-        <div><b>Don’t know your measurements?</b>Estimate arm span, leg length and shoulder width from one photo.</div>
-        <button type="button" class="btn" id="photoOpen">Measure from a photo</button>
-      </div>
       <form class="fields" id="form" autocomplete="off">
         <div class="field"><label for="height">Height</label><div class="inbox"><input id="height" inputmode="decimal"><span class="u-len">cm</span></div>
           <div class="hint">Barefoot, standing against a wall.</div></div>
         <div class="field"><label for="weight">Weight</label><div class="inbox"><input id="weight" inputmode="decimal"><span class="u-wt">kg</span></div></div>
+        <div class="photo-cta">
+          <div><b>Don’t know the measurements below?</b>Estimate arm span, leg length and shoulder width from one photo, scaled from your height above.</div>
+          <button type="button" class="btn" id="photoOpen">Measure from a photo</button>
+        </div>
         <div class="field"><label for="span">Arm span<span class="opt">optional</span></label><div class="inbox"><input id="span" inputmode="decimal"><span class="u-len">cm</span></div>
           <div class="hint">Arms straight out to the sides, fingertip to fingertip.</div></div>
         <div class="field"><div class="lab"><label for="sit"><span id="sitLabel">Sitting height</span><span class="opt">optional</span></label><button type="button" class="info" id="sitInfo" aria-expanded="false" aria-controls="how-sit" aria-label="How to measure sitting height">i</button></div><div class="inbox"><input id="sit" inputmode="decimal"><span class="u-len">cm</span></div>
@@ -470,6 +476,12 @@ dialog#photoDlg::backdrop{background:rgba(10,14,22,.62)}
   <div class="dlg">
     <div class="dlg-head"><h2 id="photoTitle">Measure from a photo</h2><button type="button" class="x" id="photoClose" aria-label="Close">×</button></div>
     <div id="photoIntro" class="dlg" style="padding:0">
+      <div class="dlg-h">
+        <div class="dlg-step">Step 1 · Your height</div>
+        <div class="row"><div class="inbox"><input id="photoHeight" inputmode="decimal" aria-label="Your height"><span class="u-len">cm</span></div>
+          <span class="fine" style="margin:0">Barefoot. The photo is converted to centimetres using this, so it needs to be accurate.</span></div>
+      </div>
+      <div class="dlg-step">Step 2 · Take the photo</div>
       <svg viewBox="0 0 320 150" role="img" aria-label="A person standing with arms straight out to the sides, photographed from 2 to 3 metres away with the camera at waist height.">
         <line class="hw-line" x1="14" y1="140" x2="306" y2="140"/>
         <circle class="hw-body" cx="80" cy="24" r="11"/>
@@ -485,12 +497,11 @@ dialog#photoDlg::backdrop{background:rgba(10,14,22,.62)}
         <text class="hw-note" x="273" y="72" text-anchor="middle">waist height</text>
       </svg>
       <ol>
-        <li>Enter your <b>height</b> first. The photo is scaled from it.</li>
         <li>Wear fitted clothes and stand barefoot against a plain background. Hold your arms straight out to the sides at shoulder height, palms forward, feet slightly apart.</li>
         <li>Have someone take the photo from 2–3 m away, straight on, with the camera at waist height. Your whole body, head to feet, must be in the frame.</li>
       </ol>
       <p class="fine">The photo is analysed on your device and never uploaded. The pose model (about 9 MB) downloads the first time you use it.</p>
-      <div class="dlg-actions"><label class="btn primary" for="photoFile" id="photoPick">Take or choose a photo</label><input type="file" id="photoFile" accept="image/*" class="vh"></div>
+      <div class="dlg-actions" style="align-items:center"><label class="btn primary" for="photoFile" id="photoPick">Take or choose a photo</label><input type="file" id="photoFile" accept="image/*" class="vh"><span id="pickHint" role="status"></span></div>
     </div>
     <div id="photoStatus" class="dlg-status" role="status" hidden></div>
     <div id="photoResult" class="dlg" style="padding:0" hidden>
@@ -1215,7 +1226,13 @@ $('#presets').innerHTML=PRESETS.map(p=>`<button type="button" class="chip" data-
 $('#presets').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
   const p=PRESETS.find(p=>p.k===b.dataset.k);example=p.k;estFields.clear();updateEst();writeMetric(p);render();save()});
 $('#form').addEventListener('input',e=>{example=null;if(estFields.delete(e.target.id))updateEst();render();save()});
-$('#photoOpen').addEventListener('click',()=>{pStatus('');const d=$('#photoDlg');if(d.showModal)d.showModal();else d.setAttribute('open','')});
+// The photo is scaled from height, so the dialog asks for it first and mirrors the form field
+function photoHeightOk(){const v=parseFloat($('#photoHeight').value),cm=units==='metric'?v:v*2.54;return isFinite(cm)&&cm>=120&&cm<=245}
+function syncPhotoGate(){const okH=photoHeightOk();$('#photoFile').disabled=!okH;$('#photoPick').classList.toggle('off',!okH);
+  $('#pickHint').textContent=okH?'':'Enter your height in step 1 to continue.'}
+$('#photoOpen').addEventListener('click',()=>{pStatus('');$('#photoHeight').value=$('#height').value;syncPhotoGate();
+  const d=$('#photoDlg');if(d.showModal)d.showModal();else d.setAttribute('open','');if(!photoHeightOk())$('#photoHeight').focus()});
+$('#photoHeight').addEventListener('input',()=>{const h=$('#height');h.value=$('#photoHeight').value;h.dispatchEvent(new Event('input',{bubbles:true}));syncPhotoGate()});
 $('#photoClose').addEventListener('click',()=>$('#photoDlg').close());
 $('#photoDlg').addEventListener('click',e=>{if(e.target.id==='photoDlg')e.target.close()});
 $('#photoFile').addEventListener('change',e=>{const f=e.target.files&&e.target.files[0];if(f)analysePhoto(f)});
