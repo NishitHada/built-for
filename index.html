@@ -157,6 +157,23 @@ aside.panel{position:sticky;top:calc(env(safe-area-inset-top,0px) + 16px);displa
 .note{font-size:13.5px;color:var(--muted);max-width:72ch;line-height:1.55}
 .note b{color:var(--ink)}
 .empty{padding:30px;text-align:center;color:var(--muted)}
+/* how-to-measure popovers */
+.lab{display:flex;align-items:center;gap:6px;min-width:0}
+.info{flex:none;width:20px;height:20px;border-radius:50%;border:1.5px solid var(--accent);background:none;color:var(--accent);font:italic 700 12px/1 Georgia,'Times New Roman',serif;cursor:pointer;display:inline-grid;place-items:center;padding:0}
+.info[aria-expanded="true"]{background:var(--accent);color:var(--surface)}
+.howto{grid-column:1 / -1;margin-top:8px;border:1px solid var(--line);border-radius:8px;background:var(--surface-2);padding:12px;display:flex;flex-direction:column;gap:8px}
+.howto svg{width:100%;max-width:260px;height:auto;display:block;margin:0 auto}
+.howto ol{margin:0;padding-left:20px;font-size:13px;line-height:1.45;display:flex;flex-direction:column;gap:4px}
+.howto p{margin:0;font-size:12.5px;color:var(--muted)}
+.hw-body{fill:var(--surface);stroke:var(--ink);stroke-width:2;stroke-linejoin:round}
+.hw-solid{fill:var(--line);stroke:var(--ink);stroke-width:1.5}
+.hw-line{stroke:var(--ink);stroke-width:2;fill:none}
+.hw-meas{stroke:var(--accent);stroke-width:2;fill:none}
+.hw-ext{stroke:var(--accent);stroke-width:1.2;stroke-dasharray:3 3;fill:none}
+.hw-dot{fill:var(--accent)}
+.hw-txt{fill:var(--accent);font:600 12px var(--body)}
+.hw-note{fill:var(--muted);font:12px var(--body)}
+
 
 /* single-sport check */
 .check{display:flex;flex-direction:column;gap:18px}
@@ -252,14 +269,68 @@ aside.panel{position:sticky;top:calc(env(safe-area-inset-top,0px) + 16px);displa
         <div class="field"><label for="weight">Weight</label><div class="inbox"><input id="weight" inputmode="decimal"><span class="u-wt">kg</span></div></div>
         <div class="field"><label for="span">Arm span<span class="opt">optional</span></label><div class="inbox"><input id="span" inputmode="decimal"><span class="u-len">cm</span></div>
           <div class="hint">Arms straight out to the sides, fingertip to fingertip.</div></div>
-        <div class="field"><label for="sit">Sitting height<span class="opt">optional</span></label><div class="inbox"><input id="sit" inputmode="decimal"><span class="u-len">cm</span></div>
-          <div class="hint">Sit on a flat bench against a wall; bench to top of head. Used to work out leg length.</div></div>
+        <div class="field"><div class="lab"><label for="sit">Sitting height<span class="opt">optional</span></label><button type="button" class="info" aria-expanded="false" aria-controls="how-sit" aria-label="How to measure sitting height">i</button></div><div class="inbox"><input id="sit" inputmode="decimal"><span class="u-len">cm</span></div>
+          <div class="hint">Seat to the top of your head, sitting against a wall.</div>
+          <div class="howto" id="how-sit" hidden>
+            <svg viewBox="0 0 270 205" role="img" aria-label="Side view of a person sitting on a bench against a wall. Sitting height is measured from the seat surface to the top of the head.">
+              <line class="hw-line" x1="40" y1="8" x2="40" y2="194"/>
+              <line class="hw-line" x1="40" y1="194" x2="200" y2="194"/>
+              <rect class="hw-solid" x="41" y="122" width="112" height="72"/>
+              <path class="hw-body" d="M134 118 Q146 150 142 188 L158 190 Q162 150 150 112 Z"/>
+              <rect class="hw-body" x="58" y="104" width="94" height="18" rx="8"/>
+              <rect class="hw-body" x="42" y="56" width="32" height="66" rx="10"/>
+              <path class="hw-body" d="M62 66 Q84 86 104 104 L96 110 Q76 94 56 78 Z"/>
+              <circle class="hw-body" cx="60" cy="40" r="15"/>
+              <rect class="hw-solid" x="41" y="20" width="50" height="5"/>
+              <line class="hw-ext" x1="92" y1="25" x2="214" y2="25"/>
+              <line class="hw-ext" x1="154" y1="122" x2="214" y2="122"/>
+              <line class="hw-meas" x1="208" y1="25" x2="208" y2="122"/>
+              <line class="hw-meas" x1="201" y1="25" x2="215" y2="25"/>
+              <line class="hw-meas" x1="201" y1="122" x2="215" y2="122"/>
+              <text class="hw-txt" x="220" y="68">sitting</text><text class="hw-txt" x="220" y="83">height</text>
+              <text class="hw-note" x="96" y="14">book, flat</text>
+              <text class="hw-note" x="160" y="140">seat</text>
+            </svg>
+            <ol>
+              <li>Sit on a hard, flat bench or chair with your back, shoulders and head against a wall. Look straight ahead.</li>
+              <li>Lay a book flat on your head, touching the wall, and mark the wall under it.</li>
+              <li>Measure from the <b>seat</b> up to the mark, not from the floor.</li>
+            </ol>
+            <p>Your height minus this number is your leg length, which matters for jumping, running and lifting.</p>
+          </div></div>
         <div class="field"><label for="hand">Hand length<span class="opt">optional</span></label><div class="inbox"><input id="hand" inputmode="decimal"><span class="u-len">cm</span></div>
           <div class="hint">Wrist crease to tip of the middle finger.</div></div>
         <div class="field"><label for="foot">Foot length<span class="opt">optional</span></label><div class="inbox"><input id="foot" inputmode="decimal"><span class="u-len">cm</span></div>
           <div class="hint">Heel to longest toe.</div></div>
-        <div class="field"><label for="shoulder">Shoulder width<span class="opt">optional</span></label><div class="inbox"><input id="shoulder" inputmode="decimal"><span class="u-len">cm</span></div>
-          <div class="hint">Between the bony tips of the shoulders (biacromial).</div></div>
+        <div class="field"><div class="lab"><label for="shoulder">Shoulder width<span class="opt">optional</span></label><button type="button" class="info" aria-expanded="false" aria-controls="how-shoulder" aria-label="How to measure shoulder width">i</button></div><div class="inbox"><input id="shoulder" inputmode="decimal"><span class="u-len">cm</span></div>
+          <div class="hint">Straight across your back, from one shoulder’s bony tip to the other.</div>
+          <div class="howto" id="how-shoulder" hidden>
+            <svg viewBox="0 0 260 205" role="img" aria-label="Back view of the upper body. Shoulder width is measured in a straight line between the bony tips at the outer edge of each shoulder.">
+              <path class="hw-body" d="M80 86 Q60 90 58 114 L54 190 Q63 197 72 190 L80 124 Z"/>
+              <path class="hw-body" d="M180 86 Q200 90 202 114 L206 190 Q197 197 188 190 L180 124 Z"/>
+              <rect class="hw-body" x="120" y="54" width="20" height="20"/>
+              <path class="hw-body" d="M121 70 Q86 72 74 86 Q72 102 81 124 L83 200 L177 200 L179 124 Q188 102 186 86 Q174 72 139 70 Z"/>
+              <line x1="130" y1="78" x2="130" y2="196" stroke="var(--line)" stroke-width="1.5" stroke-dasharray="4 4"/>
+              <circle class="hw-body" cx="130" cy="36" r="21"/>
+              <line class="hw-ext" x1="76" y1="86" x2="76" y2="112"/>
+              <line class="hw-ext" x1="184" y1="86" x2="184" y2="112"/>
+              <line class="hw-meas" x1="76" y1="106" x2="184" y2="106"/>
+              <line class="hw-meas" x1="76" y1="99" x2="76" y2="113"/>
+              <line class="hw-meas" x1="184" y1="99" x2="184" y2="113"/>
+              <circle class="hw-dot" cx="76" cy="86" r="5"/>
+              <circle class="hw-dot" cx="184" cy="86" r="5"/>
+              <line class="hw-ext" x1="188" y1="82" x2="214" y2="56" stroke-dasharray="none"/>
+              <text class="hw-txt" x="200" y="50">bony tip</text>
+              <text class="hw-txt" x="130" y="126" text-anchor="middle">shoulder width</text>
+              <text class="hw-note" x="8" y="18">back view</text>
+            </svg>
+            <ol>
+              <li>Find the bony tip of each shoulder: follow your collarbone outwards until it ends in a small bump.</li>
+              <li>Stand relaxed with arms at your sides and have someone measure across your back from one bump to the other.</li>
+              <li>Measure in a straight line, not around the curve of your back, and ignore the muscle on the outside of the shoulder.</li>
+            </ol>
+            <p>Typical adults measure about 36 cm (women) or 40 cm (men).</p>
+          </div></div>
       </form>
       <div class="divider"></div>
       <div>
@@ -267,7 +338,7 @@ aside.panel{position:sticky;top:calc(env(safe-area-inset-top,0px) + 16px);displa
         <div class="presets" id="presets"></div>
       </div>
       <div><button class="linkbtn" id="clear" type="button">Clear all fields</button></div>
-      <button class="jump" id="jump" type="button">See my results \u2193</button>
+      <button class="jump" id="jump" type="button">See my results &darr;</button>
     </aside>
 
     <main class="results" id="results">
@@ -693,6 +764,8 @@ $('#checkOut').addEventListener('click',e=>{const b=e.target.closest('[data-pos]
   pickPos=b.dataset.pos;render();save();const nb=document.querySelector(`[data-pos="${CSS.escape(pickPos)}"]`);if(nb)nb.focus({preventScroll:true})});
 $('#rest').addEventListener('click',e=>{const b=e.target.closest('[data-check]');if(!b)return;
   pick=b.dataset.check;pickPos=null;render();save();$('#check').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'})});
+document.querySelectorAll('.info').forEach(b=>b.addEventListener('click',()=>{
+  const p=document.getElementById(b.getAttribute('aria-controls'));p.hidden=!p.hidden;b.setAttribute('aria-expanded',String(!p.hidden))}));
 $('#jump').addEventListener('click',()=>$('#results').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'}));
 $('#clear').addEventListener('click',()=>{IDS.forEach(id=>$('#'+id).value='');example=null;render();save();$('#height').focus()});
 
