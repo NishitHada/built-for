@@ -950,7 +950,9 @@ function estimate(P,H,handCm){
   const span=(d(15,13)+d(13,11)+d(11,12)+d(12,14)+d(14,16))*cm+2*handCm;  // wrist-to-wrist along the arms, plus both hands
   const hipY=(P[23].y+P[24].y)/2;
   const leg=(floorY-hipY)*cm*0.902;          // hip-joint height scaled to crotch-level leg length
-  const sh=d(11,12)*cm;
+  // Pose "shoulders" are joint centres; shoulder width is measured between the bony tips further out.
+  // 1.25 = tape 40 cm vs photo 32 cm (first real-world check, 2026-09-26; see DECISIONS.md #003).
+  const sh=d(11,12)*cm*1.25;
   const okv={span:span/H>.9&&span/H<1.12&&level&&straight, leg:leg/H>.4&&leg/H<.56, sh:sh/H>.17&&sh/H<.29};
   return {span,leg,sh,okv,warn,eyeY,floorY,Hpx,hipY};
 }

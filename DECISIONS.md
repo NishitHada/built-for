@@ -4,6 +4,24 @@ Short records of product and method decisions: what was decided, why, and what i
 
 ---
 
+## 003 — Correct photo shoulder width by ×1.25
+
+**Date:** 2026-09-26 · **Status:** accepted, provisional (one data point)
+
+### Context
+First real-world check of photo measuring: arm span and leg length came out close to tape measurements, but shoulder width read **32 cm against 40 cm** by tape.
+
+### Cause
+The pose model's shoulder landmarks sit at the shoulder **joint centres**. Shoulder width (biacromial breadth) is measured between the **bony tips** (acromion), which sit several centimetres further out on each side. The raw landmark distance therefore always under-reads.
+
+### Decision
+Multiply the landmark distance by **1.25** (40 / 32) for shoulder width only. Arm span still uses the raw distance, because the arm line genuinely runs through the joint centres.
+
+### Consequences
+Shoulder width estimates should now land near tape values for builds like the tester's. The factor rests on **one person**; photo validation (roadmap 1.3) should refit it, along with the eye-height (0.936) and hip-to-leg (0.902) factors, once 30–50 tape-vs-photo pairs are collected.
+
+---
+
 ## 002 — Rank sports by advantage ratio, keep match % as secondary
 
 **Date:** 2026-09-26 · **Status:** accepted

@@ -47,7 +47,8 @@ Source: *120 years of Olympic history* (`athlete_events.csv`, 271k rows, 1896–
 - [ ] Write a test protocol: tape-measure arm span, inseam, shoulder width; take the photo per the app's instructions
 - [ ] **(you)** Collect 30–50 people (friends, a gym, a club)
 - [ ] Hidden debug mode that shows the raw estimate next to the typed value, for data collection
-- [ ] Compute mean error and spread per measurement; recalibrate the 0.936 eye-height and 0.902 hip-to-leg factors
+- [x] First real-world check (1 person): arm span and leg length close; shoulder width 32 vs 40 cm → added ×1.25 correction ([DECISIONS.md](DECISIONS.md) #003)
+- [ ] Compute mean error and spread per measurement; recalibrate the 0.936 eye-height, 0.902 hip-to-leg and 1.25 shoulder factors
 - [ ] Publish the accuracy on the page ("arm span within ±X cm for 80% of people")
 
 ---
