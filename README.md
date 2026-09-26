@@ -10,6 +10,9 @@ Enter your body measurements and see which sports your build naturally suits.
 - Team sports (football/soccer, basketball, volleyball, rugby union, American football) are scored per position.
 - **Check a sport** shows your match for one sport or position and ranks the limiting factors: how far off each measurement is, whether it is fixed (bone length) or changeable (weight, BMI), and how many points it costs.
 - Shows your build as a proportional diagram with percentile gauges.
+- **Measure from a photo:** estimates arm span, leg length and shoulder width from one full-body photo, scaled from your height. Uses MediaPipe Pose Landmarker running in the browser; the photo is never uploaded. Estimates are labelled and editable.
+- **Next steps** for the sport or position you check: how to get started, gear, a first focus based on your limiting factors, nearby clubs and venues from OpenStreetMap (Overpass API, location rounded to ~100 m and only sent when you tap the button), and a Google Maps fallback.
+- **Share** a text summary of your results.
 
 Inputs: height and weight (required); arm span, sitting height or inseam, hand length, foot length and shoulder width (optional). Metric or imperial. Leg length is height minus sitting height; a barefoot crotch-to-floor inseam is used as leg length directly, since the two agree within about a centimetre on average (ANSUR II).
 

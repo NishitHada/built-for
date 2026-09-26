@@ -157,6 +157,61 @@ aside.panel{position:sticky;top:calc(env(safe-area-inset-top,0px) + 16px);displa
 .note{font-size:13.5px;color:var(--muted);max-width:72ch;line-height:1.55}
 .note b{color:var(--ink)}
 .empty{padding:30px;text-align:center;color:var(--muted)}
+/* shared buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:8px;padding:9px 14px;font-weight:700;font-size:14px;cursor:pointer;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);text-decoration:none;line-height:1.2}
+.btn:hover{border-color:var(--ink)}
+.btn.primary{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.btn[disabled]{opacity:.55;cursor:progress}
+.vh{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* photo measuring */
+.photo-cta{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;border:1px dashed var(--accent);border-radius:8px;padding:10px 12px}
+.photo-cta div{display:flex;flex-direction:column;font-size:13px;color:var(--muted);flex:1 1 170px}
+.photo-cta b{color:var(--ink);font-size:14px}
+.field.est .inbox{border-style:dashed;border-color:var(--accent)}
+.field.est > label::after,.field.est .lab::after{content:"photo estimate";font-size:10px;text-transform:uppercase;letter-spacing:.06em;font-weight:700;color:var(--accent);margin-left:6px;white-space:nowrap}
+dialog#photoDlg{border:0;padding:0;background:var(--surface);color:var(--ink);border-radius:12px;width:min(560px,calc(100vw - 32px));max-height:calc(100dvh - 32px);box-shadow:0 20px 60px rgba(0,0,0,.35)}
+dialog#photoDlg::backdrop{background:rgba(10,14,22,.62)}
+.dlg{display:flex;flex-direction:column;gap:14px;padding:18px}
+.dlg-head{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.dlg-head h2{font-size:24px;text-transform:uppercase}
+.dlg .x{border:0;background:none;color:var(--muted);font-size:26px;line-height:1;cursor:pointer;padding:2px 6px}
+.dlg ol{margin:0;padding-left:20px;font-size:14px;display:flex;flex-direction:column;gap:6px}
+.dlg svg{width:100%;max-width:320px;height:auto;display:block;margin:0 auto}
+.dlg .fine{margin:0}
+.dlg-status{font-size:14px;padding:10px 12px;border-radius:8px;background:var(--surface-2);border:1px solid var(--line)}
+.dlg-status.err{border-color:var(--bad);color:var(--bad)}
+#photoCanvas{width:100%;height:auto;border-radius:8px;display:block;background:var(--surface-2)}
+.est-list{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
+.est-list li{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);font-size:14.5px}
+.est-list li span:last-child{font-family:var(--mono)}
+.est-list li.skip span:last-child{color:var(--bad)}
+.warns{margin:0;padding-left:18px;font-size:13.5px;color:var(--warn);display:flex;flex-direction:column;gap:4px}
+.dlg-actions{display:flex;gap:8px;flex-wrap:wrap}
+
+/* next steps */
+#next{display:flex;flex-direction:column;gap:18px}
+.next-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+@media (max-width:760px){.next-grid{grid-template-columns:1fr}}
+.ncol h3{font-size:19px;text-transform:uppercase;margin-bottom:8px}
+.ncol ol{margin:0 0 10px;padding-left:20px;display:flex;flex-direction:column;gap:6px;font-size:14.5px}
+.ncol .gear{margin:0 0 12px;font-size:14px}
+.focus{background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:10px 14px;font-size:14px}
+.focus p{margin:4px 0 0}
+.nmuted{margin:0;color:var(--muted);font-size:14px}
+.nbtns{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.places{list-style:none;padding:0;margin:0;border-top:1px solid var(--line)}
+.places li{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--line);align-items:center}
+.places li div{min-width:0}
+.places li b{display:block;overflow-wrap:anywhere}
+.places li span{display:block;font-size:12.5px;color:var(--muted)}
+.places a{color:var(--accent);font-weight:600;white-space:nowrap;font-size:13.5px}
+.pstatus{font-size:14px;color:var(--muted);margin:6px 0}
+.pstatus.err{color:var(--bad)}
+.fine{font-size:12px;color:var(--muted);margin:8px 0 0}
+.share{display:flex;gap:12px;align-items:center;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:14px}
+#shareTxt{width:100%;min-height:130px;font:13px/1.5 var(--mono);border:1px solid var(--line);border-radius:8px;background:var(--surface-2);color:var(--ink);padding:10px}
+
 /* how-to-measure popovers */
 .legmode{grid-column:1 / -1;justify-self:start;margin-top:6px}
 .legmode label{padding:4px 10px;font-size:12px}
@@ -264,6 +319,10 @@ aside.panel{position:sticky;top:calc(env(safe-area-inset-top,0px) + 16px);displa
           <input type="radio" name="sex" id="s-m" value="m" checked><label for="s-m">Men</label>
           <input type="radio" name="sex" id="s-f" value="f"><label for="s-f">Women</label>
         </div>
+      </div>
+      <div class="photo-cta">
+        <div><b>Don’t know your measurements?</b>Estimate arm span, leg length and shoulder width from one photo.</div>
+        <button type="button" class="btn" id="photoOpen">Measure from a photo</button>
       </div>
       <form class="fields" id="form" autocomplete="off">
         <div class="field"><label for="height">Height</label><div class="inbox"><input id="height" inputmode="decimal"><span class="u-len">cm</span></div>
@@ -380,10 +439,61 @@ aside.panel{position:sticky;top:calc(env(safe-area-inset-top,0px) + 16px);displa
         <div class="pick"><label for="sportSel">Sport</label><select id="sportSel"></select></div>
         <div id="checkOut" class="check"></div>
       </section>
+      <section class="panel" id="next" aria-label="Next steps">
+        <div class="section-head" style="margin:0"><h2>Next steps</h2><p id="nextSub"></p></div>
+        <div class="next-grid">
+          <div class="ncol" id="startOut"></div>
+          <div class="ncol">
+            <h3>Places near you</h3>
+            <p class="nmuted">Clubs, courts and venues for <span id="placeSport"></span>.</p>
+            <div class="nbtns"><button type="button" class="btn primary" id="findPlaces">Use my location</button><a class="btn" id="mapsLink" href="https://www.google.com/maps" target="_blank" rel="noopener">Search Google Maps</a></div>
+            <div id="placesOut"></div>
+            <p class="fine">Your approximate location (rounded to about 100 m) is sent to OpenStreetMap’s Overpass service to run the search. This app doesn’t store it.</p>
+          </div>
+        </div>
+        <div class="share"><button type="button" class="btn" id="shareBtn">Share my results</button><span id="shareMsg" class="nmuted" role="status"></span><textarea id="shareTxt" hidden readonly aria-label="Results to copy"></textarea></div>
+      </section>
       <div id="rest" class="results"></div>
     </main>
   </div>
 </div>
+
+<dialog id="photoDlg" aria-labelledby="photoTitle">
+  <div class="dlg">
+    <div class="dlg-head"><h2 id="photoTitle">Measure from a photo</h2><button type="button" class="x" id="photoClose" aria-label="Close">×</button></div>
+    <div id="photoIntro" class="dlg" style="padding:0">
+      <svg viewBox="0 0 320 150" role="img" aria-label="A person standing with arms straight out to the sides, photographed from 2 to 3 metres away with the camera at waist height.">
+        <line class="hw-line" x1="14" y1="140" x2="306" y2="140"/>
+        <circle class="hw-body" cx="80" cy="24" r="11"/>
+        <rect class="hw-body" x="68" y="37" width="24" height="50" rx="6"/>
+        <rect class="hw-body" x="24" y="39" width="112" height="9" rx="4.5"/>
+        <path class="hw-body" d="M70 86 L64 138 L74 138 L80 96 L86 138 L96 138 L90 86 Z"/>
+        <rect class="hw-solid" x="258" y="80" width="30" height="20" rx="3"/>
+        <circle class="hw-body" cx="265" cy="90" r="5"/>
+        <line class="hw-line" x1="273" y1="100" x2="264" y2="140"/><line class="hw-line" x1="273" y1="100" x2="282" y2="140"/>
+        <line class="hw-meas" x1="110" y1="122" x2="250" y2="122"/>
+        <line class="hw-meas" x1="110" y1="116" x2="110" y2="128"/><line class="hw-meas" x1="250" y1="116" x2="250" y2="128"/>
+        <text class="hw-txt" x="180" y="114" text-anchor="middle">2–3 m</text>
+        <text class="hw-note" x="273" y="72" text-anchor="middle">waist height</text>
+      </svg>
+      <ol>
+        <li>Enter your <b>height</b> first. The photo is scaled from it.</li>
+        <li>Wear fitted clothes and stand barefoot against a plain background. Hold your arms straight out to the sides at shoulder height, palms forward, feet slightly apart.</li>
+        <li>Have someone take the photo from 2–3 m away, straight on, with the camera at waist height. Your whole body, head to feet, must be in the frame.</li>
+      </ol>
+      <p class="fine">The photo is analysed on your device and never uploaded. The pose model (about 9 MB) downloads the first time you use it.</p>
+      <div class="dlg-actions"><label class="btn primary" for="photoFile" id="photoPick">Take or choose a photo</label><input type="file" id="photoFile" accept="image/*" class="vh"></div>
+    </div>
+    <div id="photoStatus" class="dlg-status" role="status" hidden></div>
+    <div id="photoResult" class="dlg" style="padding:0" hidden>
+      <canvas id="photoCanvas"></canvas>
+      <ul class="est-list" id="estList"></ul>
+      <ul class="warns" id="estWarn"></ul>
+      <p class="fine">Estimates are usually within a few centimetres. If one looks wrong, measure it with a tape and type it in.</p>
+      <div class="dlg-actions"><button type="button" class="btn primary" id="estUse">Use these measurements</button><label class="btn" for="photoFile">Try another photo</label></div>
+    </div>
+  </div>
+</dialog>
 
 <script>
 (function(){
@@ -510,7 +620,7 @@ function writeMetric(m){
     $('#'+id).value=ok(v)?String(+(v/(id==='weight'?kw:k)).toFixed(1)):''});
   if(m.sex) document.getElementById(m.sex==='f'?'s-f':'s-m').checked=true;
 }
-function save(){try{localStorage.setItem('builtfor',JSON.stringify({units,example,pick,pickPos,legMode,m:readMetric()}))}catch(e){}}
+function save(){try{localStorage.setItem('builtfor',JSON.stringify({units,example,pick,pickPos,legMode,est:[...estFields],m:readMetric()}))}catch(e){}}
 function load(){try{return JSON.parse(localStorage.getItem('builtfor')||'null')}catch(e){return null}}
 
 // ---------- scoring ----------
@@ -713,6 +823,219 @@ function factorBlock(r,m,name){
     ${missing.length?`<div class="lowconf">Not measured: ${missing.map(x=>lc(describe(x,m).label)).join(', ')}. Add ${missing.length>1?'them':'it'} to complete this check. Missing measurements count as neutral and cost ${Math.round(50*(1-r.cov))} pts of certainty.</div>`:''}`;
 }
 
+
+// ---------- photo measuring (MediaPipe pose, runs on-device) ----------
+const MP='https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14';
+const POSE_MODEL='https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_full/float16/latest/pose_landmarker_full.task';
+let poser=null, lastEst=null;
+const estFields=new Set();
+function updateEst(){IDS.forEach(id=>$('#'+id).closest('.field').classList.toggle('est',estFields.has(id)))}
+function pStatus(msg,err){const s=$('#photoStatus');s.hidden=!msg;s.textContent=msg||'';s.classList.toggle('err',!!err)}
+async function getPoser(){
+  if(poser)return poser;
+  pStatus('Loading the pose model (about 9 MB, first time only)…');
+  const {FilesetResolver,PoseLandmarker}=await import(MP+'/vision_bundle.mjs');
+  const files=await FilesetResolver.forVisionTasks(MP+'/wasm');
+  const opts=d=>({baseOptions:{modelAssetPath:POSE_MODEL,delegate:d},runningMode:'IMAGE',numPoses:1});
+  try{poser=await PoseLandmarker.createFromOptions(files,opts('GPU'))}
+  catch(e){poser=await PoseLandmarker.createFromOptions(files,opts('CPU'))}
+  return poser;
+}
+function loadImage(file){return new Promise((res,rej)=>{const u=URL.createObjectURL(file),i=new Image();
+  i.onload=()=>{URL.revokeObjectURL(u);res(i)};i.onerror=()=>{URL.revokeObjectURL(u);rej(new Error('image'))};i.src=u})}
+// Landmark ids: 2/5 eyes, 11/12 shoulders, 13/14 elbows, 15/16 wrists, 23/24 hips, 29/30 heels, 31/32 toes
+function estimate(P,H,handCm){
+  const d=(a,b)=>Math.hypot(P[a].x-P[b].x,P[a].y-P[b].y);
+  const eyeY=(P[2].y+P[5].y)/2, floorY=Math.max(P[29].y,P[30].y,P[31].y,P[32].y);
+  const Hpx=(floorY-eyeY)/0.936;            // eye height is ~93.6% of stature
+  const cm=H/Hpx, warn=[];
+  const seen={face:[2,5],shoulders:[11,12],wrists:[15,16],hips:[23,24],feet:[29,30,31,32]};
+  const hidden=Object.keys(seen).filter(k=>seen[k].some(i=>(P[i].v??1)<.5));
+  if(hidden.length)warn.push(`Couldn’t clearly see your ${hidden.join(', ')}. Make sure your whole body is in the frame.`);
+  const angle=(a,b,c)=>{const v1=[P[a].x-P[b].x,P[a].y-P[b].y],v2=[P[c].x-P[b].x,P[c].y-P[b].y];
+    return Math.acos(Math.max(-1,Math.min(1,(v1[0]*v2[0]+v1[1]*v2[1])/(Math.hypot(...v1)*Math.hypot(...v2)))))*180/Math.PI};
+  const level=Math.abs(P[15].y-P[11].y)<.1*Hpx&&Math.abs(P[16].y-P[12].y)<.1*Hpx;
+  const straight=angle(11,13,15)>150&&angle(12,14,16)>150;
+  if(!level)warn.push('Your arms aren’t level with your shoulders, so arm span is less reliable.');
+  if(!straight)warn.push('Your elbows look bent. Keep your arms straight for an accurate arm span.');
+  if(d(11,12)/Hpx<.15)warn.push('You seem to be turned sideways. Face the camera straight on.');
+  const span=(d(15,13)+d(13,11)+d(11,12)+d(12,14)+d(14,16))*cm+2*handCm;  // wrist-to-wrist along the arms, plus both hands
+  const hipY=(P[23].y+P[24].y)/2;
+  const leg=(floorY-hipY)*cm*0.902;          // hip-joint height scaled to crotch-level leg length
+  const sh=d(11,12)*cm;
+  const okv={span:span/H>.9&&span/H<1.12&&level&&straight, leg:leg/H>.4&&leg/H<.56, sh:sh/H>.17&&sh/H<.29};
+  return {span,leg,sh,okv,warn,eyeY,floorY,Hpx,hipY};
+}
+function drawPose(ctx,P,e,w){
+  const acc=getComputedStyle(document.documentElement).getPropertyValue('--accent').trim()||'#2346B8';
+  const tape=getComputedStyle(document.documentElement).getPropertyValue('--tape').trim()||'#F2C12E';
+  const lw=Math.max(2,w/260);ctx.lineCap='round';ctx.lineJoin='round';
+  const path=(ids,col)=>{ctx.strokeStyle=col;ctx.lineWidth=lw;ctx.beginPath();ids.forEach((i,k)=>k?ctx.lineTo(P[i].x,P[i].y):ctx.moveTo(P[i].x,P[i].y));ctx.stroke()};
+  ctx.strokeStyle='rgba(0,0,0,.45)';ctx.lineWidth=lw*2.6;ctx.beginPath();[15,13,11,12,14,16].forEach((i,k)=>k?ctx.lineTo(P[i].x,P[i].y):ctx.moveTo(P[i].x,P[i].y));ctx.stroke();
+  path([15,13,11,12,14,16],acc);
+  path([11,12],tape);
+  const hx=(P[23].x+P[24].x)/2;
+  ctx.setLineDash([lw*3,lw*2]);ctx.strokeStyle=tape;ctx.beginPath();ctx.moveTo(hx,e.hipY);ctx.lineTo(hx,e.floorY);ctx.stroke();
+  const top=e.floorY-e.Hpx, lx=Math.max(lw*4,Math.min(...P.map(p=>p.x))-lw*10);
+  ctx.strokeStyle='#ffffff';ctx.beginPath();ctx.moveTo(lx,top);ctx.lineTo(lx,e.floorY);ctx.stroke();ctx.setLineDash([]);
+  [11,12,13,14,15,16,23,24].forEach(i=>{ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(P[i].x,P[i].y,lw*1.6,0,7);ctx.fill()});
+}
+async function analysePhoto(file){
+  const m=readMetric();
+  $('#photoResult').hidden=true;
+  if(!ok(m.h)||m.h<120||m.h>245){pStatus('Enter your height first. The photo is scaled from it.',true);return}
+  const pick=$('#photoPick');pick.setAttribute('aria-disabled','true');
+  try{
+    const img=await loadImage(file);
+    const k=Math.min(1,1280/Math.max(img.naturalWidth,img.naturalHeight));
+    const cv=$('#photoCanvas'),w=Math.round(img.naturalWidth*k),h=Math.round(img.naturalHeight*k);
+    cv.width=w;cv.height=h;const ctx=cv.getContext('2d');ctx.drawImage(img,0,0,w,h);
+    let pose;
+    try{pose=await getPoser()}catch(e){
+      pStatus('The pose model couldn’t load here. Photo measuring works on the full site at nishithada.github.io/built-for, or you can type your measurements in.',true);return}
+    pStatus('Finding your pose…');
+    const res=pose.detect(cv);
+    if(!res.landmarks||!res.landmarks.length){pStatus('Couldn’t find a person in that photo. Stand back so your whole body is in the frame, in good light.',true);return}
+    const P=res.landmarks[0].map(p=>({x:p.x*w,y:p.y*h,v:p.visibility}));
+    const e=estimate(P,m.h,ok(m.hand)?m.hand:.108*m.h);
+    drawPose(ctx,P,e,w);
+    lastEst=e;
+    const row=(label,v,good)=>`<li class="${good?'':'skip'}"><span>${label}</span><span>${good?fmtL(v):'not reliable, skipped'}</span></li>`;
+    $('#estList').innerHTML=row('Arm span',e.span,e.okv.span)+row(legMode==='inseam'?'Inseam (leg length)':'Leg length',e.leg,e.okv.leg)+row('Shoulder width',e.sh,e.okv.sh)
+      +`<li><span>Scaled from your height</span><span>${fmtH(m.h)}</span></li>`;
+    $('#estWarn').innerHTML=e.warn.map(x=>`<li>${x}</li>`).join('');
+    $('#estUse').disabled=!(e.okv.span||e.okv.leg||e.okv.sh);
+    pStatus('');$('#photoResult').hidden=false;
+    $('#photoResult').scrollIntoView({block:'nearest'});
+  }catch(err){pStatus('Something went wrong reading that photo. Try a different one.',true)}
+  finally{pick.removeAttribute('aria-disabled');$('#photoFile').value=''}
+}
+function useEstimate(){
+  const e=lastEst;if(!e)return;
+  const m=readMetric();
+  if(e.okv.span){m.span=e.span;estFields.add('span')}
+  if(e.okv.leg){m.sit=m.h-e.leg;estFields.add('sit')}
+  if(e.okv.sh){m.shoulder=e.sh;estFields.add('shoulder')}
+  writeMetric(m);example=null;updateEst();render();save();
+  $('#photoDlg').close();
+}
+
+// ---------- next steps ----------
+const T=t=>`nwr["sport"~"(^|;)(${t})(;|$)"]`, LZ=(v,named)=>`nwr["leisure"="${v}"]${named?'["name"]':''}`;
+const START={
+ 'Basketball':{s:['Play pickup games at a local court to learn the flow of the game.','Join a recreational league or club team. Most run adult beginner divisions.','Practise ball handling and shooting form for 15 minutes a day.'],g:'Basketball shoes with ankle support and a ball (size 7 for men, size 6 for women).',q:'basketball court',f:[T('basketball')]},
+ 'Volleyball':{s:['Find a club or community centre with a beginners’ session.','Learn the three core contacts first: forearm pass, set and serve.','Try beach volleyball too. It builds movement and game sense fast.'],g:'Indoor court shoes and knee pads.',q:'volleyball club',f:[T('volleyball|beachvolleyball')]},
+ 'Swimming':{s:['Book an adult stroke-improvement class at a local pool.','Join a masters or adult club squad. Most accept anyone who can swim 50 m.','Train technique before distance: body position and breathing first.'],g:'Swimsuit, goggles and a swim cap. Fins and a kickboard help with drills.',q:'swimming pool',f:[T('swimming'),LZ('swimming_pool',1)]},
+ 'Water polo':{s:['Get comfortable treading water with the eggbeater kick for several minutes.','Find a club with a beginners’ or masters’ group. Many welcome strong swimmers new to polo.','Keep swimming 2–3 times a week alongside polo sessions.'],g:'Swimsuit and a mouthguard. Clubs usually lend caps.',q:'water polo club',f:[T('water_polo'),LZ('swimming_pool',1)]},
+ 'Rowing':{s:['Sign up for a learn-to-row course at a rowing club. They provide boats and coaching.','Use an indoor rowing machine to learn the legs, back, arms sequence.','Test yourself over 2,000 m on the machine. It’s the standard fitness benchmark.'],g:'Close-fitting sports clothes that won’t catch in the seat slide. Clubs provide boats and oars.',q:'rowing club',f:[T('rowing')]},
+ 'Coxswain':{s:['Ask a rowing club about coxing. Clubs are often short of coxes and train them.','Learn steering, commands and water-safety rules on a learn-to-cox session.','Sit in on crew training to learn race calls and how to read a crew.'],g:'Waterproof layers and a buoyancy aid. Clubs provide the headset and speaker.',q:'rowing club',f:[T('rowing')]},
+ 'Distance running':{s:['Start with run–walk intervals three times a week.','Join a running club or a free weekly timed 5 km run to train with others.','Raise your weekly distance by no more than about 10% a week.'],g:'Running shoes fitted at a running shop.',q:'running club',f:[T('running|athletics'),LZ('track')]},
+ 'Sprinting':{s:['Join an athletics club. Sprint groups teach starts, acceleration and form.','Train short, fast efforts with full recovery rather than long runs.','Add strength work such as squats and jumps twice a week.'],g:'Trainers to start. Track spikes once you train on a track.',q:'athletics track',f:[T('athletics'),LZ('track')]},
+ 'High jump':{s:['Find an athletics club with a jumps coach. High jump needs supervised landing mats.','Learn the curved approach and the flop from low heights.','Build spring with skipping, bounding and jump training.'],g:'Trainers to start, then jumping spikes.',q:'athletics club',f:[T('athletics'),LZ('track')]},
+ 'Long & triple jump':{s:['Join an athletics club and ask for the jumps group.','Get a consistent run-up first. Most beginner fouls come from it.','Develop sprint speed, since it drives your distance.'],g:'Trainers to start, then spikes with heel cushioning.',q:'athletics club',f:[T('athletics'),LZ('track')]},
+ 'Shot put & discus':{s:['Join an athletics club with a throws coach. Throwing areas need supervision.','Learn a standing throw before adding the glide or spin.','Lift weights 2–3 times a week. Power drives throwing distance.'],g:'Flat-soled throwing shoes help with the spin. Clubs provide the implements.',q:'athletics club',f:[T('athletics'),LZ('track')]},
+ 'Gymnastics':{s:['Look for adult or recreational gymnastics classes. Many clubs run them.','Build the basics first: handstands, bridges, rolls and core strength.','Stretch daily. Flexibility takes longest to improve.'],g:'Fitted sports clothes. Clubs provide all apparatus.',q:'gymnastics club',f:[T('gymnastics')]},
+ 'Diving':{s:['Be a confident swimmer, then book a learn-to-dive class.','Start from the poolside and 1 m springboard before any platform.','Add trampoline and dryland sessions to learn somersaults safely.'],g:'Swimsuit and a small chamois towel. Pools provide the boards.',q:'diving pool',f:[T('diving'),LZ('swimming_pool',1)]},
+ 'Figure skating':{s:['Take learn-to-skate group lessons at an ice rink.','Master forward and backward skating, stops and edges before jumps.','Skate public sessions between lessons to build hours on the ice.'],g:'Hire skates at first, then buy figure skates fitted by a specialist.',q:'ice rink',f:[T('skating|ice_skating|figure_skating'),LZ('ice_rink')]},
+ 'Ski jumping':{s:['Find a ski club with a jumping programme. Jumps are rare, so check regional clubs.','Get solid at alpine or cross-country skiing first.','Start on small training hills under a coach.'],g:'Clubs usually lend jumping skis, suits and helmets to beginners.',q:'ski jumping club',f:[T('ski_jumping|skiing')]},
+ 'Weightlifting':{s:['Find a weightlifting club or a gym with lifting platforms and a coach.','Learn the snatch and clean and jerk with a light bar or broomstick first.','Build a base with squats, pulls and mobility work.'],g:'Weightlifting shoes with a raised heel once you train regularly.',q:'weightlifting gym',f:[T('weightlifting|powerlifting'),LZ('fitness_centre',1)]},
+ 'Sumo':{s:['Search for an amateur sumo club. They are rare outside Japan, so look regionally.','Wrestling or judo clubs build the same balance and pushing skills.','Train leg strength and hip mobility. The shiko stomp is the classic drill.'],g:'Clubs supply the belt (mawashi). Wear shorts to start.',q:'sumo club',f:[T('sumo|wrestling|judo')]},
+ 'Rugby union':{s:['Contact a local rugby club. Most run adult beginner or social sessions.','Learn safe tackling and falling before contact games.','Play touch rugby first to learn the laws and passing.'],g:'Studded boots and a mouthguard. A scrum cap is optional.',q:'rugby club',f:[T('rugby_union|rugby')]},
+ 'American football':{s:['Look for an adult amateur or flag football league.','Flag football is a no-contact way to learn routes and plays.','Build strength and sprint speed in the off-season.'],g:'Cleats and a mouthguard. Contact teams usually help with helmets and pads.',q:'american football team',f:[T('american_football')]},
+ 'Wrestling & judo':{s:['Try a beginners’ class at a judo or wrestling club.','Learn to fall safely before learning throws.','Train grip strength and conditioning between sessions.'],g:'A judo suit (clubs often lend one) or wrestling shoes.',q:'judo club',f:[T('judo|wrestling|martial_arts')]},
+ 'Boxing':{s:['Join a boxing club’s beginner or fitness class.','Learn stance, footwork and the jab before sparring.','Only spar under a coach, with proper gear.'],g:'Hand wraps, 12–16 oz gloves and a mouthguard.',q:'boxing gym',f:[T('boxing|kickboxing')]},
+ 'Fencing':{s:['Book a beginners’ course at a fencing club. They lend all equipment.','Choose a weapon after the course: foil, épée or sabre.','Footwork drills make the biggest early difference.'],g:'Clubs lend mask, jacket and weapon at first. Bring trainers and long trousers.',q:'fencing club',f:[T('fencing')]},
+ 'Rock climbing':{s:['Visit an indoor climbing or bouldering wall and take an intro session.','Start with bouldering. It needs no ropes or partner.','Climb 2–3 times a week. Technique improves faster than strength.'],g:'Climbing shoes (hire at first) and chalk. A harness for roped climbing.',q:'climbing gym',f:[T('climbing|bouldering')]},
+ 'Road cycling (climbing)':{s:['Join a cycling club’s beginner group ride.','Learn to ride in a group: holding a line, signalling and drafting.','Add hill repeats to build climbing power.'],g:'A road bike, helmet, padded shorts, lights and a puncture kit.',q:'cycling club',f:[T('cycling|road_cycling'),'nwr["shop"="bicycle"]["name"]']},
+ 'Tennis':{s:['Book group lessons at a local club or public court.','Learn the forehand, backhand and serve with a coach before habits set in.','Play social doubles for match practice.'],g:'Racquet, balls and court shoes.',q:'tennis court',f:[T('tennis')]},
+ 'Badminton':{s:['Find a club night or pay-and-play court at a sports centre.','Learn the grips and the high serve first.','Shadow footwork drills build court coverage.'],g:'Racquet, shuttles and non-marking indoor shoes.',q:'badminton club',f:[T('badminton')]},
+ 'Handball':{s:['Find a handball club. Many run adult beginner sessions.','Learn passing, catching and the jump shot.','Build shoulder strength and throwing power.'],g:'Indoor court shoes. Clubs provide balls.',q:'handball club',f:[T('handball')]},
+ 'Football (soccer)':{s:['Join a casual 5-a-side or 7-a-side game to get touches on the ball.','Sign up with an amateur club. Most have adult and beginner teams.','Tell the coach which position you want to try. Your best fits are listed above.'],g:'Football boots (or turf shoes for artificial pitches) and shin pads.',q:'football club',f:[T('soccer')]},
+ 'Baseball pitcher':{s:['Join an adult amateur baseball or softball league.','Learn pitching mechanics from a coach. Poor mechanics cause arm injuries.','Follow a throwing programme with rest days to protect your arm.'],g:'Glove, cleats and baseballs.',q:'baseball field',f:[T('baseball|softball')]},
+ 'Horse racing jockey':{s:['Take lessons at a riding school to build a secure seat.','Look into racing-school courses. They are the usual route to a licence.','Work in a racing yard to gain experience riding out.'],g:'Riding helmet, boots and a body protector.',q:'riding school',f:[T('equestrian|horse_racing')]}
+};
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let lastRes=null, placesKey=null;
+function renderNext(m,res){
+  lastRes=res;
+  const r=res.find(x=>x.sp.n===pick); if(!r)return;
+  const cur=r.positions?(r.positions.find(p=>p.p.n===pickPos)||r.positions[0]):r;
+  const S=START[r.sp.n], name=r.positions?`${r.sp.n} (${cur.p.n.toLowerCase()})`:r.sp.n, Pc=Math.round(cur.score*100);
+  $('#nextSub').textContent=`For ${name}. Pick another sport above to change this.`;
+  const {limits}=analyse(cur);
+  const chg=limits.find(x=>CHANGEABLE[x.tr]), fix=limits.find(x=>!CHANGEABLE[x.tr]&&x.pts>=8);
+  let focus;
+  if(fix&&r.positions){
+    const alt=r.positions.find(p=>p!==cur&&p.score>cur.score+.05);
+    focus=alt?`Your ${lc(describe(fix,m).label)} is the main limit for ${cur.p.n.toLowerCase()}. ${alt.p.n} (${Math.round(alt.score*100)}%) suits your build better and is worth trying when you start.`
+             :`Your ${lc(describe(fix,m).label)} is the main limit here. ${FIX_ADVICE[fix.tr]}`;
+  }else if(fix){
+    const alts=res.filter(x=>x!==r&&x.sp.cat===r.sp.cat&&x.score>r.score).slice(0,2);
+    focus=`Your ${lc(describe(fix,m).label)} is the main limit here. ${FIX_ADVICE[fix.tr]}`+(alts.length?` Similar sports that suit you better: ${alts.map(a=>`${a.sp.n} (${Math.round(a.score*100)}%)`).join(', ')}.`:'');
+  }else if(chg){
+    const n=numeric(chg,m);focus=`Your ${lc(describe(chg,m).label)} is ${gapText(n,m)}. ${changeAdvice(n)}`;
+  }else focus=`Nothing in your build holds you back at ${Pc}%. Your progress will come down to skill and training.`;
+  $('#startOut').innerHTML=`<h3>How to get started</h3><ol>${S.s.map(x=>`<li>${x}</li>`).join('')}</ol>
+    <p class="gear"><b>Gear:</b> ${S.g}</p><div class="focus"><b>Your first focus</b><p>${focus}</p></div>`;
+  $('#placeSport').textContent=r.sp.n.toLowerCase();
+  $('#mapsLink').href=`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(S.q+' near me')}`;
+  if(placesKey!==r.sp.n){placesKey=r.sp.n;$('#placesOut').innerHTML=''}
+}
+async function overpass(filters,lat,lon,rad){
+  const q=`[out:json][timeout:20];(${filters.map(f=>`${f}(around:${rad},${lat},${lon});`).join('')});out center tags 80;`;
+  const ac=new AbortController(),t=setTimeout(()=>ac.abort(),25000);
+  try{const resp=await fetch('https://overpass-api.de/api/interpreter',{method:'POST',body:new URLSearchParams({data:q}),signal:ac.signal});
+    if(!resp.ok)throw new Error('http '+resp.status);return (await resp.json()).elements||[]}
+  finally{clearTimeout(t)}
+}
+function km(a,b,c,d){const R=6371,r=x=>x*Math.PI/180,dl=r(c-a),dn=r(d-b);
+  const h=Math.sin(dl/2)**2+Math.cos(r(a))*Math.cos(r(c))*Math.sin(dn/2)**2;return 2*R*Math.asin(Math.sqrt(h))}
+const KIND={pitch:'Pitch or court',sports_centre:'Sports centre',stadium:'Stadium',track:'Track',swimming_pool:'Pool',fitness_centre:'Gym',ice_rink:'Ice rink',sports_hall:'Sports hall'};
+async function findPlaces(){
+  const sport=pick, S=START[sport], out=$('#placesOut'), btn=$('#findPlaces');
+  const st=(msg,err)=>{out.innerHTML=`<p class="pstatus${err?' err':''}">${msg}</p>`};
+  btn.disabled=true;st('Finding your location…');
+  try{
+    const pos=await new Promise((res,rej)=>{if(!navigator.geolocation)return rej({code:9});
+      navigator.geolocation.getCurrentPosition(res,rej,{timeout:12000,maximumAge:600000})});
+    const lat=+pos.coords.latitude.toFixed(3), lon=+pos.coords.longitude.toFixed(3);
+    st('Searching OpenStreetMap…');
+    let els=await overpass(S.f,lat,lon,8000);
+    if(els.length<3)els=await overpass(S.f,lat,lon,25000);
+    if(pick!==sport)return;
+    const seen=new Set();let unnamed=0;
+    const list=els.map(e=>{const la=e.lat??e.center?.lat, lo=e.lon??e.center?.lon, t=e.tags||{};
+        const kind=KIND[t.leisure]||(t.club?'Club':t.shop==='bicycle'?'Bike shop':'Venue');
+        return {name:t.name,kind,la,lo,dist:km(lat,lon,la,lo)}})
+      .filter(p=>ok(p.la)&&ok(p.lo))
+      .sort((a,b)=>a.dist*(a.name?1:1.6)-b.dist*(b.name?1:1.6))
+      .filter(p=>{const k=(p.name||'')+p.la.toFixed(3)+p.lo.toFixed(3);if(seen.has(k))return false;seen.add(k);
+        if(!p.name){if(unnamed>=3)return false;unnamed++}return true})
+      .slice(0,8);
+    if(!list.length){st(`No ${sport.toLowerCase()} places are mapped within 25 km in OpenStreetMap. Try the Google Maps search.`);return}
+    const fd=k=>units==='metric'?(k<1?`${Math.round(k*1000)} m`:`${k.toFixed(1)} km`):`${(k*.621).toFixed(1)} mi`;
+    out.innerHTML=`<ol class="places">${list.map(p=>`<li><div><b>${esc(p.name||'Unnamed '+p.kind.toLowerCase())}</b><span>${p.kind} · ${fd(p.dist)} away</span></div>
+      <a href="https://www.google.com/maps/dir/?api=1&destination=${p.la.toFixed(5)},${p.lo.toFixed(5)}" target="_blank" rel="noopener">Directions</a></li>`).join('')}</ol>
+      <p class="fine">From OpenStreetMap. Check opening times and membership with the venue.</p>`;
+  }catch(err){
+    if(err&&err.code===1)st('Location access is blocked. Allow location for this site and try again, or use the Google Maps search.',true);
+    else if(err&&(err.code===2||err.code===3||err.code===9))st('Couldn’t get your location. Use the Google Maps search instead.',true);
+    else st('Couldn’t reach OpenStreetMap right now. Use the Google Maps search instead.',true);
+  }finally{btn.disabled=false}
+}
+async function shareResults(){
+  const res=lastRes;if(!res)return;
+  const url='https://nishithada.github.io/built-for/';
+  const top=res.slice(0,3).map((r,i)=>`${i+1}. ${r.sp.n}${r.best?` (${r.best.toLowerCase()})`:''}: ${Math.round(r.score*100)}%`).join('\n');
+  const c=res.find(x=>x.sp.n===pick), cur=c&&c.positions?(c.positions.find(p=>p.p.n===pickPos)||c.positions[0]):null;
+  const chk=c&&!res.slice(0,3).includes(c)?`\nAlso checked ${c.sp.n}${cur?` as ${cur.p.n.toLowerCase()}`:''}: ${Math.round((cur||c).score*100)}%`:'';
+  const text=`My body is built for:\n${top}${chk}\n\nFind yours:`;
+  const msg=$('#shareMsg'), ta=$('#shareTxt');
+  if(navigator.share){try{await navigator.share({title:'Built For',text,url});msg.textContent='Shared.';return}catch(e){if(e&&e.name==='AbortError')return}}
+  try{await navigator.clipboard.writeText(`${text} ${url}`);msg.textContent='Copied to your clipboard.';ta.hidden=true}
+  catch(e){ta.value=`${text} ${url}`;ta.hidden=false;ta.focus();ta.select();msg.textContent='Copy the text below.'}
+}
+
 // ---------- render ----------
 function render(){
   const m=readMetric(), out=$('#out');
@@ -721,7 +1044,7 @@ function render(){
   if(example){const p=PRESETS.find(p=>p.k===example);
     $('#bannerText').innerHTML=`Showing the <b>${p.label.toLowerCase()}</b> measurements. Type your own to replace them.`}
   const valid=ok(m.h)&&ok(m.w)&&m.h>=120&&m.h<=245&&m.w>=30&&m.w<=250;
-  $('#check').hidden=!valid;
+  $('#check').hidden=!valid;$('#next').hidden=!valid;
   if(!valid){
     out.innerHTML='<div class="panel empty">Enter your height and weight to see which sports suit your build. The optional measurements make the result sharper.</div>';$('#rest').innerHTML='';return}
   const T=traits(m), sexWord=m.sex==='f'?'women':'men';
@@ -766,6 +1089,7 @@ function render(){
 
   out.innerHTML=`<section><div class="podium">${pod}</div></section>`;
   renderCheck(m,T,res);
+  renderNext(m,res);
   $('#rest').innerHTML=`
     <section class="panel">
       <div class="section-head"><h2>Your build</h2><p>Percentiles compared with adult ${sexWord}. Dashed line = average.</p></div>
@@ -782,8 +1106,15 @@ function render(){
 // ---------- wiring ----------
 $('#presets').innerHTML=PRESETS.map(p=>`<button type="button" class="chip" data-k="${p.k}">${p.label}</button>`).join('');
 $('#presets').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
-  const p=PRESETS.find(p=>p.k===b.dataset.k);example=p.k;writeMetric(p);render();save()});
-$('#form').addEventListener('input',()=>{example=null;render();save()});
+  const p=PRESETS.find(p=>p.k===b.dataset.k);example=p.k;estFields.clear();updateEst();writeMetric(p);render();save()});
+$('#form').addEventListener('input',e=>{example=null;if(estFields.delete(e.target.id))updateEst();render();save()});
+$('#photoOpen').addEventListener('click',()=>{pStatus('');const d=$('#photoDlg');if(d.showModal)d.showModal();else d.setAttribute('open','')});
+$('#photoClose').addEventListener('click',()=>$('#photoDlg').close());
+$('#photoDlg').addEventListener('click',e=>{if(e.target.id==='photoDlg')e.target.close()});
+$('#photoFile').addEventListener('change',e=>{const f=e.target.files&&e.target.files[0];if(f)analysePhoto(f)});
+$('#estUse').addEventListener('click',useEstimate);
+$('#findPlaces').addEventListener('click',findPlaces);
+$('#shareBtn').addEventListener('click',shareResults);
 $('#form').addEventListener('submit',e=>e.preventDefault());
 document.querySelectorAll('input[name=sex]').forEach(r=>r.addEventListener('change',()=>{render();save()}));
 document.querySelectorAll('input[name=units]').forEach(r=>r.addEventListener('change',()=>{
@@ -813,14 +1144,15 @@ document.querySelectorAll('input[name=legmode]').forEach(x=>x.addEventListener('
 document.querySelectorAll('.info').forEach(b=>b.addEventListener('click',()=>{
   const p=document.getElementById(b.getAttribute('aria-controls'));p.hidden=!p.hidden;b.setAttribute('aria-expanded',String(!p.hidden))}));
 $('#jump').addEventListener('click',()=>$('#results').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'}));
-$('#clear').addEventListener('click',()=>{IDS.forEach(id=>$('#'+id).value='');example=null;render();save();$('#height').focus()});
+$('#clear').addEventListener('click',()=>{IDS.forEach(id=>$('#'+id).value='');estFields.clear();updateEst();example=null;render();save();$('#height').focus()});
 
 const saved=load();
 if(saved&&saved.m){
   if(saved.units==='imperial'){units='imperial';$('#u-imp').checked=true;
     document.querySelectorAll('.u-len').forEach(e=>e.textContent='in');document.querySelectorAll('.u-wt').forEach(e=>e.textContent='lb')}
-  example=saved.example||null;if(saved.pick)pick=saved.pick;if(saved.legMode==='inseam'){legMode='inseam';applyLegMode()}pickPos=saved.pickPos||null;writeMetric(saved.m);
+  example=saved.example||null;if(saved.pick)pick=saved.pick;(saved.est||[]).forEach(x=>estFields.add(x));if(saved.legMode==='inseam'){legMode='inseam';applyLegMode()}pickPos=saved.pickPos||null;writeMetric(saved.m);
 }else writeMetric(PRESETS[0]);
+updateEst();
 render();
 })();
 </script>
