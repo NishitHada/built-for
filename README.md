@@ -6,7 +6,7 @@ Enter your body measurements and see which sports your build naturally suits.
 
 ## What it does
 
-Three screens: a short landing page, a measurements form (required basics, optional extras or one photo), and results with tabs for **Sports** (top 3, a ranked list you can filter by region, team or individual, and a deep dive per sport), **Your build** and **Methodology**.
+Screens: a landing page with an explore strip of sports, a measurements form (required basics, optional extras or one photo), results (top 3 and a ranked list you can filter by region, team or individual, plus your build), a page per sport at `#s-<sport>` (your personal fit, or what the sport rewards if you haven't measured yet), and a methodology page.
 
 - Scores 35 sports against the body proportions elite athletes in each sport tend to share.
 - Team sports (football/soccer, basketball, volleyball, rugby union, American football, cricket, kabaddi) are scored per position.

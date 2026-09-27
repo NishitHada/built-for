@@ -4,6 +4,24 @@ Short records of product and method decisions: what was decided, why, and what i
 
 ---
 
+## 006 — Sport pages, explore strip, and a landing page in the house style
+
+**Date:** 2026-09-27 · **Status:** accepted
+
+### Context
+The deep dive sat under the ranked list, so tapping a sport jumped far down the page with no way back to your place, it was always on screen, and it couldn't be linked. The owner also supplied a new landing mockup (dark navy and electric blue) and chose to keep the existing visual style (option A).
+
+### Decision
+- **Sport pages** at `#s-<sport>` (e.g. `#s-cricket`), opened from the explore cards, the top 3 and the ranked list. With measurements they show the personal fit (advantage, positions, limiting factors, next steps). Without them they show what the sport rewards: typical height, BMI and helpful traits per position, a call to measure, and next steps. "← All sports" and the browser Back button return to the exact list position; a switcher moves between sports.
+- **Landing** follows the mockup's structure in the house style: new headline, icon trust row, two primary actions, the owner's body illustration, and an **Explore** strip that leads with the region's popular sports, shows each one's typical elite height, and expands to all 35.
+- **Methodology** becomes its own page (`#method`), reachable from the header before measuring; results keep two tabs (Sports, Your build).
+
+### Trade-offs
+- The illustration's "Arm span" and "Shoulder width" lines are drawn in the wrong places (arm span should run fingertip to fingertip with arms out). Pending: unlabelled, higher-resolution artwork with the lines drawn in code.
+- Sport cards are typographic; athlete artwork for each sport would need to be commissioned.
+
+---
+
 ## 005 — Three screens, one filterable list, next steps only in the deep dive
 
 **Date:** 2026-09-27 · **Status:** accepted

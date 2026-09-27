@@ -56,6 +56,7 @@ Source: *120 years of Olympic history* (`athlete_events.csv`, 271k rows, 1896–
 ---
 
 ### 1.4 Layout
+- [x] Landing redesign with explore strip, in the house style ([DECISIONS.md](DECISIONS.md) #006)
 - [x] Landing, measure and results screens; one filterable ranked list; next steps only in the deep dive; results tabs ([DECISIONS.md](DECISIONS.md) #005)
 
 ---
@@ -72,7 +73,9 @@ Source: *120 years of Olympic history* (`athlete_events.csv`, 271k rows, 1896–
 ## Phase 3 — Engagement and growth (static)
 
 - [ ] Share card: draw a result image in the browser (top 3 + body diagram) for Instagram/WhatsApp
-- [ ] One page per sport ("Am I built for basketball?") for search traffic
+- [x] One page per sport at `#s-<sport>`, useful with or without measurements ([DECISIONS.md](DECISIONS.md) #006)
+- [ ] **(you)** Unlabelled, higher-resolution body illustration so the measurement lines can be drawn correctly in code
+- [ ] Search-friendly sport pages: separate static URLs per sport (hash links aren't indexed)
 - [ ] Phone-based ability tests: vertical jump from slow-motion video (flight time), 20 m sprint timer, sit-and-reach, plank; fold into scoring as a separate "ability" signal
 - [ ] Youth mode: age-group norms and predicted adult height from parents' heights (Khamis–Roche), with careful framing for under-18s
 - [ ] 8-week starter plans per sport, printable-free (on page), with a re-test reminder
