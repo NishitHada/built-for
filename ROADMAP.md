@@ -78,6 +78,7 @@ Source: *120 years of Olympic history* (`athlete_events.csv`, 271k rows, 1896–
 - [x] Corrected body illustration: arm span fingertip to fingertip, shoulder width between the bony tips (supplied by owner)
 - [ ] Search-friendly sport pages: separate static URLs per sport (hash links aren't indexed)
 - [ ] Phone-based ability tests: vertical jump from slow-motion video (flight time), 20 m sprint timer, sit-and-reach, plank; fold into scoring as a separate "ability" signal
+- [x] Note for under-18s in the Basics card (ⓘ next to "Compare with"): results compare you with adults
 - [ ] Youth mode: age-group norms and predicted adult height from parents' heights (Khamis–Roche), with careful framing for under-18s
 - [ ] 8-week starter plans per sport, printable-free (on page), with a re-test reminder
 
