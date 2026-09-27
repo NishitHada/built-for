@@ -186,6 +186,20 @@ dialog#photoDlg::backdrop{background:rgba(10,14,22,.62)}
 .btn.off{opacity:.45;pointer-events:none}
 #pickHint{font-size:13px;color:var(--warn)}
 .dlg-status{font-size:14px;padding:10px 12px;border-radius:8px;background:var(--surface-2);border:1px solid var(--line)}
+.ps-row{display:flex;gap:10px;align-items:center}
+.spin{width:16px;height:16px;flex:none;border-radius:50%;border:2px solid var(--line);border-top-color:var(--accent);animation:spin .8s linear infinite}
+.dlg-status.err .spin,.dlg-status.done .spin{display:none}
+.ps-num{margin-left:auto;font-family:var(--mono);font-size:12.5px;color:var(--muted);white-space:nowrap}
+.prog{height:6px;border-radius:3px;background:var(--line);overflow:hidden;margin-top:9px}
+.prog i{display:block;height:100%;width:0;background:var(--accent);transition:width .2s}
+.prog.ind i{width:35%;animation:slide 1.2s ease-in-out infinite}
+.ps-slow{margin:7px 0 0;font-size:12.5px;color:var(--muted)}
+.pwrap{position:relative;overflow:hidden;border-radius:8px}
+.scan{position:absolute;left:0;right:0;top:0;height:22%;pointer-events:none;background:linear-gradient(180deg,transparent,color-mix(in srgb,var(--accent) 40%,transparent) 88%,var(--accent));animation:scan 1.5s ease-in-out infinite alternate}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes slide{from{transform:translateX(-100%)}to{transform:translateX(290%)}}
+@keyframes scan{from{transform:translateY(-100%)}to{transform:translateY(455%)}}
+@media (prefers-reduced-motion: reduce){.spin,.prog.ind i{animation:none}.scan{display:none}}
 .dlg-status.err{border-color:var(--bad);color:var(--bad)}
 #photoCanvas{width:100%;height:auto;border-radius:8px;display:block;background:var(--surface-2)}
 .est-list{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
@@ -503,13 +517,19 @@ dialog#photoDlg::backdrop{background:rgba(10,14,22,.62)}
       <p class="fine">The photo is analysed on your device and never uploaded. The pose model (about 9 MB) downloads the first time you use it.</p>
       <div class="dlg-actions" style="align-items:center"><label class="btn primary" for="photoFile" id="photoPick">Take or choose a photo</label><input type="file" id="photoFile" accept="image/*" class="vh"><span id="pickHint" role="status"></span></div>
     </div>
-    <div id="photoStatus" class="dlg-status" role="status" hidden></div>
+    <div id="photoStatus" class="dlg-status" hidden>
+      <div class="ps-row"><span class="spin" aria-hidden="true"></span><span id="psText" role="status"></span><span class="ps-num" id="psNum" aria-hidden="true"></span></div>
+      <div class="prog" id="psBar" hidden><i></i></div>
+      <p class="ps-slow" id="psSlow" hidden>Still working. The model downloads only once; next time this step is instant.</p>
+    </div>
     <div id="photoResult" class="dlg" style="padding:0" hidden>
-      <canvas id="photoCanvas"></canvas>
+      <div class="pwrap"><canvas id="photoCanvas"></canvas><div class="scan" id="scan" hidden></div></div>
+      <div id="estBlock" class="dlg" style="padding:0">
       <ul class="est-list" id="estList"></ul>
       <ul class="warns" id="estWarn"></ul>
       <p class="fine">Estimates are usually within a few centimetres. If one looks wrong, measure it with a tape and type it in.</p>
       <div class="dlg-actions"><button type="button" class="btn primary" id="estUse">Use these measurements</button><label class="btn" for="photoFile">Try another photo</label></div>
+      </div>
     </div>
   </div>
 </dialog>
@@ -929,16 +949,47 @@ const POSE_MODEL='https://storage.googleapis.com/mediapipe-models/pose_landmarke
 let poser=null, lastEst=null;
 const estFields=new Set();
 function updateEst(){IDS.forEach(id=>$('#'+id).closest('.field').classList.toggle('est',estFields.has(id)))}
-function pStatus(msg,err){const s=$('#photoStatus');s.hidden=!msg;s.textContent=msg||'';s.classList.toggle('err',!!err)}
-async function getPoser(){
-  if(poser)return poser;
-  pStatus('Loading the pose model (about 9 MB, first time only)…');
-  const {FilesetResolver,PoseLandmarker}=await import(MP+'/vision_bundle.mjs');
-  const files=await FilesetResolver.forVisionTasks(MP+'/wasm');
-  const opts=d=>({baseOptions:{modelAssetPath:POSE_MODEL,delegate:d},runningMode:'IMAGE',numPoses:1});
-  try{poser=await PoseLandmarker.createFromOptions(files,opts('GPU'))}
-  catch(e){poser=await PoseLandmarker.createFromOptions(files,opts('CPU'))}
-  return poser;
+// Status line: text, optional progress (0\u20131, or null for an indeterminate bar), optional number
+let slowT=null;
+function pStatus(msg,o={}){
+  const s=$('#photoStatus');s.hidden=!msg;s.classList.toggle('err',!!o.err);s.classList.toggle('done',!!o.done);
+  if($('#psText').textContent!==(msg||''))$('#psText').textContent=msg||'';
+  $('#psNum').textContent=o.num||'';
+  const bar=$('#psBar');bar.hidden=o.err||o.done||o.prog===undefined;
+  if(!bar.hidden){bar.classList.toggle('ind',o.prog===null);bar.firstElementChild.style.width=o.prog===null?'':`${(o.prog*100).toFixed(1)}%`}
+  if(!msg||o.err||o.done){clearTimeout(slowT);slowT=null;$('#psSlow').hidden=true}
+}
+// Yield so the status can paint. Hidden tabs pause animation frames, so a timer backs it up.
+const nextPaint=()=>new Promise(r=>{let done=false;const go=()=>{if(!done){done=true;setTimeout(r,0)}};requestAnimationFrame(go);setTimeout(go,60)});
+// Download the model with progress, keeping a copy in the browser cache so later visits skip it
+async function fetchModel(onp){
+  const CACHE='built-for-pose-v1';
+  try{const hit=await (await caches.open(CACHE)).match(POSE_MODEL);if(hit)return new Uint8Array(await hit.arrayBuffer())}catch(e){}
+  const resp=await fetch(POSE_MODEL);if(!resp.ok)throw new Error('model '+resp.status);
+  const total=+resp.headers.get('content-length')||9398198, reader=resp.body.getReader(), parts=[];let got=0;
+  for(;;){const {done,value}=await reader.read();if(done)break;parts.push(value);got+=value.length;onp(Math.min(1,got/total),got,total)}
+  const buf=new Uint8Array(got);let off=0;for(const p of parts){buf.set(p,off);off+=p.length}
+  try{await (await caches.open(CACHE)).put(POSE_MODEL,new Response(buf.slice()))}catch(e){}
+  return buf;
+}
+let poserP=null;
+function getPoser(){
+  if(poser)return Promise.resolve(poser);
+  if(!poserP)poserP=(async()=>{
+    clearTimeout(slowT);slowT=setTimeout(()=>{$('#psSlow').hidden=false},7000);
+    pStatus('Loading the pose engine\u2026',{prog:null});
+    const {FilesetResolver,PoseLandmarker}=await import(MP+'/vision_bundle.mjs');
+    const files=await FilesetResolver.forVisionTasks(MP+'/wasm');
+    const mb=n=>(n/1048576).toFixed(1);
+    const buf=await fetchModel((p,got,total)=>pStatus('Downloading the pose model',{prog:p,num:`${mb(got)} of ${mb(total)} MB`}));
+    pStatus('Starting the pose model\u2026',{prog:null});await nextPaint();
+    const opts=d=>({baseOptions:{modelAssetBuffer:buf,delegate:d},runningMode:'IMAGE',numPoses:1});
+    try{poser=await PoseLandmarker.createFromOptions(files,opts('GPU'))}
+    catch(e){poser=await PoseLandmarker.createFromOptions(files,opts('CPU'))}
+    pStatus('Pose model ready.',{done:true});
+    return poser;
+  })().catch(e=>{poserP=null;pStatus('');throw e});
+  return poserP;
 }
 function loadImage(file){return new Promise((res,rej)=>{const u=URL.createObjectURL(file),i=new Image();
   i.onload=()=>{URL.revokeObjectURL(u);res(i)};i.onerror=()=>{URL.revokeObjectURL(u);rej(new Error('image'))};i.src=u})}
@@ -984,19 +1035,22 @@ function drawPose(ctx,P,e,w){
 async function analysePhoto(file){
   const m=readMetric();
   $('#photoResult').hidden=true;
-  if(!ok(m.h)||m.h<120||m.h>245){pStatus('Enter your height first. The photo is scaled from it.',true);return}
+  if(!ok(m.h)||m.h<120||m.h>245){pStatus('Enter your height first. The photo is scaled from it.',{err:true});return}
   const pick=$('#photoPick');pick.setAttribute('aria-disabled','true');
   try{
     const img=await loadImage(file);
     const k=Math.min(1,1280/Math.max(img.naturalWidth,img.naturalHeight));
     const cv=$('#photoCanvas'),w=Math.round(img.naturalWidth*k),h=Math.round(img.naturalHeight*k);
     cv.width=w;cv.height=h;const ctx=cv.getContext('2d');ctx.drawImage(img,0,0,w,h);
+    // Show the photo straight away with a scanning line while the model loads and runs
+    $('#estBlock').hidden=true;$('#scan').hidden=false;$('#photoResult').hidden=false;
+    $('#photoResult').scrollIntoView({block:'nearest'});
     let pose;
     try{pose=await getPoser()}catch(e){
-      pStatus('The pose model couldn’t load here. Photo measuring works on the full site at nishithada.github.io/built-for, or you can type your measurements in.',true);return}
-    pStatus('Finding your pose…');
+      pStatus('The pose model couldn\u2019t load here. Photo measuring works on the full site at nishithada.github.io/built-for, or you can type your measurements in.',{err:true});return}
+    pStatus('Finding your pose\u2026',{prog:null});await nextPaint();
     const res=pose.detect(cv);
-    if(!res.landmarks||!res.landmarks.length){pStatus('Couldn’t find a person in that photo. Stand back so your whole body is in the frame, in good light.',true);return}
+    if(!res.landmarks||!res.landmarks.length){pStatus('Couldn\u2019t find a person in that photo. Stand back so your whole body is in the frame, in good light.',{err:true});return}
     const P=res.landmarks[0].map(p=>({x:p.x*w,y:p.y*h,v:p.visibility}));
     const e=estimate(P,m.h,ok(m.hand)?m.hand:.108*m.h);
     drawPose(ctx,P,e,w);
@@ -1006,10 +1060,10 @@ async function analysePhoto(file){
       +`<li><span>Scaled from your height</span><span>${fmtH(m.h)}</span></li>`;
     $('#estWarn').innerHTML=e.warn.map(x=>`<li>${x}</li>`).join('');
     $('#estUse').disabled=!(e.okv.span||e.okv.leg||e.okv.sh);
-    pStatus('');$('#photoResult').hidden=false;
+    pStatus('');$('#estBlock').hidden=false;
     $('#photoResult').scrollIntoView({block:'nearest'});
-  }catch(err){pStatus('Something went wrong reading that photo. Try a different one.',true)}
-  finally{pick.removeAttribute('aria-disabled');$('#photoFile').value=''}
+  }catch(err){pStatus('Something went wrong reading that photo. Try a different one.',{err:true})}
+  finally{$('#scan').hidden=true;pick.removeAttribute('aria-disabled');$('#photoFile').value=''}
 }
 function useEstimate(){
   const e=lastEst;if(!e)return;
@@ -1230,7 +1284,8 @@ $('#form').addEventListener('input',e=>{example=null;if(estFields.delete(e.targe
 function photoHeightOk(){const v=parseFloat($('#photoHeight').value),cm=units==='metric'?v:v*2.54;return isFinite(cm)&&cm>=120&&cm<=245}
 function syncPhotoGate(){const okH=photoHeightOk();$('#photoFile').disabled=!okH;$('#photoPick').classList.toggle('off',!okH);
   $('#pickHint').textContent=okH?'':'Enter your height in step 1 to continue.'}
-$('#photoOpen').addEventListener('click',()=>{pStatus('');$('#photoHeight').value=$('#height').value;syncPhotoGate();
+$('#photoOpen').addEventListener('click',()=>{pStatus(poser?'Pose model ready.':'',{done:true});$('#photoHeight').value=$('#height').value;syncPhotoGate();
+  getPoser().catch(()=>{});   // preload while the user reads the steps; errors surface when a photo is chosen
   const d=$('#photoDlg');if(d.showModal)d.showModal();else d.setAttribute('open','');if(!photoHeightOk())$('#photoHeight').focus()});
 $('#photoHeight').addEventListener('input',()=>{const h=$('#height');h.value=$('#photoHeight').value;h.dispatchEvent(new Event('input',{bubbles:true}));syncPhotoGate()});
 $('#photoClose').addEventListener('click',()=>$('#photoDlg').close());
