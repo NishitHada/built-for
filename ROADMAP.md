@@ -74,7 +74,7 @@ Source: *120 years of Olympic history* (`athlete_events.csv`, 271k rows, 1896–
 
 - [ ] Share card: draw a result image in the browser (top 3 + body diagram) for Instagram/WhatsApp
 - [x] One page per sport at `#s-<sport>`, useful with or without measurements ([DECISIONS.md](DECISIONS.md) #006)
-- [ ] **(you)** Unlabelled, higher-resolution body illustration so the measurement lines can be drawn correctly in code
+- [x] Corrected body illustration: arm span fingertip to fingertip, shoulder width between the bony tips (supplied by owner)
 - [ ] Search-friendly sport pages: separate static URLs per sport (hash links aren't indexed)
 - [ ] Phone-based ability tests: vertical jump from slow-motion video (flight time), 20 m sprint timer, sit-and-reach, plank; fold into scoring as a separate "ability" signal
 - [ ] Youth mode: age-group norms and predicted adult height from parents' heights (Khamis–Roche), with careful framing for under-18s

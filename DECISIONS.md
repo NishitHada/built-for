@@ -17,7 +17,8 @@ The deep dive sat under the ranked list, so tapping a sport jumped far down the 
 - **Methodology** becomes its own page (`#method`), reachable from the header before measuring; results keep two tabs (Sports, Your build).
 
 ### Trade-offs
-- The illustration's "Arm span" and "Shoulder width" lines are drawn in the wrong places (arm span should run fingertip to fingertip with arms out). Pending: unlabelled, higher-resolution artwork with the lines drawn in code.
+- The first illustration drew "Arm span" and "Shoulder width" in the wrong places; replaced on 2026-09-27 with the owner's corrected artwork (arms out, fingertip to fingertip; shoulder tips).
+- Explore cards use a colour per sport, a coloured icon, a colour wash and a faded large icon. Athlete artwork per sport (as in the mockup) would need to be commissioned for all 35.
 - Sport cards are typographic; athlete artwork for each sport would need to be commissioned.
 
 ---
