@@ -4,6 +4,18 @@ Short records of product and method decisions: what was decided, why, and what i
 
 ---
 
+## 007 — Deep dive is a results tab
+
+**Date:** 2026-09-27 · **Status:** accepted (amends 006)
+
+### Context
+After 006 moved the deep dive to a separate sport page, the owner found it hard to reach and asked for it to be a tab.
+
+### Decision
+Results have three tabs: **Sports · Deep dive · Your build**. The Deep dive tab holds the sport picker, your fit, positions, limiting factors and next steps. Tapping any sport (list row, top 3, explore card) opens it in that tab. The tab keeps the shareable address `#s-<sport>`; "← All sports" and the browser Back button return to the Sports tab at the same list position. Before you've measured there are no results, so a sport opens as its own page showing what the sport rewards. The separate "Deep dive into any sport" bar is removed because the tab carries the picker.
+
+---
+
 ## 006 — Sport pages, explore strip, and a landing page in the house style
 
 **Date:** 2026-09-27 · **Status:** accepted

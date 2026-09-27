@@ -285,11 +285,7 @@ dialog#photoDlg::backdrop{background:rgba(10,14,22,.62)}
 .hero-cta{display:flex;gap:18px;align-items:center;flex-wrap:wrap;margin-top:24px}
 .btn.big{font-size:16px;padding:13px 22px}
 .photo-link{margin-top:16px;font-size:14px}
-.lookup{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--line);border-left:0;border-right:0;padding:14px 2px}
-.lookup label{display:flex;flex-direction:column;gap:2px}
-.lookup label b{font-family:var(--display);font-size:20px;text-transform:uppercase;font-weight:700}
-.lookup label span{font-size:13.5px;color:var(--muted)}
-.lookup select{font:inherit;font-size:15px;padding:9px 12px;border:1px solid var(--ink);border-radius:8px;background:var(--surface-2);color:var(--ink);min-width:min(100%,260px);max-width:100%}
+#spBlock{display:flex;flex-direction:column;gap:18px}
 .landfoot{margin:0;font-size:14px;text-align:center}
 #v-landing{padding-top:clamp(12px,3vw,32px)}
 .explore{display:grid;grid-template-columns:1fr;gap:18px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:20px;background:var(--surface)}
@@ -681,14 +677,11 @@ dialog#photoDlg::backdrop{background:rgba(10,14,22,.62)}
     <div class="banner" id="banner"><span class="tag">Example</span><span id="bannerText"></span></div>
     <div class="tabs" role="tablist" aria-label="Results">
       <button type="button" role="tab" id="tab-sports" aria-controls="p-sports" aria-selected="true" data-tab="sports">Sports</button>
+      <button type="button" role="tab" id="tab-dive" aria-controls="p-dive" aria-selected="false" data-tab="dive" tabindex="-1">Deep dive</button>
       <button type="button" role="tab" id="tab-build" aria-controls="p-build" aria-selected="false" data-tab="build" tabindex="-1">Your build</button>
     </div>
     <div class="tabpanel" id="p-sports" role="tabpanel" aria-labelledby="tab-sports">
       <div id="out"></div>
-      <div class="lookup">
-        <label for="lookupSel"><b>Deep dive into any sport</b><span>Your fit, best position, what limits you and how to start.</span></label>
-        <select id="lookupSel"></select>
-      </div>
       <section class="listsec" aria-labelledby="listTitle">
         <div class="section-head"><h2 id="listTitle">All sports</h2><p id="listSub"></p></div>
         <div class="fchips" role="group" aria-label="Filter sports">
@@ -702,14 +695,17 @@ dialog#photoDlg::backdrop{background:rgba(10,14,22,.62)}
         <div class="slist" id="listOut"></div>
       </section>
     </div>
+    <div class="tabpanel" id="p-dive" role="tabpanel" aria-labelledby="tab-dive" hidden></div>
     <div class="tabpanel" id="p-build" role="tabpanel" aria-labelledby="tab-build" hidden><div id="buildOut"></div></div>
   </section>
 
   <section class="view" id="v-sport" aria-label="Sport" hidden>
+    <div id="spBlock">
     <div class="sp-top"><button type="button" class="linkbtn back" id="spBack">&larr; All sports</button>
       <div class="pick"><label for="sportSel">Sport</label><select id="sportSel"></select></div></div>
     <div class="sphead" id="spHead"></div>
     <section class="panel check" id="check" aria-label="Your fit for this sport"><div id="checkOut" class="check"></div></section>
+    </div>
   </section>
 
   <section class="view" id="v-method" aria-label="Methodology" hidden>
@@ -1509,7 +1505,6 @@ function buildSportSelect(){
   const groups=`<optgroup label="Popular ${region==='GLOBAL'?'worldwide':'in '+esc(R.name)}">${R.pop.filter(n=>SPORTS.some(s=>s.n===n)).map(opt).join('')}</optgroup>`
     +cats.map(c=>`<optgroup label="${c}">${SPORTS.filter(s=>s.cat===c).map(s=>opt(s.n)).join('')}</optgroup>`).join('');
   $('#sportSel').innerHTML=groups;
-  $('#lookupSel').innerHTML='<option value="">Choose a sport\u2026</option>'+groups;
 }
 // ---------- render ----------
 const OPT=['span','sit','hand','foot','shoulder'];
@@ -1660,7 +1655,12 @@ function applyView(){VIEWS.forEach(v=>{$('#v-'+v).hidden=v!==view});
   // Units matter where numbers are typed (the Basics card) or shown; the landing page doesn't need the switch
   $('#unitsHdr').hidden=view==='landing'||view==='measure';
   // The landing page carries its own brand and actions, so the site header only appears once you're inside
-  $('#siteHeader').hidden=view==='landing'}
+  $('#siteHeader').hidden=view==='landing';
+  mountSport()}
+// One sport block, shown as the Deep dive tab inside results, or as its own page before you've measured
+function mountSport(){const host=view==='results'?$('#p-dive'):$('#v-sport'),el=$('#spBlock');if(el.parentElement!==host)host.appendChild(el)}
+const validNow=()=>{const m=readMetric();return ok(m.h)&&ok(m.w)&&m.h>=120&&m.h<=245&&m.w>=30&&m.w<=250};
+let sportsY=0;
 const hashFor=v=>v==='landing'?'':v==='sport'?'#s-'+slug(pick):'#'+v;
 function show(v,{push=true,top=true,restore=false}={}){
   if(view==='results'&&v!=='results')resultsY=window.scrollY;
@@ -1672,13 +1672,25 @@ function show(v,{push=true,top=true,restore=false}={}){
 }
 // Back links: step back through history when we came from inside the app, otherwise go somewhere sensible
 function goBack(fallback){if(navDepth>0){navDepth--;history.back()}else show(fallback,{restore:true})}
-function setTab(t){
+function setTab(t,{push=false}={}){
+  if(view==='results'&&tab==='sports'&&t!=='sports')sportsY=window.scrollY;
   tab=t;document.querySelectorAll('.tabs [role=tab]').forEach(b=>{const on=b.dataset.tab===t;b.setAttribute('aria-selected',String(on));b.tabIndex=on?0:-1});
-  ['sports','build'].forEach(k=>{$('#p-'+k).hidden=k!==t});
+  ['sports','dive','build'].forEach(k=>{$('#p-'+k).hidden=k!==t});
+  mountSport();
+  // The Deep dive tab has its own address (#s-cricket), so Back returns to the list
+  if(push&&view==='results'){const want=t==='dive'?'#s-'+slug(pick):'#results';
+    if(want!==location.hash){try{history.pushState({view:'results',tab:t},'',want);navDepth++}catch(e){}}}
+}
+function openSport(n){
+  pick=n;pickPos=null;
+  if(!validNow()){show('sport');return}
+  if(view!=='results'){view='results';applyView()}
+  setTab('dive',{push:true});render();save();
+  const tb=$('.tabs').getBoundingClientRect().top;if(tb<0||tb>innerHeight*.5)$('.tabs').scrollIntoView({block:'start'});
 }
 function viewFromHash(){
   const h=location.hash;
-  if(h.startsWith('#s-')){const sp=SPORTS.find(s=>slug(s.n)===h.slice(3));if(sp){if(pick!==sp.n){pick=sp.n;pickPos=null}return 'sport'}}
+  if(h.startsWith('#s-')){const sp=SPORTS.find(s=>slug(s.n)===h.slice(3));if(sp){if(pick!==sp.n){pick=sp.n;pickPos=null}return validNow()?'results':'sport'}}
   return {'#measure':'measure','#results':'results','#method':'method'}[h]||'landing';
 }
 
@@ -1714,26 +1726,26 @@ document.querySelectorAll('input[name=units],input[name=units2]').forEach(r=>r.a
   const m=readMetric();units=r.value;applyUnitsUI();writeMetric(m);render();save()}));
 $('#regionSel').innerHTML=Object.entries(REGIONS).map(([k,v])=>`<option value="${k}">${v.name}</option>`).join('');
 $('#regionSel').addEventListener('change',e=>{region=e.target.value;regionAuto=false;$('#regionNote').textContent='';buildSportSelect();render();save()});
-$('#lookupSel').addEventListener('change',e=>{const v=e.target.value;if(!v)return;e.target.value='';pick=v;pickPos=null;show('sport')});
 $('#sportSel').addEventListener('change',e=>{pick=e.target.value;pickPos=null;try{history.replaceState({view:'sport'},'','#s-'+slug(pick))}catch(err){}render();save()});
 $('#checkOut').addEventListener('click',e=>{const b=e.target.closest('[data-pos]');if(!b)return;
   pickPos=b.dataset.pos;render();save();const nb=document.querySelector(`[data-pos="${CSS.escape(pickPos)}"]`);if(nb)nb.focus({preventScroll:true})});
 const smooth=()=>matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth';
-document.addEventListener('click',e=>{const b=e.target.closest('[data-check]');if(!b)return;
-  pick=b.dataset.check;pickPos=null;show('sport')});
+document.addEventListener('click',e=>{const b=e.target.closest('[data-check]');if(b)openSport(b.dataset.check)});
 document.addEventListener('click',e=>{const b=e.target.closest('[data-go]');if(b)show(b.dataset.go)});
 document.addEventListener('click',e=>{const b=e.target.closest('[data-sex]');if(!b)return;document.getElementById(b.dataset.sex==='f'?'s-f':'s-m').checked=true;render();save()});
 document.addEventListener('click',e=>{if(e.target.closest('#exMore')){exAll=!exAll;render()}});
-$('#spBack').addEventListener('click',()=>goBack(lastRes?'results':'landing'));
+$('#spBack').addEventListener('click',()=>{
+  if(view!=='results'){goBack(lastRes?'results':'landing');return}
+  if(navDepth>0){navDepth--;history.back()}else{setTab('sports',{push:true});window.scrollTo(0,sportsY)}});
 $('#methBack').addEventListener('click',()=>goBack(lastRes?'results':'landing'));
 
-document.addEventListener('click',e=>{const b=e.target.closest('[data-tab]');if(!b)return;setTab(b.dataset.tab);
-  if(!b.closest('.tabs'))$('.tabs').scrollIntoView({behavior:smooth(),block:'start'})});
+document.addEventListener('click',e=>{const b=e.target.closest('[data-tab]');if(!b)return;const t=b.dataset.tab;setTab(t,{push:true});
+  if(t==='sports')window.scrollTo(0,sportsY);else{const tb=$('.tabs').getBoundingClientRect().top;if(tb<0)$('.tabs').scrollIntoView({block:'start'})}});
 $('.tabs').addEventListener('keydown',e=>{const ts=[...document.querySelectorAll('.tabs [role=tab]')],i=ts.findIndex(t=>t.dataset.tab===tab);
   const j=e.key==='ArrowRight'?(i+1)%ts.length:e.key==='ArrowLeft'?(i+ts.length-1)%ts.length:-1;if(j<0)return;e.preventDefault();setTab(ts[j].dataset.tab);ts[j].focus()});
 document.querySelectorAll('.fchip').forEach(c=>c.addEventListener('click',()=>{listF=c.dataset.f;render();save()}));
 $('#startBtn').addEventListener('click',()=>{show('measure');if(!$('#height').value)$('#height').focus()});
-$('#exampleBtn').addEventListener('click',()=>{const p=PRESETS[0];example=p.k;estFields.clear();updateEst();writeMetric(p);show('results')});
+$('#exampleBtn').addEventListener('click',()=>{const p=PRESETS[0];example=p.k;estFields.clear();updateEst();writeMetric(p);setTab('sports');show('results')});
 $('#heroPhoto').addEventListener('click',()=>{show('measure');$('#photoOpen').click()});
 $('#editBtn').addEventListener('click',()=>show('measure'));
 $('#homeLink').addEventListener('click',e=>{e.preventDefault();show('landing')});
@@ -1741,8 +1753,14 @@ $('#navMethod').addEventListener('click',()=>show('method'));
 $('#toResults').addEventListener('click',()=>{
   const m=readMetric(),bad=!ok(m.h)||m.h<120||m.h>245?'#height':!ok(m.w)||m.w<30||m.w>250?'#weight':null;
   if(bad){const e=$('#mErr');e.textContent=`Enter your ${bad==='#height'?'height':'weight'} to continue${units==='metric'?(bad==='#height'?' (120\u2013245 cm)':' (30\u2013250 kg)'):''}.`;e.hidden=false;$(bad).focus();return}
-  show('results')});
-window.addEventListener('popstate',()=>{const v=viewFromHash();show(v,{push:false,restore:true})});
+  setTab('sports');show('results')});
+window.addEventListener('popstate',()=>{
+  const v=viewFromHash();
+  if(v!=='results'){show(v,{push:false,restore:true});return}
+  const t=location.hash.startsWith('#s-')?'dive':'sports';
+  if(view!=='results'){view='results';applyView()}
+  setTab(t);render();save();
+  window.scrollTo(0,t==='sports'?sportsY:0)});
 function applyLegMode(){
   const ins=legMode==='inseam';
   document.getElementById(ins?'lm-ins':'lm-sit').checked=true;
@@ -1779,7 +1797,7 @@ document.querySelectorAll('.nSports').forEach(e=>e.textContent=SPORTS.length);
 document.querySelectorAll('.nPos').forEach(e=>e.textContent=SPORTS.reduce((a,sp)=>a+(sp.pos?sp.pos.length:0),0));
 // First visit lands on the welcome screen; returning visitors go straight to their results
 view=location.hash?viewFromHash():(saved&&saved.m?'results':'landing');
-applyView();setTab('sports');render();
+applyView();setTab(view==='results'&&location.hash.startsWith('#s-')?'dive':'sports');render();
 })();
 </script>
 
