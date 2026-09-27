@@ -43,10 +43,6 @@ button,input{font:inherit;color:inherit}
 
 /* header */
 .top{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:16px;padding-bottom:18px;margin-bottom:24px;border-bottom:1px solid var(--line)}
-.brand{display:flex;flex-direction:column;gap:6px}
-.brand h1{font-size:clamp(34px,5vw,52px);text-transform:uppercase}
-.brand h1 span{background:var(--tape);color:#1E1800;padding:0 .18em;box-decoration-break:clone}
-.brand p{margin:0;color:var(--muted);max-width:56ch}
 
 .seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--surface)}
 .seg input{position:absolute;opacity:0;pointer-events:none}
@@ -267,6 +263,98 @@ dialog#photoDlg::backdrop{background:rgba(10,14,22,.62)}
 @media (min-width:1000px){.list .next-grid{grid-template-columns:1fr 1fr}}
 .ncol h4{font-family:var(--display);font-size:16px;text-transform:uppercase;letter-spacing:.02em;margin:0 0 6px}
 .nextwrap{grid-column:1 / -1}
+
+/* ---- screens: landing, measure, results ---- */
+.logo{font-family:var(--display);font-weight:700;font-size:26px;text-transform:uppercase;color:var(--ink);text-decoration:none;letter-spacing:.01em}
+.logo span{background:var(--tape);color:#1E1800;padding:0 .15em}
+.topnav{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.navlink{background:none;border:0;color:var(--muted);font:inherit;font-weight:600;font-size:14px;cursor:pointer;padding:4px 2px}
+.navlink:hover{color:var(--ink)}
+.top{align-items:center}
+.view{display:flex;flex-direction:column;gap:18px}
+.hero{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:36px;align-items:center;padding-block:12px}
+@media (max-width:880px){.hero{grid-template-columns:1fr;gap:22px}}
+.hero h1{font-size:clamp(40px,6.4vw,76px);text-transform:uppercase;margin-top:8px}
+.hero h1 span{background:var(--tape);color:#1E1800;padding:0 .18em;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.lede{font-size:18px;color:var(--muted);max-width:46ch;margin:16px 0 0}
+.trust{list-style:none;display:flex;flex-wrap:wrap;gap:8px 18px;padding:0;margin:18px 0 0;font-size:13.5px;color:var(--muted)}
+.trust li::before{content:"\2713\00a0";color:var(--good);font-weight:700}
+.hero-cta{display:flex;gap:18px;align-items:center;flex-wrap:wrap;margin-top:24px}
+.btn.big{font-size:16px;padding:13px 22px}
+.photo-teaser{margin-top:22px;width:100%;max-width:480px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 12px;text-align:left;border:1px dashed var(--accent);border-radius:10px;background:var(--surface);padding:12px 14px;cursor:pointer;color:var(--ink);font:inherit}
+.photo-teaser span{font-size:13.5px;color:var(--muted);grid-column:1}
+.photo-teaser .chev{grid-column:2;grid-row:1 / span 2;align-self:center;font-size:22px;color:var(--accent)}
+.hero-fig{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px}
+.how{list-style:none;padding:0;margin:8px 0 0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;counter-reset:how}
+.how li{border-top:3px solid var(--tape);padding-top:10px;display:flex;flex-direction:column;gap:4px;counter-increment:how}
+.how b{font-family:var(--display);text-transform:uppercase;font-size:20px}
+.how b::before{content:counter(how) ". "}
+.how span{color:var(--muted);font-size:14px}
+@media (max-width:640px){.how{grid-template-columns:1fr}}
+.stepper{list-style:none;display:flex;gap:20px;padding:0;margin:0;font-size:14px;font-weight:600;color:var(--muted);flex-wrap:wrap}
+.stepper li{display:flex;gap:8px;align-items:center}
+.stepper span{width:24px;height:24px;border-radius:50%;border:1.5px solid var(--line);display:grid;place-items:center;font-size:12px}
+.stepper li.on{color:var(--ink)}
+.stepper li.on span{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.stepper li.done span{background:var(--tape);color:#1E1800;border-color:var(--tape-deep)}
+.vtitle{font-size:34px;text-transform:uppercase}
+.vsub{margin:6px 0 0;color:var(--muted)}
+.mgrid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:28px;align-items:start}
+@media (max-width:980px){.mgrid{grid-template-columns:1fr}.livepv{display:none!important}}
+.mcol{display:flex;flex-direction:column;gap:16px;max-width:640px;min-width:0}
+.fields.mform{gap:16px}
+.mcard{display:flex;flex-direction:column;gap:14px}
+.mhead{display:flex;align-items:center;gap:10px}
+.mhead h3{font-size:22px;text-transform:uppercase}
+.tagpill{font-size:11px;text-transform:uppercase;letter-spacing:.07em;font-weight:700;border:1px solid var(--line);border-radius:999px;padding:2px 9px;color:var(--muted)}
+.tagpill.req{border-color:var(--ink);color:var(--ink)}
+.mfoot{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center}
+.ferr{flex-basis:100%;margin:0;color:var(--bad);font-size:14px}
+.mextra{display:flex;flex-direction:column;gap:10px;border-top:1px solid var(--line);padding-top:14px}
+.livepv{position:sticky;top:calc(env(safe-area-inset-top,0px) + 16px);display:flex;flex-direction:column;gap:10px}
+.livepv h3{font-size:18px;text-transform:uppercase}
+.pvlist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;border-top:1px solid var(--line)}
+.pvlist li{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
+.pvlist b{font-family:var(--display);font-size:17px;text-transform:uppercase;font-weight:600;line-height:1.15}
+.pvlist span{font-family:var(--mono);font-size:13.5px;white-space:nowrap}
+.editbar{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 14px}
+.eb-sum{font-size:14px}
+.eb-sum b{font-family:var(--mono);font-weight:500}
+.eb-act{display:flex;gap:8px;flex-wrap:wrap}
+.editbar #shareMsg{flex-basis:100%}
+.editbar #shareMsg:empty{display:none}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tabs button{appearance:none;background:none;border:0;border-bottom:3px solid transparent;padding:10px 14px;font:inherit;font-weight:700;font-size:15px;color:var(--muted);cursor:pointer;white-space:nowrap;margin-bottom:-1px}
+.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--tape-deep)}
+.tabpanel{display:flex;flex-direction:column;gap:22px}
+#out{display:flex;flex-direction:column;gap:14px}
+.pcard .explore{margin-top:auto;align-self:flex-start}
+.fchips{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
+.fchip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 12px;font:inherit;font-size:13.5px;font-weight:600;cursor:pointer;color:var(--ink)}
+.fchip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.rgn{display:inline-flex;gap:6px;align-items:center;font-size:13px;color:var(--muted);font-weight:600}
+.rgn select{font:inherit;font-weight:400;font-size:14px;padding:5px 8px;border:1px solid var(--line);border-radius:6px;background:var(--surface-2);color:var(--ink);max-width:100%}
+.slist{display:flex;flex-direction:column;border-top:1px solid var(--line)}
+.srow{appearance:none;background:none;border:0;border-bottom:1px solid var(--line);width:100%;text-align:left;cursor:pointer;font:inherit;color:var(--ink);display:grid;grid-template-columns:40px minmax(0,1.4fr) minmax(70px,1.5fr) 60px 74px 14px;gap:12px;align-items:center;padding:10px 4px}
+.srow:hover{background:var(--surface)}
+.srow .n{font-family:var(--mono);color:var(--muted);font-size:13px}
+.srow .nm{font-family:var(--display);font-weight:600;font-size:20px;text-transform:uppercase;line-height:1.1}
+.srow .nm small{display:block;font-family:var(--body);font-size:11px;letter-spacing:.06em;color:var(--muted);font-weight:600}
+.srow .p{font-family:var(--mono);text-align:right;font-weight:500}
+.srow .mt{font-size:12.5px;color:var(--muted);text-align:right}
+.srow .chev{color:var(--muted)}
+@media (max-width:640px){.srow{grid-template-columns:30px minmax(0,1fr) 56px 12px;gap:8px}.srow .bar,.srow .mt{display:none}}
+.method{display:flex;flex-direction:column;gap:18px}
+.method h2{font-size:26px;text-transform:uppercase}
+.method h3{font-size:19px;text-transform:uppercase;margin-bottom:6px}
+.method p,.method li{max-width:68ch;font-size:15px}
+.method p{margin:0}
+.method ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+.method ul.bands{list-style:none;padding:0;margin-top:10px}
+.method a{color:var(--accent)}
+.mgrid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px}
+@media (max-width:760px){.mgrid2{grid-template-columns:1fr}}
 /* how-to-measure popovers */
 .legmode{grid-column:1 / -1;justify-self:start;margin-top:6px}
 .legmode label{padding:4px 10px;font-size:12px}
@@ -343,8 +431,6 @@ dialog#photoDlg::backdrop{background:rgba(10,14,22,.62)}
   .posdetail{padding:12px}
   .verdict .big{font-size:52px}
 }
-.jump{display:none;border:0;border-radius:8px;background:var(--ink);color:var(--bg);font-weight:700;padding:11px 14px;cursor:pointer;width:100%}
-@media (max-width:880px){.jump{display:block}}
 @media (prefers-reduced-motion: reduce){*{transition:none!important}}
 </style>
 </head>
@@ -352,35 +438,60 @@ dialog#photoDlg::backdrop{background:rgba(10,14,22,.62)}
 
 <div class="wrap">
   <header class="top">
-    <div class="brand">
-      <span class="eyebrow">Anthropometric sport fit</span>
-      <h1>What is your body <span>built for?</span></h1>
-      <p>Enter your measurements. Each sport is scored against the body proportions its elite athletes tend to share.</p>
-    </div>
-    <div class="seg" role="radiogroup" aria-label="Units">
-      <input type="radio" name="units" id="u-metric" value="metric" checked><label for="u-metric">cm · kg</label>
-      <input type="radio" name="units" id="u-imp" value="imperial"><label for="u-imp">in · lb</label>
-    </div>
+    <a class="logo" href="#" id="homeLink">Built <span>For</span></a>
+    <nav class="topnav" aria-label="Site">
+      <button type="button" class="navlink" id="navMethod">How it works</button>
+      <div class="seg" role="radiogroup" aria-label="Units">
+        <input type="radio" name="units" id="u-metric" value="metric" checked><label for="u-metric">cm · kg</label>
+        <input type="radio" name="units" id="u-imp" value="imperial"><label for="u-imp">in · lb</label>
+      </div>
+    </nav>
   </header>
 
-  <div class="grid">
-    <aside class="panel" aria-label="Your measurements">
-      <div class="row2">
-        <h2 style="font-size:22px;text-transform:uppercase">Your measurements</h2>
+  <section class="view" id="v-landing" aria-label="Welcome">
+    <div class="hero">
+      <div class="hero-text">
+        <span class="eyebrow">Anthropometric sport fit</span>
+        <h1>What is your body <span>built for?</span></h1>
+        <p class="lede">See how your proportions compare with <span class="heroN"></span> Olympic athletes, and which of 35 sports and positions your body gives you a head start in.</p>
+        <ul class="trust"><li>About 2 minutes</li><li>No account</li><li>Photos stay on your device</li></ul>
+        <div class="hero-cta"><button type="button" class="btn primary big" id="startBtn">Get started &rarr;</button><button type="button" class="linkbtn" id="exampleBtn">See an example first</button></div>
+        <button type="button" class="photo-teaser" id="heroPhoto"><b>Don’t want to measure yourself?</b><span>Use one photo to estimate arm span, leg length and shoulder width.</span><span class="chev" aria-hidden="true">›</span></button>
       </div>
-      <div class="row2">
-        <span class="eyebrow">Compare against</span>
-        <div class="seg" role="radiogroup" aria-label="Sex">
-          <input type="radio" name="sex" id="s-m" value="m" checked><label for="s-m">Men</label>
-          <input type="radio" name="sex" id="s-f" value="f"><label for="s-f">Women</label>
-        </div>
-      </div>
-      <form class="fields" id="form" autocomplete="off">
+      <div class="hero-fig" id="heroFig"></div>
+    </div>
+    <ol class="how" id="how">
+      <li><b>Measure</b><span>Height and weight, plus up to five optional measurements or one photo.</span></li>
+      <li><b>Compare</b><span>Your build against Olympic athletes and elite players in 35 sports and positions.</span></li>
+      <li><b>Start</b><span>Your best sports, what limits you, and where to play near you.</span></li>
+    </ol>
+  </section>
+
+  <section class="view" id="v-measure" aria-label="Your measurements" hidden>
+    <ol class="stepper"><li class="on"><span>1</span>Measurements</li><li><span>2</span>Results</li></ol>
+    <div class="mgrid">
+      <div class="mcol">
+        <div><h2 class="vtitle">Your measurements</h2><p class="vsub">Start with the basics. Each optional measurement sharpens the result.</p></div>
+        <div class="banner" id="mExample" hidden><span class="tag">Example</span><span>These are example measurements.</span><button type="button" class="linkbtn" id="clearExample">Clear and enter mine</button></div>
+        <form class="fields mform" id="form" autocomplete="off">
+          <section class="panel mcard" aria-label="Required measurements">
+            <div class="mhead"><h3>Basics</h3><span class="tagpill req">Required</span></div>
+            <div class="row2">
+              <span class="eyebrow">Compare with</span>
+              <div class="seg" role="radiogroup" aria-label="Sex">
+                <input type="radio" name="sex" id="s-m" value="m" checked><label for="s-m">Men</label>
+                <input type="radio" name="sex" id="s-f" value="f"><label for="s-f">Women</label>
+              </div>
+            </div>
+
         <div class="field"><label for="height">Height</label><div class="inbox"><input id="height" inputmode="decimal"><span class="u-len">cm</span></div>
           <div class="hint">Barefoot, standing against a wall.</div></div>
         <div class="field"><label for="weight">Weight</label><div class="inbox"><input id="weight" inputmode="decimal"><span class="u-wt">kg</span></div></div>
+          </section>
+          <section class="panel mcard" aria-label="Optional measurements">
+            <div class="mhead"><h3>Sharper result</h3><span class="tagpill">Optional</span></div>
         <div class="photo-cta">
-          <div><b>Don’t know the measurements below?</b>Estimate arm span, leg length and shoulder width from one photo, scaled from your height above.</div>
+          <div><b>Estimate from a photo</b>One full-body photo gives arm span, leg length and shoulder width, scaled from your height.</div>
           <button type="button" class="btn" id="photoOpen">Measure from a photo</button>
         </div>
         <div class="field"><label for="span">Arm span<span class="opt">optional</span></label><div class="inbox"><input id="span" inputmode="decimal"><span class="u-len">cm</span></div>
@@ -476,29 +587,76 @@ dialog#photoDlg::backdrop{background:rgba(10,14,22,.62)}
             </ol>
             <p>Typical adults measure about 36 cm (women) or 40 cm (men).</p>
           </div></div>
-      </form>
-      <div class="divider"></div>
-      <div>
-        <div class="eyebrow" style="margin-bottom:8px">Try an example build</div>
-        <div class="presets" id="presets"></div>
+                </section>
+        </form>
+        <div class="mfoot">
+          <button type="button" class="btn primary big" id="toResults">See my results &rarr;</button>
+          <span class="nmuted" id="mCount"></span>
+          <p class="ferr" id="mErr" role="alert" hidden></p>
+        </div>
+        <div class="mextra">
+          <div class="eyebrow">Or try an example build</div>
+          <div class="presets" id="presets"></div>
+          <div><button class="linkbtn" id="clear" type="button">Clear all fields</button></div>
+        </div>
       </div>
-      <div><button class="linkbtn" id="clear" type="button">Clear all fields</button></div>
-      <button class="jump" id="jump" type="button">See my results &darr;</button>
-    </aside>
+      <aside class="livepv panel" id="livePv" aria-label="Live preview"></aside>
+    </div>
+  </section>
 
-    <main class="results" id="results">
-      <div class="banner" id="banner"><span class="tag">Example</span><span id="bannerText"></span></div>
-      <div class="regionbar" id="regionBar"><label for="regionSel">Popular sports for</label><select id="regionSel"></select><span class="nmuted" id="regionNote"></span></div>
+  <section class="view" id="v-results" aria-label="Your results" hidden>
+    <ol class="stepper"><li class="done"><span>✓</span>Measurements</li><li class="on"><span>2</span>Results</li></ol>
+    <div class="editbar">
+      <div class="eb-sum" id="ebSum"></div>
+      <div class="eb-act"><button type="button" class="btn" id="editBtn">Edit measurements</button><button type="button" class="btn" id="shareBtn">Share</button></div>
+      <span id="shareMsg" class="nmuted" role="status"></span><textarea id="shareTxt" hidden readonly aria-label="Results to copy"></textarea>
+    </div>
+    <div class="banner" id="banner"><span class="tag">Example</span><span id="bannerText"></span></div>
+    <div class="tabs" role="tablist" aria-label="Results">
+      <button type="button" role="tab" id="tab-sports" aria-controls="p-sports" aria-selected="true" data-tab="sports">Sports</button>
+      <button type="button" role="tab" id="tab-build" aria-controls="p-build" aria-selected="false" data-tab="build" tabindex="-1">Your build</button>
+      <button type="button" role="tab" id="tab-method" aria-controls="p-method" aria-selected="false" data-tab="method" tabindex="-1">Methodology</button>
+    </div>
+    <div class="tabpanel" id="p-sports" role="tabpanel" aria-labelledby="tab-sports">
       <div id="out"></div>
-      <div class="share" id="shareBar"><button type="button" class="btn" id="shareBtn">Share my results</button><span id="shareMsg" class="nmuted" role="status"></span><textarea id="shareTxt" hidden readonly aria-label="Results to copy"></textarea></div>
-      <section class="panel check" id="check" aria-label="Check one sport">
-        <div class="section-head" style="margin:0"><h2>Check a sport</h2><p>See how your build fits one sport and what limits it.</p></div>
+      <section class="listsec" aria-labelledby="listTitle">
+        <div class="section-head"><h2 id="listTitle">All sports</h2><p id="listSub"></p></div>
+        <div class="fchips" role="group" aria-label="Filter sports">
+          <button type="button" class="fchip" data-f="pop" aria-pressed="false">Popular in <span id="popName">your region</span></button>
+          <button type="button" class="fchip" data-f="all" aria-pressed="false">All <span class="nSports"></span></button>
+          <button type="button" class="fchip" data-f="team" aria-pressed="false">Team</button>
+          <button type="button" class="fchip" data-f="ind" aria-pressed="false">Individual</button>
+          <label class="rgn" for="regionSel">Region <select id="regionSel"></select></label>
+          <span class="nmuted" id="regionNote"></span>
+        </div>
+        <div class="slist" id="listOut"></div>
+      </section>
+      <section class="panel check" id="check" aria-label="Sport deep dive">
+        <div class="section-head" style="margin:0"><h2>Deep dive</h2><p>Your fit for one sport, what limits it, and how to start.</p></div>
         <div class="pick"><label for="sportSel">Sport</label><select id="sportSel"></select></div>
         <div id="checkOut" class="check"></div>
       </section>
-      <div id="rest" class="results"></div>
-    </main>
-  </div>
+    </div>
+    <div class="tabpanel" id="p-build" role="tabpanel" aria-labelledby="tab-build" hidden><div id="buildOut"></div></div>
+    <div class="tabpanel" id="p-method" role="tabpanel" aria-labelledby="tab-method" hidden>
+      <section class="panel method">
+        <h2>How the scoring works</h2>
+        <div class="mgrid2">
+          <div><h3>Advantage</h3><p>How much more common your build is among a sport’s elite athletes than among people in general. “6.6×” means people with your height and build turn up 6.6 times as often among Olympic badminton players as in the general population. Sports are ranked by this number.</p>
+            <ul class="bands"><li><b>3× or more</b> strong natural advantage</li><li><b>1.5–3×</b> some advantage</li><li><b>0.67–1.5×</b> no clear advantage</li><li><b>Below 0.67×</b> built against it</li></ul></div>
+          <div><h3>Match</h3><p>How closely you fit the typical athlete in that sport or position. Being inside the middle half of the athletes on a measurement scores full marks. Match drives the limiting factors in the deep dive.</p></div>
+          <div><h3>Where the targets come from</h3><p>Height and BMI for 27 sports are fitted on <span class="heroN"></span> Olympic athletes from 1992 to 2016. Arm span, leg, hand, foot and shoulder targets, and sports without Olympic data (climbing, sumo, jockey, coxswain, rugby union, American football, cricket, kabaddi), use published sports-science findings. Team positions are placed around each sport’s real median.</p></div>
+          <div><h3>Photo measuring</h3><p>The pose model runs in your browser and the photo is never uploaded. It finds your joints and converts them to centimetres using your height. Early checks put arm span and leg length within a few centimetres; shoulder width uses a correction from a tape-measure comparison.</p></div>
+        </div>
+        <div><h3>Limits</h3>
+          <ul><li>Build is one factor among many. Training, skill, aerobic capacity, muscle fibre type, coordination and nerve matter far more for most people, and plenty of champions have the “wrong” body for their sport.</li>
+            <li>“People in general” uses Western adult averages for now, so people from populations with shorter averages are understated in tall sports.</li>
+            <li>Which sports count as popular in each region is an editorial judgement.</li>
+            <li>If you’re still growing, treat the results loosely.</li></ul></div>
+        <p class="fine">Full method, trade-offs and data sources: <a href="https://github.com/NishitHada/built-for/blob/main/DECISIONS.md" target="_blank" rel="noopener">decision log</a> · <a href="https://github.com/NishitHada/built-for" target="_blank" rel="noopener">source code</a>.</p>
+      </section>
+    </div>
+  </section>
 </div>
 
 <dialog id="photoDlg" aria-labelledby="photoTitle">
@@ -649,7 +807,7 @@ const PRESETS=[
 
 const IDS=['height','weight','span','sit','hand','foot','shoulder'];
 const KEYS={height:'h',weight:'w',span:'span',sit:'sit',hand:'hand',foot:'foot',shoulder:'shoulder'};
-let units='metric', example='example', pick='Football (soccer)', pickPos=null, legMode='sit', region=null, regionAuto=true;
+let units='metric', example='example', pick='Football (soccer)', pickPos=null, legMode='sit', region=null, regionAuto=true, view='landing', tab='sports', listF=null;
 
 // ---------- math ----------
 function erf(x){const s=Math.sign(x);x=Math.abs(x);const t=1/(1+.3275911*x);
@@ -722,7 +880,7 @@ function writeMetric(m){
     $('#'+id).value=ok(v)?String(+(v/(id==='weight'?kw:k)).toFixed(1)):''});
   if(m.sex) document.getElementById(m.sex==='f'?'s-f':'s-m').checked=true;
 }
-function save(){try{localStorage.setItem('builtfor',JSON.stringify({units,example,pick,pickPos,legMode,region:regionAuto?null:region,est:[...estFields],m:readMetric()}))}catch(e){}}
+function save(){try{localStorage.setItem('builtfor',JSON.stringify({units,example,pick,pickPos,legMode,listF,region:regionAuto?null:region,est:[...estFields],m:readMetric()}))}catch(e){}}
 function load(){try{return JSON.parse(localStorage.getItem('builtfor')||'null')}catch(e){return null}}
 
 // ---------- scoring ----------
@@ -1277,49 +1435,66 @@ function buildSportSelect(){
   $('#sportSel').innerHTML=`<optgroup label="Popular ${region==='GLOBAL'?'worldwide':'in '+esc(R.name)}">${R.pop.filter(n=>SPORTS.some(s=>s.n===n)).map(opt).join('')}</optgroup>`
     +cats.map(c=>`<optgroup label="${c}">${SPORTS.filter(s=>s.cat===c).map(s=>opt(s.n)).join('')}</optgroup>`).join('');
 }
-function localSection(res,m){
-  const R=regionInfo(), pop=new Set(R.pop), where=region==='GLOBAL'?'worldwide':`in ${R.name}`;
-  const rows=res.map((r,i)=>({r,i})).filter(x=>pop.has(x.r.sp.n));
-  if(!rows.length)return '';
-  const P=x=>Math.round(x*100);
-  return `<section class="panel local" aria-label="Popular sports ${esc(where)}">
-    <div class="section-head"><h2>Popular ${esc(where)}</h2><p>How your build fits the sports people play most here, ranked by your advantage. Tap one to check it.</p></div>
-    <ol class="localist">${rows.map(({r,i})=>`<li><button type="button" class="lrow" data-check="${esc(r.sp.n)}">
-      <span class="lr-rank">#${i+1}</span>
-      <span class="lr-name">${esc(r.sp.n)}${r.best?`<small>best as ${esc(r.best.toLowerCase())}</small>`:''}</span>
-      <span class="bar"><i style="width:${advBar(r.adv)}%"></i></span>
-      <span class="lr-adv">${fmtAdv(r.adv)}</span><span class="lr-match">${P(r.score)}% match</span></button></li>`).join('')}</ol>
-    <p class="fine"># is the sport\u2019s rank among all ${res.length} sports for your build.</p>
-  </section>`;
-}
-
 // ---------- render ----------
+const OPT=['span','sit','hand','foot','shoulder'];
 function render(){
-  const m=readMetric(), out=$('#out');
-  const banner=$('#banner');
-  banner.hidden=!example;
-  if(example){const p=PRESETS.find(p=>p.k===example);
-    $('#bannerText').innerHTML=`Showing the <b>${p.label.toLowerCase()}</b> measurements. Type your own to replace them.`}
+  const m=readMetric();
   const valid=ok(m.h)&&ok(m.w)&&m.h>=120&&m.h<=245&&m.w>=30&&m.w<=250;
-  $('#check').hidden=!valid;$('#shareBar').hidden=!valid;$('#regionBar').hidden=!valid;
+  const nOpt=OPT.filter(k=>ok(m[k])).length;
+  $('#mCount').textContent=`2 required · ${nOpt} of 5 optional added`;
+  if(valid)$('#mErr').hidden=true;
+  $('#mExample').hidden=!example;
+  if(view==='landing')$('#heroFig').innerHTML=figure({sex:'m',h:183,w:77,span:190,sit:95,shoulder:41.5});
   if(!valid){
-    out.innerHTML='<div class="panel empty">Enter your height and weight to see which sports suit your build. The optional measurements make the result sharper.</div>';$('#rest').innerHTML='';return}
+    if(view==='results'){view='measure';applyView()}
+    $('#livePv').innerHTML='<h3>Live preview</h3><p class="nmuted" style="margin:0">Enter your height and weight to see your top sports appear here.</p>';
+    ['#out','#listOut','#buildOut','#checkOut'].forEach(x=>$(x).innerHTML='');lastRes=null;return}
   const T=traits(m), sexWord=m.sex==='f'?'women':'men';
   const res=SPORTS.map(sp=>scoreEntry(sp,T,m.sex)).sort(byAdv);
-  const P=x=>Math.round(x*100), popHere=new Set(regionInfo().pop);
+  const P=x=>Math.round(x*100), R=regionInfo(), popHere=new Set(R.pop);
+  lastRes=res;
 
+  // measure screen: live preview (desktop)
+  $('#livePv').innerHTML=`<h3>Your top sports so far</h3><ol class="pvlist">${res.slice(0,5).map(r=>`<li><b>${esc(r.sp.n)}</b><span>${fmtAdv(r.adv)}</span></li>`).join('')}</ol>
+    <p class="fine" style="margin:0">Updates as you type. Each optional measurement sharpens it.</p>`;
+
+  // results: summary bar and example banner
+  $('#ebSum').innerHTML=`<b>${fmtH(m.h)}</b> · <b>${fmtW(m.w)}</b> · compared with ${sexWord} · ${nOpt} of 5 optional${estFields.size?` (${estFields.size} from photo)`:''}`;
+  $('#banner').hidden=!example;
+  if(example){const p=PRESETS.find(p=>p.k===example);
+    $('#bannerText').innerHTML=`Showing the <b>${p.label.toLowerCase()}</b> measurements. Edit them to see your own results.`}
+
+  // top 3
   const pod=res.slice(0,3).map((r,i)=>`<article class="pcard${i===0?' first':''}">
-      <div class="fit"><span class="rank">${['Best fit','Second','Third'][i]} \u00B7 ${r.sp.cat}</span>${popHere.has(r.sp.n)?'<span class="locpill">popular here</span>':''}</div>
+      <div class="fit"><span class="rank">${['Best fit','Second','Third'][i]} · ${r.sp.cat}</span>${popHere.has(r.sp.n)?'<span class="locpill">popular here</span>':''}</div>
       <h3>${r.sp.n}</h3>${r.best?`<div class="as">Best as <b>${r.best}</b></div>`:''}
       <div class="pct">${fmtAdv(r.adv)}<small> advantage</small></div>
       <p class="advline">${advSentence(r.sp,r.best,r.adv,m.sex)} <b>Match ${P(r.score)}%.</b></p>
       <p>${r.why}</p>${critList(r.rows,m)}
       ${r.cov<.99?`<div class="lowconf">Based on ${Math.round(r.cov*100)}% of the measurements this sport uses.</div>`:''}
       ${olyNote(r.sp,m.sex)}
-      ${nextHTML('pod:'+r.sp.n,r,r.positions?r.positions[0]:r,m,res)}
+      <button type="button" class="btn explore" data-check="${esc(r.sp.n)}">Details and next steps &rarr;</button>
     </article>`).join('');
+  $('#out').innerHTML=`<p class="explain"><b>Advantage</b> is how much more common your build is among a sport’s elite athletes than among ${sexWord} in general. <b>Match</b> is how closely you fit their typical build. <button type="button" class="linkbtn" data-tab="method">How it’s calculated</button></p>
+    <div class="podium">${pod}</div>`;
 
-  // profile
+  // one ranked list with filters
+  const f=listF||(region!=='GLOBAL'?'pop':'all'), where=region==='GLOBAL'?'worldwide':`in ${R.name}`;
+  document.querySelectorAll('.fchip').forEach(c=>c.setAttribute('aria-pressed',String(c.dataset.f===f)));
+  $('#popName').textContent=region==='GLOBAL'?'worldwide':R.name;
+  const keep={pop:r=>popHere.has(r.sp.n),all:()=>true,team:r=>!!r.sp.pos,ind:r=>!r.sp.pos}[f];
+  const shown=res.map((r,i)=>({r,i})).filter(({r})=>keep(r));
+  $('#listTitle').textContent={pop:`Popular ${where}`,all:`All ${res.length} sports`,team:'Team sports',ind:'Individual sports'}[f];
+  $('#listSub').textContent=f==='all'?'Ranked by your advantage. Pick one for the deep dive.':`${shown.length} of ${res.length} sports, ranked by your advantage. # is the rank among all sports.`;
+  $('#listOut').innerHTML=shown.map(({r,i})=>`<button type="button" class="srow" data-check="${esc(r.sp.n)}">
+      <span class="n">#${i+1}</span>
+      <span class="nm">${esc(r.sp.n)}<small>${r.sp.cat}${r.best?` · best as ${esc(r.best)}`:''}${f!=='pop'&&popHere.has(r.sp.n)?'<span class="locpill">popular here</span>':''}</small></span>
+      <span class="bar"><i style="width:${advBar(r.adv)}%"></i></span>
+      <span class="p">${fmtAdv(r.adv)}</span><span class="mt">${P(r.score)}% match</span><span class="chev" aria-hidden="true">›</span></button>`).join('');
+
+  renderCheck(m,T,res);
+
+  // your build tab
   const L=T.shr===undefined?undefined:-T.shr;
   const std=[['height',T.h],['arm span',T.ape],['leg length',L],['hand size',T.hand],['foot size',T.foot],['shoulder width',T.shoulder]]
     .filter(x=>x[1]!==undefined).sort((a,b)=>Math.abs(b[1])-Math.abs(a[1])).slice(0,2);
@@ -1337,32 +1512,28 @@ function render(){
       <div class="tape" style="background-image:none;background:linear-gradient(90deg,var(--line) 0 14%,var(--tape) 14% 40%,var(--tape-deep) 40% 60%,var(--line) 60%)"><div class="mark" style="left:${bmiPos.toFixed(1)}%"></div></div>
       <div class="scale"><span>15</span><span>lean endurance</span><span>power</span><span>40</span></div></div>`
   ].join('');
-
-  const list=res.map((r,i)=>`<details><summary>
-      <span class="n">${String(i+1).padStart(2,'0')}</span>
-      <span class="nm">${r.sp.n}<small>${r.sp.cat}${r.best?` \u00B7 best as ${r.best}`:''}${popHere.has(r.sp.n)?'<span class="locpill">popular here</span>':''}</small></span>
-      <span class="bar"><i style="width:${advBar(r.adv)}%"></i></span>
-      <span class="p">${fmtAdv(r.adv)}</span><span class="chev">›</span></summary>
-      <div class="body"><div><p>${r.best?`As ${r.best.toLowerCase()}: ${r.why}`:r.why}</p>${r.positions?`<ul class="minipos">${r.positions.map(p=>`<li><span>${p.p.n}</span><span class="mono">${fmtAdv(p.adv)} \u00B7 ${P(p.score)}%</span></li>`).join('')}</ul>`:''}${r.cov<.99?`<div class="lowconf">Based on ${Math.round(r.cov*100)}% of the measurements this sport uses. Missing ones count as neutral.</div>`:''}
-        <button type="button" class="linkbtn checkbtn" data-check="${r.sp.n}">See limiting factors for ${r.sp.n.toLowerCase()}</button></div>${critList(r.rows,m)}
-        <div class="nextwrap">${nextHTML('list:'+r.sp.n,r,r.positions?r.positions[0]:r,m,res)}</div></div>
-    </details>`).join('');
-
-  out.innerHTML=`<p class="explain"><b>Advantage</b> is how much more common your build is among a sport\u2019s elite athletes than among ${sexWord} in general. <b>Match</b> is how closely you fit their typical build.</p><section><div class="podium">${pod}</div></section>${localSection(res,m)}`;
-  renderCheck(m,T,res);
-  lastRes=res;
-  $('#rest').innerHTML=`
-    <section class="panel">
+  $('#buildOut').innerHTML=`<section class="panel">
       <div class="section-head"><h2>Your build</h2><p>Percentiles compared with adult ${sexWord}. Dashed line = average.</p></div>
       ${stdTxt?`<p class="standout">${stdTxt}</p>`:''}
       <div class="profile"><div class="figure">${figure(m)}</div><div class="gauges">${gauges}</div></div>
-    </section>
-    <section>
-      <div class="section-head"><h2>All ${SPORTS.length} sports ranked</h2><p>Open a row to see which measurements help and which hold you back.</p></div>
-      <div class="list">${list}</div>
-    </section>
-    <p class="note"><b>How to read this.</b> Scores compare your proportions with the typical build of elite athletes in each sport. Build is one factor among many. Training, skill, aerobic capacity, muscle fibre type, coordination and nerve matter far more for most people, and plenty of champions have the "wrong" body for their sport. Population norms are approximate adult averages; if you are still growing, treat the results loosely.</p>`;
+    </section>`;
 }
+
+// ---------- screens and tabs ----------
+const VIEWS=['landing','measure','results'];
+function applyView(){VIEWS.forEach(v=>{$('#v-'+v).hidden=v!==view})}
+function show(v,{push=true,top=true}={}){
+  view=v;applyView();
+  if(push){const want=v==='landing'?location.pathname+location.search:'#'+v;
+    try{if(('#'+v)!==location.hash&&!(v==='landing'&&!location.hash))history.pushState({view:v},'',want)}catch(e){}}
+  render();save();
+  if(top)window.scrollTo(0,0);
+}
+function setTab(t){
+  tab=t;document.querySelectorAll('.tabs [role=tab]').forEach(b=>{const on=b.dataset.tab===t;b.setAttribute('aria-selected',String(on));b.tabIndex=on?0:-1});
+  ['sports','build','method'].forEach(k=>{$('#p-'+k).hidden=k!==t});
+}
+function viewFromHash(){return {'#measure':'measure','#results':'results'}[location.hash]||'landing'}
 
 // ---------- wiring ----------
 $('#presets').innerHTML=PRESETS.map(p=>`<button type="button" class="chip" data-k="${p.k}">${p.label}</button>`).join('');
@@ -1396,8 +1567,27 @@ $('#regionSel').addEventListener('change',e=>{region=e.target.value;regionAuto=f
 $('#sportSel').addEventListener('change',e=>{pick=e.target.value;pickPos=null;render();save()});
 $('#checkOut').addEventListener('click',e=>{const b=e.target.closest('[data-pos]');if(!b)return;
   pickPos=b.dataset.pos;render();save();const nb=document.querySelector(`[data-pos="${CSS.escape(pickPos)}"]`);if(nb)nb.focus({preventScroll:true})});
+const smooth=()=>matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth';
 document.addEventListener('click',e=>{const b=e.target.closest('[data-check]');if(!b)return;
-  pick=b.dataset.check;pickPos=null;render();save();$('#check').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'})});
+  pick=b.dataset.check;pickPos=null;
+  if(view!=='results')show('results',{top:false});setTab('sports');render();save();
+  $('#check').scrollIntoView({behavior:smooth(),block:'start'})});
+document.addEventListener('click',e=>{const b=e.target.closest('[data-tab]');if(!b)return;setTab(b.dataset.tab);
+  if(!b.closest('.tabs'))$('.tabs').scrollIntoView({behavior:smooth(),block:'start'})});
+$('.tabs').addEventListener('keydown',e=>{const ts=[...document.querySelectorAll('.tabs [role=tab]')],i=ts.findIndex(t=>t.dataset.tab===tab);
+  const j=e.key==='ArrowRight'?(i+1)%ts.length:e.key==='ArrowLeft'?(i+ts.length-1)%ts.length:-1;if(j<0)return;e.preventDefault();setTab(ts[j].dataset.tab);ts[j].focus()});
+document.querySelectorAll('.fchip').forEach(c=>c.addEventListener('click',()=>{listF=c.dataset.f;render();save()}));
+$('#startBtn').addEventListener('click',()=>{show('measure');if(!$('#height').value)$('#height').focus()});
+$('#exampleBtn').addEventListener('click',()=>{const p=PRESETS[0];example=p.k;estFields.clear();updateEst();writeMetric(p);show('results')});
+$('#heroPhoto').addEventListener('click',()=>{show('measure');$('#photoOpen').click()});
+$('#editBtn').addEventListener('click',()=>show('measure'));
+$('#homeLink').addEventListener('click',e=>{e.preventDefault();show('landing')});
+$('#navMethod').addEventListener('click',()=>{if(lastRes){show('results');setTab('method')}else{show('landing',{top:false});$('#how').scrollIntoView({behavior:smooth()})}});
+$('#toResults').addEventListener('click',()=>{
+  const m=readMetric(),bad=!ok(m.h)||m.h<120||m.h>245?'#height':!ok(m.w)||m.w<30||m.w>250?'#weight':null;
+  if(bad){const e=$('#mErr');e.textContent=`Enter your ${bad==='#height'?'height':'weight'} to continue${units==='metric'?(bad==='#height'?' (120\u2013245 cm)':' (30\u2013250 kg)'):''}.`;e.hidden=false;$(bad).focus();return}
+  show('results')});
+window.addEventListener('popstate',()=>{const v=viewFromHash();if(v!==view)show(v,{push:false})});
 function applyLegMode(){
   const ins=legMode==='inseam';
   document.getElementById(ins?'lm-ins':'lm-sit').checked=true;
@@ -1412,7 +1602,7 @@ document.querySelectorAll('input[name=legmode]').forEach(x=>x.addEventListener('
   const m=readMetric();legMode=x.value;applyLegMode();writeMetric(m);render();save()}));
 document.querySelectorAll('.info').forEach(b=>b.addEventListener('click',()=>{
   const p=document.getElementById(b.getAttribute('aria-controls'));p.hidden=!p.hidden;b.setAttribute('aria-expanded',String(!p.hidden))}));
-$('#jump').addEventListener('click',()=>$('#results').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'}));
+$('#clearExample').addEventListener('click',()=>$('#clear').click());
 $('#clear').addEventListener('click',()=>{IDS.forEach(id=>$('#'+id).value='');estFields.clear();updateEst();example=null;render();save();$('#height').focus()});
 
 const saved=load();
@@ -1420,12 +1610,18 @@ if(saved&&saved.m){
   if(saved.units==='imperial'){units='imperial';$('#u-imp').checked=true;
     document.querySelectorAll('.u-len').forEach(e=>e.textContent='in');document.querySelectorAll('.u-wt').forEach(e=>e.textContent='lb')}
   example=saved.example||null;if(saved.pick)pick=saved.pick;if(saved.region&&REGIONS[saved.region]){region=saved.region;regionAuto=false}(saved.est||[]).forEach(x=>estFields.add(x));if(saved.legMode==='inseam'){legMode='inseam';applyLegMode()}pickPos=saved.pickPos||null;writeMetric(saved.m);
-}else writeMetric(PRESETS[0]);
+}else example=null;   // first visit: empty form; the example loads only on request
 if(!region)region=detectRegion();
 $('#regionSel').value=region;$('#regionNote').textContent=regionAuto?'(from your time zone)':'';
+if(saved&&saved.listF)listF=saved.listF;
 buildSportSelect();
 updateEst();
-render();
+const nOly=Object.values(OLY).reduce((a,d)=>a+(d.m?d.m.n:0)+(d.f?d.f.n:0),0);
+document.querySelectorAll('.heroN').forEach(e=>e.textContent=`${(Math.floor(nOly/1000)*1000).toLocaleString()}+`);
+document.querySelectorAll('.nSports').forEach(e=>e.textContent=SPORTS.length);
+// First visit lands on the welcome screen; returning visitors go straight to their results
+view=location.hash?viewFromHash():(saved&&saved.m?'results':'landing');
+applyView();setTab('sports');render();
 })();
 </script>
 

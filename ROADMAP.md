@@ -42,8 +42,8 @@ Source: *120 years of Olympic history* (`athlete_events.csv`, 271k rows, 1896–
 - [x] Regression check: the example builds (swimmer, marathoner, gymnast, lineman, volleyball, climber) still rank their own sport near the top
 
 ### 1.2 Methodology section
-- [ ] "How scoring works" section on the page: data sources, what's fitted vs literature-based, what the % means, limits
-- [ ] Cite sources in the README
+- [x] Methodology tab on the results page: advantage and match, data sources, photo measuring, limits (part of the layout rework, [DECISIONS.md](DECISIONS.md) #005)
+- [x] Cite sources in the README
 
 ### 1.3 Validate photo measuring **(you + code)**
 - [ ] Write a test protocol: tape-measure arm span, inseam, shoulder width; take the photo per the app's instructions
@@ -52,6 +52,11 @@ Source: *120 years of Olympic history* (`athlete_events.csv`, 271k rows, 1896–
 - [x] First real-world check (1 person): arm span and leg length close; shoulder width 32 vs 40 cm → added ×1.25 correction ([DECISIONS.md](DECISIONS.md) #003)
 - [ ] Compute mean error and spread per measurement; recalibrate the 0.936 eye-height, 0.902 hip-to-leg and 1.25 shoulder factors
 - [ ] Publish the accuracy on the page ("arm span within ±X cm for 80% of people")
+
+---
+
+### 1.4 Layout
+- [x] Landing, measure and results screens; one filterable ranked list; next steps only in the deep dive; results tabs ([DECISIONS.md](DECISIONS.md) #005)
 
 ---
 

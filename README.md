@@ -6,6 +6,8 @@ Enter your body measurements and see which sports your build naturally suits.
 
 ## What it does
 
+Three screens: a short landing page, a measurements form (required basics, optional extras or one photo), and results with tabs for **Sports** (top 3, a ranked list you can filter by region, team or individual, and a deep dive per sport), **Your build** and **Methodology**.
+
 - Scores 35 sports against the body proportions elite athletes in each sport tend to share.
 - Team sports (football/soccer, basketball, volleyball, rugby union, American football, cricket, kabaddi) are scored per position.
 - Detects your region from the device time zone and shows how you rank in the sports popular there (e.g. cricket, kabaddi and hockey in India).

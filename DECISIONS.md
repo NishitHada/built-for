@@ -4,6 +4,26 @@ Short records of product and method decisions: what was decided, why, and what i
 
 ---
 
+## 005 — Three screens, one filterable list, next steps only in the deep dive
+
+**Date:** 2026-09-27 · **Status:** accepted
+
+### Context
+A UX review of the single long page found: controls far from what they change (the region dropdown sat above the top 3 but controlled a list further down); two lists answering the same question ("Popular in India" and "All sports"); Next steps repeated 39 times; the form burying results on phones; no methodology page. The owner proposed a landing / measurements / results flow; this adopts its structure and keeps the existing visual style.
+
+### Decision
+- **Landing** (first visit only): promise, trust points (about 2 minutes, no account, photos stay on device), Get started, See an example, photo shortcut, three-step "how it works".
+- **Measure**: two-step progress bar; Basics (required) and Sharper result (optional, with the photo card) cards; "See my results" with inline validation and a count of measurements entered; a live preview of top sports on desktop. First visits start with an empty form; example values are flagged with a "Clear and enter mine" notice so they can't silently mix with real ones.
+- **Results** with tabs **Sports · Your build · Methodology** and a summary bar (measurements, Edit, Share).
+  - Sports: top 3 → **one ranked list with filter chips** (Popular in <region>, All, Team, Individual) with the region dropdown beside them → a single **deep dive**, the only place with Next steps.
+  - Popular-in-region is the default filter outside "Worldwide", so local sports stay visible without a second list.
+- Returning visitors go straight to Results. Screens map to `#measure` / `#results` so the browser Back button works.
+
+### Consequences
+One list instead of two, one Next steps block instead of 39, the region control sits on the list it filters, and the phone flow is measure → results rather than one long scroll. Methodology (roadmap 1.2) now has a home. Trade-off: the deep dive and your build are one tap further away than before.
+
+---
+
 ## 004 — Show region-popular sports; add cricket, kabaddi, field hockey, table tennis, ice hockey
 
 **Date:** 2026-09-27 · **Status:** accepted
