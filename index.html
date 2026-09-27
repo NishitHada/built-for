@@ -284,7 +284,6 @@ dialog#photoDlg::backdrop{background:rgba(10,14,22,.62)}
 .trust span{font-size:13px;color:var(--muted)}
 .hero-cta{display:flex;gap:18px;align-items:center;flex-wrap:wrap;margin-top:24px}
 .btn.big{font-size:16px;padding:13px 22px}
-.btn.sm{font-size:13.5px;padding:7px 12px}
 .photo-link{margin-top:16px;font-size:14px}
 .explore{display:grid;grid-template-columns:1fr;gap:18px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:20px;background:var(--surface)}
 @media (min-width:1180px){.explore{grid-template-columns:minmax(0,230px) minmax(0,1fr);gap:24px}}
@@ -486,8 +485,7 @@ dialog#photoDlg::backdrop{background:rgba(10,14,22,.62)}
     <a class="logo" href="#" id="homeLink">Built <span>For</span></a>
     <nav class="topnav" aria-label="Site">
       <button type="button" class="navlink" id="navMethod">Methodology</button>
-      <button type="button" class="btn primary sm" id="hdrStart">Get started</button>
-      <div class="seg" role="radiogroup" aria-label="Units">
+      <div class="seg" role="radiogroup" aria-label="Units" id="unitsHdr">
         <input type="radio" name="units" id="u-metric" value="metric" checked><label for="u-metric">cm · kg</label>
         <input type="radio" name="units" id="u-imp" value="imperial"><label for="u-imp">in · lb</label>
       </div>
@@ -526,6 +524,13 @@ dialog#photoDlg::backdrop{background:rgba(10,14,22,.62)}
         <form class="fields mform" id="form" autocomplete="off">
           <section class="panel mcard" aria-label="Required measurements">
             <div class="mhead"><h3>Basics</h3><span class="tagpill req">Required</span></div>
+            <div class="row2">
+              <span class="eyebrow">Units</span>
+              <div class="seg" role="radiogroup" aria-label="Units">
+                <input type="radio" name="units2" id="u2-metric" value="metric" checked><label for="u2-metric">cm · kg</label>
+                <input type="radio" name="units2" id="u2-imp" value="imperial"><label for="u2-imp">in · lb</label>
+              </div>
+            </div>
             <div class="row2">
               <span class="eyebrow">Compare with</span>
               <div class="seg" role="radiogroup" aria-label="Sex">
@@ -1549,7 +1554,6 @@ function render(){
   $('#mCount').textContent=`2 required · ${nOpt} of 5 optional added`;
   if(valid)$('#mErr').hidden=true;
   renderExplore(m.sex);
-  $('#hdrStart').hidden=view==='measure'||view==='results'||(valid&&view!=='landing');
   $('#mExample').hidden=!example;
   if(!valid){
     if(view==='results'){view='measure';applyView()}
@@ -1627,7 +1631,9 @@ function render(){
 
 // ---------- screens and tabs ----------
 const VIEWS=['landing','measure','results','sport','method'];
-function applyView(){VIEWS.forEach(v=>{$('#v-'+v).hidden=v!==view})}
+function applyView(){VIEWS.forEach(v=>{$('#v-'+v).hidden=v!==view});
+  // Units matter where numbers are typed (the Basics card) or shown; the landing page doesn't need the switch
+  $('#unitsHdr').hidden=view==='landing'||view==='measure'}
 const hashFor=v=>v==='landing'?'':v==='sport'?'#s-'+slug(pick):'#'+v;
 function show(v,{push=true,top=true,restore=false}={}){
   if(view==='results'&&v!=='results')resultsY=window.scrollY;
@@ -1671,11 +1677,14 @@ document.addEventListener('toggle',e=>{const d=e.target;if(d.matches&&d.matches(
 $('#shareBtn').addEventListener('click',shareResults);
 $('#form').addEventListener('submit',e=>e.preventDefault());
 document.querySelectorAll('input[name=sex]').forEach(r=>r.addEventListener('change',()=>{render();save()}));
-document.querySelectorAll('input[name=units]').forEach(r=>r.addEventListener('change',()=>{
-  const m=readMetric();units=r.value;
+// Both units switches (header and Basics card) stay in sync
+function applyUnitsUI(){
+  ['u','u2'].forEach(k=>{document.getElementById(`${k}-${units==='metric'?'metric':'imp'}`).checked=true});
   document.querySelectorAll('.u-len').forEach(e=>e.textContent=units==='metric'?'cm':'in');
   document.querySelectorAll('.u-wt').forEach(e=>e.textContent=units==='metric'?'kg':'lb');
-  writeMetric(m);render();save()}));
+}
+document.querySelectorAll('input[name=units],input[name=units2]').forEach(r=>r.addEventListener('change',()=>{
+  const m=readMetric();units=r.value;applyUnitsUI();writeMetric(m);render();save()}));
 $('#regionSel').innerHTML=Object.entries(REGIONS).map(([k,v])=>`<option value="${k}">${v.name}</option>`).join('');
 $('#regionSel').addEventListener('change',e=>{region=e.target.value;regionAuto=false;$('#regionNote').textContent='';buildSportSelect();render();save()});
 $('#sportSel').addEventListener('change',e=>{pick=e.target.value;pickPos=null;try{history.replaceState({view:'sport'},'','#s-'+slug(pick))}catch(err){}render();save()});
@@ -1689,7 +1698,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-sex]');if(
 document.addEventListener('click',e=>{if(e.target.closest('#exMore')){exAll=!exAll;render()}});
 $('#spBack').addEventListener('click',()=>goBack(lastRes?'results':'landing'));
 $('#methBack').addEventListener('click',()=>goBack(lastRes?'results':'landing'));
-$('#hdrStart').addEventListener('click',()=>$('#startBtn').click());
+
 document.addEventListener('click',e=>{const b=e.target.closest('[data-tab]');if(!b)return;setTab(b.dataset.tab);
   if(!b.closest('.tabs'))$('.tabs').scrollIntoView({behavior:smooth(),block:'start'})});
 $('.tabs').addEventListener('keydown',e=>{const ts=[...document.querySelectorAll('.tabs [role=tab]')],i=ts.findIndex(t=>t.dataset.tab===tab);
@@ -1725,11 +1734,13 @@ $('#clear').addEventListener('click',()=>{IDS.forEach(id=>$('#'+id).value='');es
 
 const saved=load();
 if(saved&&saved.m){
-  if(saved.units==='imperial'){units='imperial';$('#u-imp').checked=true;
-    document.querySelectorAll('.u-len').forEach(e=>e.textContent='in');document.querySelectorAll('.u-wt').forEach(e=>e.textContent='lb')}
+  if(saved.units==='imperial')units='imperial';
   example=saved.example||null;if(saved.pick)pick=saved.pick;if(saved.region&&REGIONS[saved.region]){region=saved.region;regionAuto=false}(saved.est||[]).forEach(x=>estFields.add(x));if(saved.legMode==='inseam'){legMode='inseam';applyLegMode()}pickPos=saved.pickPos||null;writeMetric(saved.m);
 }else example=null;   // first visit: empty form; the example loads only on request
 if(!region)region=detectRegion();
+// New visitors in the US start in inches and pounds; everyone else in cm and kg
+if(!(saved&&saved.units)&&region==='US')units='imperial';
+applyUnitsUI();
 $('#regionSel').value=region;$('#regionNote').textContent=regionAuto?'(from your time zone)':'';
 if(saved&&saved.listF)listF=saved.listF;
 buildSportSelect();
