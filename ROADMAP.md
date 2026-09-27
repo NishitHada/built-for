@@ -72,7 +72,8 @@ Source: *120 years of Olympic history* (`athlete_events.csv`, 271k rows, 1896–
 
 ## Phase 3 — Engagement and growth (static)
 
-- [ ] Share card: draw a result image in the browser (top 3 + body diagram) for Instagram/WhatsApp
+- [x] Link previews for WhatsApp and other apps: Open Graph tags, a preview card per sport, share pages at `s/<sport>/`
+- [ ] Personal share image (your top 3 and advantage) drawn in the browser, for Instagram stories and WhatsApp status
 - [x] One page per sport at `#s-<sport>`, useful with or without measurements ([DECISIONS.md](DECISIONS.md) #006)
 - [x] Corrected body illustration: arm span fingertip to fingertip, shoulder width between the bony tips (supplied by owner)
 - [ ] Search-friendly sport pages: separate static URLs per sport (hash links aren't indexed)

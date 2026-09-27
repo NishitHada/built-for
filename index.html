@@ -4,6 +4,16 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Enter your body measurements to see which sports and team positions your build naturally suits, and what limits your fit.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Built For">
+<meta property="og:title" content="Find out what you’re built for">
+<meta property="og:description" content="Compare your body with 35,000+ Olympic athletes and see which of 35 sports and 36 positions give you a head start. About 2 minutes, no account.">
+<meta property="og:url" content="https://nishithada.github.io/built-for/">
+<meta property="og:image" content="https://nishithada.github.io/built-for/og/default.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Find out what you’re built for: compare your body with Olympic athletes across 35 sports.">
+<meta name="twitter:card" content="summary_large_image">
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Built For</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -406,6 +416,31 @@ dialog#photoDlg::backdrop{background:rgba(10,14,22,.62)}
 .method a{color:var(--accent)}
 .mgrid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px}
 @media (max-width:760px){.mgrid2{grid-template-columns:1fr}}
+
+/* ---- link-preview cards (rendered at 1200x630 by scripts/make_share.py via ?og=<sport>) ---- */
+body.og{margin:0;background:var(--bg)}
+.ogc{width:1200px;height:630px;box-sizing:border-box;padding:48px 64px 92px;display:grid;grid-template-columns:minmax(0,1fr) 470px;gap:40px;align-items:start;position:relative;overflow:hidden;background:var(--bg);color:var(--ink)}
+.ogc .eyebrow{font-size:18px;letter-spacing:.14em}
+.ogc h1{font-size:76px;line-height:.95;text-transform:uppercase;margin:14px 0 0}
+.ogc h1 span{background:var(--tape);color:#1E1800;padding:0 .14em;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.ogc .og-sub{font-size:23px;line-height:1.35;color:var(--muted);margin:18px 0 0;max-width:32ch}
+.ogc .og-foot{position:absolute;left:64px;bottom:34px;font-family:var(--mono);font-size:19px;color:var(--muted);display:flex;align-items:center;gap:14px}
+.ogc .og-foot b{background:var(--tape);color:#1E1800;font-family:var(--display);font-size:22px;padding:0 .2em;text-transform:uppercase}
+.og-icons{display:flex;gap:14px;margin-top:24px}
+.og-icons span{width:52px;height:52px;border-radius:12px;display:grid;place-items:center;border:1px solid var(--line);border-top:3px solid var(--c);background:var(--surface)}
+.og-icons svg{width:30px;height:30px;color:var(--c)}
+.og-fig{background:#08101a;border:1px solid var(--line);border-radius:16px;overflow:hidden;align-self:center;margin-top:20px}
+.og-fig img{display:block;width:100%;height:auto}
+.og-sport{background:radial-gradient(circle at 88% 50%,color-mix(in srgb,var(--c) 22%,transparent),transparent 60%),var(--bg)}
+.og-sport .og-ic{display:flex;align-items:center;gap:16px}
+.og-sport .og-ic svg{width:64px;height:64px;color:var(--c)}
+.og-sport h1{font-size:76px}
+.og-sport>div:first-child{align-self:center;margin-top:18px}
+.og-facts{list-style:none;padding:0;margin:20px 0 0;display:flex;flex-direction:column;gap:6px;font-size:22px;color:var(--muted)}
+.og-facts b{color:var(--ink);font-family:var(--mono);font-weight:500}
+.og-cta{display:inline-block;margin-top:22px;background:var(--tape);color:#1E1800;font-weight:700;font-size:24px;padding:12px 22px;border-radius:10px}
+.og-big{justify-self:center;color:var(--c);opacity:.9}
+.og-big svg{width:360px;height:360px;stroke-width:1.1}
 /* how-to-measure popovers */
 .legmode{grid-column:1 / -1;justify-self:start;margin-top:6px}
 .legmode label{padding:4px 10px;font-size:12px}
@@ -1452,11 +1487,19 @@ async function findPlaces(sport){
 }
 async function shareResults(){
   const res=lastRes;if(!res)return;
-  const url='https://nishithada.github.io/built-for/';
+  const SITE='https://nishithada.github.io/built-for/';
+  // From the Deep dive tab, share that sport's page: its link preview shows the sport's own card
+  if(tab==='dive'){
+    const c=res.find(x=>x.sp.n===pick), cur=c&&c.positions?(c.positions.find(p=>p.p.n===pickPos)||c.positions[0]):null;
+    return sendShare(`My build vs ${pick.toLowerCase()}: ${fmtAdv((cur||c).adv)} advantage${cur?` as ${cur.p.n.toLowerCase()}`:''}. Are you built for ${ogLabel(pick)}?`,`${SITE}s/${slug(pick)}/`);
+  }
+  const url=SITE;
   const top=res.slice(0,3).map((r,i)=>`${i+1}. ${r.sp.n}${r.best?` (${r.best.toLowerCase()})`:''}: ${fmtAdv(r.adv)} advantage`).join('\n');
   const c=res.find(x=>x.sp.n===pick), cur=c&&c.positions?(c.positions.find(p=>p.p.n===pickPos)||c.positions[0]):null;
   const chk=c&&!res.slice(0,3).includes(c)?`\nAlso checked ${c.sp.n}${cur?` as ${cur.p.n.toLowerCase()}`:''}: ${fmtAdv((cur||c).adv)} advantage`:'';
-  const text=`My body is built for:\n${top}${chk}\n\nFind yours:`;
+  return sendShare(`My body is built for:\n${top}${chk}\n\nFind yours:`,url);
+}
+async function sendShare(text,url){
   const msg=$('#shareMsg'), ta=$('#shareTxt');
   if(navigator.share){try{await navigator.share({title:'Built For',text,url});msg.textContent='Shared.';return}catch(e){if(e&&e.name==='AbortError')return}}
   try{await navigator.clipboard.writeText(`${text} ${url}`);msg.textContent='Copied to your clipboard.';ta.hidden=true}
@@ -1777,6 +1820,41 @@ document.querySelectorAll('.info').forEach(b=>b.addEventListener('click',()=>{
   const p=document.getElementById(b.getAttribute('aria-controls'));p.hidden=!p.hidden;b.setAttribute('aria-expanded',String(!p.hidden))}));
 $('#clearExample').addEventListener('click',()=>$('#clear').click());
 $('#clear').addEventListener('click',()=>{IDS.forEach(id=>$('#'+id).value='');estFields.clear();updateEst();example=null;render();save();$('#height').focus()});
+
+// ---------- link-preview cards ----------
+// ?og=default or ?og=<sport-slug> renders a 1200x630 card instead of the app; scripts/make_share.py captures them
+const OGLABEL={'Football (soccer)':'football','Road cycling (climbing)':'road cycling','Long & triple jump':'the long jump','Shot put & discus':'the throws','Wrestling & judo':'wrestling','Horse racing jockey':'horse racing','Baseball pitcher':'pitching','Coxswain':'coxing'};
+const ogLabel=n=>OGLABEL[n]||n.toLowerCase();
+function renderOG(key){
+  document.documentElement.dataset.theme='dark';document.body.className='og';
+  const nOly=Object.values(OLY).reduce((a,d)=>a+(d.m?d.m.n:0)+(d.f?d.f.n:0),0), nk=`${(Math.floor(nOly/1000)*1000).toLocaleString()}+`;
+  const nPos=SPORTS.reduce((a,sp)=>a+(sp.pos?sp.pos.length:0),0);
+  const foot='<div class="og-foot"><b>Built For</b>nishithada.github.io/built-for</div>';
+  const sp=SPORTS.find(x=>slug(x.n)===key);
+  if(!sp){
+    const row=['Football (soccer)','Cricket','Basketball','Swimming','Tennis','Volleyball','Rowing'];
+    document.body.innerHTML=`<div class="ogc"><div><span class="eyebrow">Anthropometric sport fit</span>
+      <h1>Find out what you’re <span>built for.</span></h1>
+      <p class="og-sub">Compare your body with ${nk} Olympic athletes across ${SPORTS.length} sports and ${nPos} positions.</p>
+      <div class="og-icons">${row.map(n=>`<span style="--c:${HUE[n]}">${sportIcon(n)}</span>`).join('')}</div></div>
+      <div class="og-fig"><img src="assets/hero-figure.jpg" alt=""></div>${foot}</div>`;
+    return;
+  }
+  const hM=typicalH(sp,'m'), olyD=sp.oly&&sp.oly.m, label=ogLabel(sp.n);
+  const facts=[
+    ok(hM)?`<li>${olyD?'Olympic':'Elite'} men average <b>${fmtH(hM)}</b></li>`:'',
+    sp.pos?`<li><b>${sp.pos.length}</b> positions: ${sp.pos.slice(0,3).map(p=>p.n.toLowerCase()).join(', ')}${sp.pos.length>3?` +${sp.pos.length-3} more`:''}</li>`:'',
+    olyD?`<li>Built from <b>${(sp.oly.m.n+(sp.oly.f?sp.oly.f.n:0)).toLocaleString()}</b> Olympic athletes</li>`:'<li>Targets from sports-science studies</li>'
+  ].join('');
+  document.body.innerHTML=`<div class="ogc og-sport" style="--c:${HUE[sp.n]}"><div>
+      <div class="og-ic">${sportIcon(sp.n)}<span class="eyebrow">${sp.cat}</span></div>
+      <h1>Are you built for <span>${esc(label)}?</span></h1>
+      <ul class="og-facts">${facts}</ul>
+      <span class="og-cta">Check your build in 2 minutes →</span></div>
+    <div class="og-big" aria-hidden="true">${sportIcon(sp.n)}</div>${foot}</div>`;
+}
+const ogKey=new URLSearchParams(location.search).get('og');
+if(ogKey){renderOG(ogKey);return}
 
 const saved=load();
 if(saved&&saved.m){

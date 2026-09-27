@@ -19,6 +19,17 @@ Screens: a landing page with an explore strip of sports, a measurements form (re
 
 Inputs: height and weight (required); arm span, sitting height or inseam, hand length, foot length and shoulder width (optional). Metric or imperial. Leg length is height minus sitting height; a barefoot crotch-to-floor inseam is used as leg length directly, since the two agree within about a centimetre on average (ANSUR II).
 
+## Link previews
+
+Shared links show a rich preview card on WhatsApp, iMessage, Slack and similar apps via Open Graph tags. Those apps ignore anything after `#`, so each sport has a small share page at `s/<sport>/` with its own tags and image (`og/<sport>.jpg`) that forwards into the app at `#s-<sport>`. The Share button uses the sport's page from the Deep dive tab.
+
+The cards are rendered by the app itself (`index.html?og=<sport>`) and captured with headless Chrome. To regenerate after changing sports or styles, serve the folder locally and run:
+
+```
+python3 -m http.server 8123
+python3 scripts/make_share.py http://localhost:8123/
+```
+
 ## How scoring works
 
 Sports are ranked by **advantage**: how much more common your build is among a sport's elite athletes than in the general population (e.g. "6.6× more common among Olympic badminton players than among men in general"). **Match %** (how closely you fit their typical build) is shown alongside and drives the limiting factors. Method and trade-offs: [DECISIONS.md](DECISIONS.md).
