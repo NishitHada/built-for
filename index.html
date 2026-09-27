@@ -285,6 +285,8 @@ dialog#photoDlg::backdrop{background:rgba(10,14,22,.62)}
 .hero-cta{display:flex;gap:18px;align-items:center;flex-wrap:wrap;margin-top:24px}
 .btn.big{font-size:16px;padding:13px 22px}
 .photo-link{margin-top:16px;font-size:14px}
+.landfoot{margin:0;font-size:14px;text-align:center}
+#v-landing{padding-top:clamp(12px,3vw,32px)}
 .explore{display:grid;grid-template-columns:1fr;gap:18px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:20px;background:var(--surface)}
 @media (min-width:1180px){.explore{grid-template-columns:minmax(0,230px) minmax(0,1fr);gap:24px}}
 .ex-intro h2{font-size:28px;text-transform:uppercase;margin-top:6px}
@@ -481,7 +483,7 @@ dialog#photoDlg::backdrop{background:rgba(10,14,22,.62)}
 <body>
 
 <div class="wrap">
-  <header class="top">
+  <header class="top" id="siteHeader">
     <a class="logo" href="#" id="homeLink">Built <span>For</span></a>
     <nav class="topnav" aria-label="Site">
       <button type="button" class="navlink" id="navMethod">Methodology</button>
@@ -513,6 +515,7 @@ dialog#photoDlg::backdrop{background:rgba(10,14,22,.62)}
         <p>From Olympic events to the sports popular <span id="exWhere"></span>. Tap one to see the build it rewards.</p></div>
       <div class="ex-cards" id="exCards"></div>
     </section>
+    <p class="landfoot"><button type="button" class="linkbtn" data-go="method">How the scoring works</button></p>
   </section>
 
   <section class="view" id="v-measure" aria-label="Your measurements" hidden>
@@ -1633,7 +1636,9 @@ function render(){
 const VIEWS=['landing','measure','results','sport','method'];
 function applyView(){VIEWS.forEach(v=>{$('#v-'+v).hidden=v!==view});
   // Units matter where numbers are typed (the Basics card) or shown; the landing page doesn't need the switch
-  $('#unitsHdr').hidden=view==='landing'||view==='measure'}
+  $('#unitsHdr').hidden=view==='landing'||view==='measure';
+  // The landing page carries its own brand and actions, so the site header only appears once you're inside
+  $('#siteHeader').hidden=view==='landing'}
 const hashFor=v=>v==='landing'?'':v==='sport'?'#s-'+slug(pick):'#'+v;
 function show(v,{push=true,top=true,restore=false}={}){
   if(view==='results'&&v!=='results')resultsY=window.scrollY;
