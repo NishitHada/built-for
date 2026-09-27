@@ -30,3 +30,10 @@ Height and BMI targets for 27 sports are fitted on Olympic athletes 1992–2016 
 ## Run locally
 
 It is a single static file with no build step. Open `index.html` in a browser.
+
+## Credits
+
+- Sport icons: [Tabler Icons](https://tabler.io/icons) v3.19.0 (MIT licence), embedded as inline SVG. Boxing, field hockey and ice hockey icons are drawn to match.
+- Olympic athlete data: *120 years of Olympic history* ([rgriff23/Olympic_history](https://github.com/rgriff23/Olympic_history)), used only as aggregate statistics.
+- Pose detection: [MediaPipe Pose Landmarker](https://ai.google.dev/edge/mediapipe/solutions/vision/pose_landmarker) (Apache 2.0), run in the browser.
+- Place search: [OpenStreetMap](https://www.openstreetmap.org/copyright) data via the Overpass API.
