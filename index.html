@@ -285,6 +285,11 @@ dialog#photoDlg::backdrop{background:rgba(10,14,22,.62)}
 .hero-cta{display:flex;gap:18px;align-items:center;flex-wrap:wrap;margin-top:24px}
 .btn.big{font-size:16px;padding:13px 22px}
 .photo-link{margin-top:16px;font-size:14px}
+.lookup{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--line);border-left:0;border-right:0;padding:14px 2px}
+.lookup label{display:flex;flex-direction:column;gap:2px}
+.lookup label b{font-family:var(--display);font-size:20px;text-transform:uppercase;font-weight:700}
+.lookup label span{font-size:13.5px;color:var(--muted)}
+.lookup select{font:inherit;font-size:15px;padding:9px 12px;border:1px solid var(--ink);border-radius:8px;background:var(--surface-2);color:var(--ink);min-width:min(100%,260px);max-width:100%}
 .landfoot{margin:0;font-size:14px;text-align:center}
 #v-landing{padding-top:clamp(12px,3vw,32px)}
 .explore{display:grid;grid-template-columns:1fr;gap:18px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:20px;background:var(--surface)}
@@ -676,6 +681,10 @@ dialog#photoDlg::backdrop{background:rgba(10,14,22,.62)}
     </div>
     <div class="tabpanel" id="p-sports" role="tabpanel" aria-labelledby="tab-sports">
       <div id="out"></div>
+      <div class="lookup">
+        <label for="lookupSel"><b>Deep dive into any sport</b><span>Your fit, best position, what limits you and how to start.</span></label>
+        <select id="lookupSel"></select>
+      </div>
       <section class="listsec" aria-labelledby="listTitle">
         <div class="section-head"><h2 id="listTitle">All sports</h2><p id="listSub"></p></div>
         <div class="fchips" role="group" aria-label="Filter sports">
@@ -1493,8 +1502,10 @@ function detectRegion(){
 const regionInfo=()=>REGIONS[region]||REGIONS.GLOBAL;
 function buildSportSelect(){
   const R=regionInfo(), cats=[...new Set(SPORTS.map(s=>s.cat))], opt=s=>`<option value="${esc(s)}">${esc(s)}</option>`;
-  $('#sportSel').innerHTML=`<optgroup label="Popular ${region==='GLOBAL'?'worldwide':'in '+esc(R.name)}">${R.pop.filter(n=>SPORTS.some(s=>s.n===n)).map(opt).join('')}</optgroup>`
+  const groups=`<optgroup label="Popular ${region==='GLOBAL'?'worldwide':'in '+esc(R.name)}">${R.pop.filter(n=>SPORTS.some(s=>s.n===n)).map(opt).join('')}</optgroup>`
     +cats.map(c=>`<optgroup label="${c}">${SPORTS.filter(s=>s.cat===c).map(s=>opt(s.n)).join('')}</optgroup>`).join('');
+  $('#sportSel').innerHTML=groups;
+  $('#lookupSel').innerHTML='<option value="">Choose a sport\u2026</option>'+groups;
 }
 // ---------- render ----------
 const OPT=['span','sit','hand','foot','shoulder'];
@@ -1692,6 +1703,7 @@ document.querySelectorAll('input[name=units],input[name=units2]').forEach(r=>r.a
   const m=readMetric();units=r.value;applyUnitsUI();writeMetric(m);render();save()}));
 $('#regionSel').innerHTML=Object.entries(REGIONS).map(([k,v])=>`<option value="${k}">${v.name}</option>`).join('');
 $('#regionSel').addEventListener('change',e=>{region=e.target.value;regionAuto=false;$('#regionNote').textContent='';buildSportSelect();render();save()});
+$('#lookupSel').addEventListener('change',e=>{const v=e.target.value;if(!v)return;e.target.value='';pick=v;pickPos=null;show('sport')});
 $('#sportSel').addEventListener('change',e=>{pick=e.target.value;pickPos=null;try{history.replaceState({view:'sport'},'','#s-'+slug(pick))}catch(err){}render();save()});
 $('#checkOut').addEventListener('click',e=>{const b=e.target.closest('[data-pos]');if(!b)return;
   pickPos=b.dataset.pos;render();save();const nb=document.querySelector(`[data-pos="${CSS.escape(pickPos)}"]`);if(nb)nb.focus({preventScroll:true})});
