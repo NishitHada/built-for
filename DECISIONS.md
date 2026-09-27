@@ -4,6 +4,26 @@ Short records of product and method decisions: what was decided, why, and what i
 
 ---
 
+## 004 — Show region-popular sports; add cricket, kabaddi, field hockey, table tennis, ice hockey
+
+**Date:** 2026-09-27 · **Status:** accepted
+
+### Context
+Rankings were global. In India, cricket (the biggest sport) wasn't in the app at all, and a user's best local options could sit far below the top 3 without being noticed.
+
+### Decision
+- **Add five sports** (30 → 35): cricket (fast bowler, spin bowler, batter, wicketkeeper), kabaddi (raider, defender), field hockey, table tennis, ice hockey. The last three have Olympic data and are fitted like the others; cricket and kabaddi use literature targets.
+- **Detect the region from the device's time zone** (no permission prompt), falling back to the browser language, then "Worldwide". A dropdown lets people change it; a manual choice is remembered.
+- **Show a "Popular in <region>" section** under the top 3, listing that region's popular sports ranked by the user's advantage, with each sport's overall rank. Popular sports also get a "popular here" badge in the top 3 and ranked list, and head the sport picker.
+- **Region never changes the global ranking or scores.** It only decides which sports are surfaced.
+
+### Trade-offs
+- The popularity lists (16 regions) are **editorial**, based on general knowledge of participation and viewership, not a dataset. They should be reviewed by people from each region.
+- Time zone is a rough proxy (e.g. all of continental Europe maps to one list; Latin America except Brazil is one list).
+- Population norms are still Western, so for Indian users the advantage in "tall" sports is understated. The population selector (roadmap) is the natural follow-up and can default from the same region.
+
+---
+
 ## 003 — Correct photo shoulder width by ×1.25
 
 **Date:** 2026-09-26 · **Status:** accepted, provisional (one data point)

@@ -66,6 +66,9 @@ GROUPS = {
     "Handball": sport("Handball"),
     "Football (soccer)": sport("Football"),
     "Baseball pitcher": lambda r: r["Sport"] in ("Baseball", "Softball"),
+    "Field hockey": sport("Hockey"),
+    "Table tennis": sport("Table Tennis"),
+    "Ice hockey": sport("Ice Hockey"),
 }
 
 # Hurdles contain "100 metres"/"400 metres" in their names; keep them out of sprinting.

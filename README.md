@@ -6,8 +6,9 @@ Enter your body measurements and see which sports your build naturally suits.
 
 ## What it does
 
-- Scores 30 sports against the body proportions elite athletes in each sport tend to share.
-- Team sports (football/soccer, basketball, volleyball, rugby union, American football) are scored per position.
+- Scores 35 sports against the body proportions elite athletes in each sport tend to share.
+- Team sports (football/soccer, basketball, volleyball, rugby union, American football, cricket, kabaddi) are scored per position.
+- Detects your region from the device time zone and shows how you rank in the sports popular there (e.g. cricket, kabaddi and hockey in India).
 - **Check a sport** shows your match for one sport or position and ranks the limiting factors: how far off each measurement is, whether it is fixed (bone length) or changeable (weight, BMI), and how many points it costs.
 - Shows your build as a proportional diagram with percentile gauges.
 - **Measure from a photo:** estimates arm span, leg length and shoulder width from one full-body photo, scaled from your height. Uses MediaPipe Pose Landmarker running in the browser; the photo is never uploaded. Estimates are labelled and editable.
@@ -22,7 +23,7 @@ Sports are ranked by **advantage**: how much more common your build is among a s
 
 Each measurement is converted to a percentile against approximate adult population norms for the chosen sex. Arm span and leg length are taken relative to height. Each sport or position has target values with a direction (more is better, less is better, or a sweet spot), a tolerance and a weight. Missing measurements count as neutral. A team sport scores as its best position.
 
-Height and BMI targets for 24 sports are fitted on Olympic athletes 1992–2016 (the *120 years of Olympic history* dataset, github.com/rgriff23/Olympic_history) by `scripts/fit_olympic.py`; within an athlete's middle half scores full marks. Team-sport positions keep literature offsets around the sport's real median. Arm span, leg, hand, foot and shoulder targets, and sports without Olympic data (climbing, sumo, jockey, coxswain, rugby union, American football), still use approximations from sports-science literature. To refit: download `athlete_events.csv` into `data/raw/` and run `python3 scripts/fit_olympic.py`. Body shape is one factor among many; training, skill and physiology matter more.
+Height and BMI targets for 27 sports are fitted on Olympic athletes 1992–2016 (the *120 years of Olympic history* dataset, github.com/rgriff23/Olympic_history) by `scripts/fit_olympic.py`; within an athlete's middle half scores full marks. Team-sport positions keep literature offsets around the sport's real median. Arm span, leg, hand, foot and shoulder targets, and sports without Olympic data (climbing, sumo, jockey, coxswain, rugby union, American football, cricket, kabaddi), still use approximations from sports-science literature. To refit: download `athlete_events.csv` into `data/raw/` and run `python3 scripts/fit_olympic.py`. Body shape is one factor among many; training, skill and physiology matter more.
 
 ## Run locally
 
