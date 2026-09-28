@@ -63,9 +63,9 @@ Source: *120 years of Olympic history* (`athlete_events.csv`, 271k rows, 1896–
 
 ## Phase 2 — Measure what people do (still static)
 
-- [ ] **(you)** Create a GoatCounter account (free, cookie-free, no consent banner) and share the site code
-- [ ] Add the GoatCounter script and events: results viewed, sport checked, photo used (success/fail), places searched (found/none), share used, preset used
-- [ ] Never send measurements or location in events
+- [x] **(you)** Create a GoatCounter account (nhada.goatcounter.com)
+- [x] GoatCounter script and events: start, example, results, sport/<name>, photo open/success/fail, places/<name> and found/none/error, directions, maps, share, region, filter, methodology
+- [x] Never send measurements or location in events (noted on the Methodology page)
 - [ ] "Did this match your experience?" thumbs up/down on the best fit, sent as an event
 
 ---

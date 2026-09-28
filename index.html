@@ -10,6 +10,7 @@
 <link rel="icon" href="favicon-48.png" type="image/png" sizes="48x48">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="theme-color" content="#0E121A">
+<script data-goatcounter="https://nhada.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebApplication", "name": "Built For", "url": "https://nishithada.github.io/built-for/", "description": "Compare your height, build and proportions with 35,000+ Olympic athletes and see which of 35 sports and 36 positions suit your body. Free, about 2 minutes, no account.", "applicationCategory": "SportsApplication", "operatingSystem": "Any", "browserRequirements": "Requires JavaScript", "isAccessibleForFree": true, "inLanguage": "en", "image": "https://nishithada.github.io/built-for/og/default.jpg", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}}</script>
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Built For">
@@ -772,7 +773,8 @@ body.og{margin:0;background:var(--bg)}
           <ul><li>Build is one factor among many. Training, skill, aerobic capacity, muscle fibre type, coordination and nerve matter far more for most people, and plenty of champions have the “wrong” body for their sport.</li>
             <li>“People in general” uses Western adult averages for now, so people from populations with shorter averages are understated in tall sports.</li>
             <li>Which sports count as popular in each region is an editorial judgement.</li>
-            <li>If you’re still growing, treat the results loosely.</li></ul></div>
+            <li>If you’re still growing, treat the results loosely.</li>
+            <li>The site counts visits and a few anonymous actions (like opening a sport) with GoatCounter, which uses no cookies. Your measurements, photo and location are never sent.</li></ul></div>
         <p class="fine">Full method, trade-offs and data sources: <a href="https://github.com/NishitHada/built-for/blob/main/DECISIONS.md" target="_blank" rel="noopener">decision log</a> · <a href="https://github.com/NishitHada/built-for" target="_blank" rel="noopener">source code</a>.</p>
       </section>
   </section>
@@ -1264,6 +1266,9 @@ function pStatus(msg,o={}){
   if(!msg||o.err||o.done){clearTimeout(slowT);slowT=null;$('#psSlow').hidden=true}
 }
 // Yield so the status can paint. Hidden tabs pause animation frames, so a timer backs it up.
+// Analytics: GoatCounter (no cookies). Anonymous action counts only; never measurements, photos or location.
+const track=path=>{try{if(window.goatcounter&&window.goatcounter.count)window.goatcounter.count({path:'evt/'+path,title:path,event:true})}catch(e){}};
+let trackedResults=false;
 const nextPaint=()=>new Promise(r=>{let done=false;const go=()=>{if(!done){done=true;setTimeout(r,0)}};requestAnimationFrame(go);setTimeout(go,60)});
 // Download the model with progress, keeping a copy in the browser cache so later visits skip it
 async function fetchModel(onp){
@@ -1351,10 +1356,10 @@ async function analysePhoto(file){
     $('#photoResult').scrollIntoView({block:'nearest'});
     let pose;
     try{pose=await getPoser()}catch(e){
-      pStatus('The pose model couldn\u2019t load here. Photo measuring works on the full site at nishithada.github.io/built-for, or you can type your measurements in.',{err:true});return}
+      track('photo-fail/model');pStatus('The pose model couldn\u2019t load here. Photo measuring works on the full site at nishithada.github.io/built-for, or you can type your measurements in.',{err:true});return}
     pStatus('Finding your pose\u2026',{prog:null});await nextPaint();
     const res=pose.detect(cv);
-    if(!res.landmarks||!res.landmarks.length){pStatus('Couldn\u2019t find a person in that photo. Stand back so your whole body is in the frame, in good light.',{err:true});return}
+    if(!res.landmarks||!res.landmarks.length){track('photo-fail/no-person');pStatus('Couldn\u2019t find a person in that photo. Stand back so your whole body is in the frame, in good light.',{err:true});return}
     const P=res.landmarks[0].map(p=>({x:p.x*w,y:p.y*h,v:p.visibility}));
     const e=estimate(P,m.h,ok(m.hand)?m.hand:.108*m.h);
     drawPose(ctx,P,e,w);
@@ -1364,9 +1369,9 @@ async function analysePhoto(file){
       +`<li><span>Scaled from your height</span><span>${fmtH(m.h)}</span></li>`;
     $('#estWarn').innerHTML=e.warn.map(x=>`<li>${x}</li>`).join('');
     $('#estUse').disabled=!(e.okv.span||e.okv.leg||e.okv.sh);
-    pStatus('');$('#estBlock').hidden=false;
+    pStatus('');$('#estBlock').hidden=false;track('photo-success');
     $('#photoResult').scrollIntoView({block:'nearest'});
-  }catch(err){pStatus('Something went wrong reading that photo. Try a different one.',{err:true})}
+  }catch(err){track('photo-fail/error');pStatus('Something went wrong reading that photo. Try a different one.',{err:true})}
   finally{$('#scan').hidden=true;pick.removeAttribute('aria-disabled');$('#photoFile').value='';$('#photoCam').value=''}
 }
 function useEstimate(){
@@ -1477,7 +1482,7 @@ async function findPlaces(sport){
       lastCoords={lat:+pos.coords.latitude.toFixed(3),lon:+pos.coords.longitude.toFixed(3)};
     }
     const {lat,lon}=lastCoords;
-    st('Searching OpenStreetMap…');
+    track('places/'+slug(sport));st('Searching OpenStreetMap…');
     let els=await overpass(S.f,lat,lon,8000);
     if(els.length<3)els=await overpass(S.f,lat,lon,25000);
     const seen=new Set();let unnamed=0;
@@ -1489,19 +1494,20 @@ async function findPlaces(sport){
       .filter(p=>{const k=(p.name||'')+p.la.toFixed(3)+p.lo.toFixed(3);if(seen.has(k))return false;seen.add(k);
         if(!p.name){if(unnamed>=3)return false;unnamed++}return true})
       .slice(0,8);
-    if(!list.length){st(`No ${esc(sport.toLowerCase())} places are mapped within 25 km in OpenStreetMap. Try the Google Maps search.`);return}
+    if(!list.length){track('places-none');st(`No ${esc(sport.toLowerCase())} places are mapped within 25 km in OpenStreetMap. Try the Google Maps search.`);return}
     const fd=k=>units==='metric'?(k<1?`${Math.round(k*1000)} m`:`${k.toFixed(1)} km`):`${(k*.621).toFixed(1)} mi`;
-    put(`<ol class="places">${list.map(p=>`<li><div><b>${esc(p.name||'Unnamed '+p.kind.toLowerCase())}</b><span>${p.kind} · ${fd(p.dist)} away</span></div>
+    track('places-found');put(`<ol class="places">${list.map(p=>`<li><div><b>${esc(p.name||'Unnamed '+p.kind.toLowerCase())}</b><span>${p.kind} · ${fd(p.dist)} away</span></div>
       <a href="https://www.google.com/maps/dir/?api=1&amp;destination=${p.la.toFixed(5)},${p.lo.toFixed(5)}" target="_blank" rel="noopener">Directions</a></li>`).join('')}</ol>
       <p class="fine">From OpenStreetMap. Check opening times and membership with the venue.</p>`);
   }catch(err){
     if(err&&err.code===1)st('Location access is blocked. Allow location for this site and try again, or use the Google Maps search.',true);
     else if(err&&(err.code===2||err.code===3||err.code===9))st('Couldn’t get your location. Use the Google Maps search instead.',true);
-    else st('Couldn’t reach OpenStreetMap right now. Use the Google Maps search instead.',true);
+    else{track('places-error');st('Couldn’t reach OpenStreetMap right now. Use the Google Maps search instead.',true)};
   }finally{busy(false)}
 }
 async function shareResults(){
   const res=lastRes;if(!res)return;
+  track(tab==='dive'?'share/'+slug(pick):'share/main');
   const SITE='https://nishithada.github.io/built-for/';
   // From the Deep dive tab, share that sport's page: its link preview shows the sport's own card
   if(tab==='dive'){
@@ -1641,6 +1647,7 @@ function render(){
   const res=SPORTS.map(sp=>scoreEntry(sp,T,m.sex)).sort(byAdv);
   const P=x=>Math.round(x*100), R=regionInfo(), popHere=new Set(R.pop);
   lastRes=res;
+  if(view==='results'&&!trackedResults){trackedResults=true;track('results')}
 
   // measure screen: live preview (desktop)
   $('#livePv').innerHTML=`<h3>Your top sports so far</h3><ol class="pvlist">${res.slice(0,5).map(r=>`<li><b>${esc(r.sp.n)}</b><span>${fmtAdv(r.adv)}</span></li>`).join('')}</ol>
@@ -1740,7 +1747,7 @@ function setTab(t,{push=false}={}){
     if(want!==location.hash){try{history.pushState({view:'results',tab:t},'',want);navDepth++}catch(e){}}}
 }
 function openSport(n){
-  pick=n;pickPos=null;
+  pick=n;pickPos=null;track('sport/'+slug(n));
   if(!validNow()){show('sport');return}
   if(view!=='results'){view='results';applyView()}
   setTab('dive',{push:true});render();save();
@@ -1761,7 +1768,7 @@ $('#form').addEventListener('input',e=>{example=null;if(estFields.delete(e.targe
 function photoHeightOk(){const v=parseFloat($('#photoHeight').value),cm=units==='metric'?v:v*2.54;return isFinite(cm)&&cm>=120&&cm<=245}
 function syncPhotoGate(){const okH=photoHeightOk();$('#photoFile').disabled=$('#photoCam').disabled=!okH;$('#photoPick').classList.toggle('off',!okH);$('#photoCamBtn').classList.toggle('off',!okH);
   $('#pickHint').textContent=okH?'':'Enter your height in step 1 to continue.'}
-$('#photoOpen').addEventListener('click',()=>{pStatus(poser?'Pose model ready.':'',{done:true});$('#photoHeight').value=$('#height').value;syncPhotoGate();
+$('#photoOpen').addEventListener('click',()=>{track('photo-open');pStatus(poser?'Pose model ready.':'',{done:true});$('#photoHeight').value=$('#height').value;syncPhotoGate();
   getPoser().catch(()=>{});   // preload while the user reads the steps; errors surface when a photo is chosen
   const d=$('#photoDlg');if(d.showModal)d.showModal();else d.setAttribute('open','');if(!photoHeightOk())$('#photoHeight').focus()});
 $('#photoHeight').addEventListener('input',()=>{const h=$('#height');h.value=$('#photoHeight').value;h.dispatchEvent(new Event('input',{bubbles:true}));syncPhotoGate()});
@@ -1783,7 +1790,7 @@ function applyUnitsUI(){
 document.querySelectorAll('input[name=units],input[name=units2]').forEach(r=>r.addEventListener('change',()=>{
   const m=readMetric();units=r.value;applyUnitsUI();writeMetric(m);render();save()}));
 $('#regionSel').innerHTML=Object.entries(REGIONS).map(([k,v])=>`<option value="${k}">${v.name}</option>`).join('');
-$('#regionSel').addEventListener('change',e=>{region=e.target.value;regionAuto=false;$('#regionNote').textContent='';buildSportSelect();render();save()});
+$('#regionSel').addEventListener('change',e=>{region=e.target.value;track('region/'+region);regionAuto=false;$('#regionNote').textContent='';buildSportSelect();render();save()});
 $('#sportSel').addEventListener('change',e=>{pick=e.target.value;pickPos=null;try{history.replaceState({view:'sport'},'','#s-'+slug(pick))}catch(err){}render();save()});
 $('#checkOut').addEventListener('click',e=>{const b=e.target.closest('[data-pos]');if(!b)return;
   pickPos=b.dataset.pos;render();save();const nb=document.querySelector(`[data-pos="${CSS.escape(pickPos)}"]`);if(nb)nb.focus({preventScroll:true})});
@@ -1801,13 +1808,15 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-tab]');if(
   if(t==='sports')window.scrollTo(0,sportsY);else{const tb=$('.tabs').getBoundingClientRect().top;if(tb<0)$('.tabs').scrollIntoView({block:'start'})}});
 $('.tabs').addEventListener('keydown',e=>{const ts=[...document.querySelectorAll('.tabs [role=tab]')],i=ts.findIndex(t=>t.dataset.tab===tab);
   const j=e.key==='ArrowRight'?(i+1)%ts.length:e.key==='ArrowLeft'?(i+ts.length-1)%ts.length:-1;if(j<0)return;e.preventDefault();setTab(ts[j].dataset.tab);ts[j].focus()});
-document.querySelectorAll('.fchip').forEach(c=>c.addEventListener('click',()=>{listF=c.dataset.f;render();save()}));
-$('#startBtn').addEventListener('click',()=>{show('measure');if(!$('#height').value)$('#height').focus()});
-$('#exampleBtn').addEventListener('click',()=>{const p=PRESETS[0];example=p.k;estFields.clear();updateEst();writeMetric(p);setTab('sports');show('results')});
+document.querySelectorAll('.fchip').forEach(c=>c.addEventListener('click',()=>{listF=c.dataset.f;track('filter/'+listF);render();save()}));
+$('#startBtn').addEventListener('click',()=>{track('start');show('measure');if(!$('#height').value)$('#height').focus()});
+$('#exampleBtn').addEventListener('click',()=>{track('example');const p=PRESETS[0];example=p.k;estFields.clear();updateEst();writeMetric(p);setTab('sports');show('results')});
 $('#heroPhoto').addEventListener('click',()=>{show('measure');$('#photoOpen').click()});
 $('#editBtn').addEventListener('click',()=>show('measure'));
 $('#homeLink').addEventListener('click',e=>{e.preventDefault();show('landing')});
-$('#navMethod').addEventListener('click',()=>show('method'));
+$('#navMethod').addEventListener('click',()=>{track('methodology');show('method')});
+// Outbound map links from the places list
+document.addEventListener('click',e=>{const a=e.target.closest('a[href*="google.com/maps"]');if(a)track(a.href.includes('/dir/')?'directions':'maps')});
 $('#toResults').addEventListener('click',()=>{
   const m=readMetric(),bad=!ok(m.h)||m.h<120||m.h>245?'#height':!ok(m.w)||m.w<30||m.w>250?'#weight':null;
   if(bad){const e=$('#mErr');e.textContent=`Enter your ${bad==='#height'?'height':'weight'} to continue${units==='metric'?(bad==='#height'?' (120\u2013245 cm)':' (30\u2013250 kg)'):''}.`;e.hidden=false;$(bad).focus();return}
