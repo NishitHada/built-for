@@ -14,7 +14,7 @@ Screens: a landing page with an explore strip of sports, a measurements form (re
 - **Check a sport** shows your match for one sport or position and ranks the limiting factors: how far off each measurement is, whether it is fixed (bone length) or changeable (weight, BMI), and how many points it costs.
 - Shows your build as a proportional diagram with percentile gauges.
 - **Measure from a photo:** estimates arm span, leg length and shoulder width from one full-body photo, scaled from your height. Uses MediaPipe Pose Landmarker running in the browser; the photo is never uploaded. Estimates are labelled and editable.
-- **Next steps** (collapsible, on every sport: top 3, ranked list and the sport check): how to get started, gear, a first focus based on your limiting factors, nearby clubs and venues from OpenStreetMap (Overpass API, location rounded to ~100 m and only sent when you tap the button), and a Google Maps fallback.
+- **Next steps** in each sport's deep dive: how to get started, gear, a first focus based on your limiting factors, and where to play (Playo by city in India for the sports it lists; a Google Maps search otherwise).
 - **Share** a text summary of your results.
 
 Inputs: height and weight (required); arm span, sitting height or inseam, hand length, foot length and shoulder width (optional). Metric or imperial. Leg length is height minus sitting height; a barefoot crotch-to-floor inseam is used as leg length directly, since the two agree within about a centimetre on average (ANSUR II).
@@ -47,4 +47,3 @@ It is a single static file with no build step. Open `index.html` in a browser.
 - Sport icons: [Tabler Icons](https://tabler.io/icons) v3.19.0 (MIT licence), embedded as inline SVG. Boxing, field hockey and ice hockey icons are drawn to match.
 - Olympic athlete data: *120 years of Olympic history* ([rgriff23/Olympic_history](https://github.com/rgriff23/Olympic_history)), used only as aggregate statistics.
 - Pose detection: [MediaPipe Pose Landmarker](https://ai.google.dev/edge/mediapipe/solutions/vision/pose_landmarker) (Apache 2.0), run in the browser.
-- Place search: [OpenStreetMap](https://www.openstreetmap.org/copyright) data via the Overpass API.

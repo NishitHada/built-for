@@ -99,5 +99,4 @@ Source: *120 years of Olympic history* (`athlete_events.csv`, 271k rows, 1896–
 - [ ] Supabase in the Mumbai region (Postgres, auth, row-level security)
 - [ ] School/academy tool: teacher login, class rosters, batch screening, per-child reports, class overview, CSV export
 - [ ] Verifiable parental consent for under-18s (DPDP Act 2023); store measurements only, never photos
-- [ ] Cloudflare Worker to cache OpenStreetMap place searches by area
 - [ ] Lead-gen partnerships with academies and booking apps, with referral tracking

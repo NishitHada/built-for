@@ -4,6 +4,25 @@ Short records of product and method decisions: what was decided, why, and what i
 
 ---
 
+## 009 — Remove the in-app venue search; keep Playo
+
+**Date:** 2026-09-28 · **Status:** accepted (amends 008)
+
+### Context
+"Find places near me" searched OpenStreetMap live. From Indian networks the public servers refused requests (HTTP 406), timed out, or answered in 10+ seconds, so visitors mostly saw a spinner and then an error. A pre-fetched city dataset was tried, but the same servers timed out while downloading it. The owner judged the feature too unreliable.
+
+### Decision
+- Remove the venue search, its location request, the live-server fallbacks and the OpenStreetMap privacy note.
+- Each sport's Next steps now has **Where to play**:
+  - In India, for the 8 sports Playo lists: a city picker (Bengaluru, Mumbai, Delhi NCR, Hyderabad, Chennai, Pune, Vijayawada, Guntur) and a "See <sport> venues on Playo" button. No location permission, no waiting; the chosen city is remembered.
+  - Otherwise: a plain "Search Google Maps" button.
+- Playo is now shown without first needing a location search. It is still unpaid, disclosed, and never affects rankings (see 008).
+
+### Consequences
+Nothing in the app depends on public map servers any more, and the location permission prompt is gone. The trade-off is no in-app list of venues and distances.
+
+---
+
 ## 008 — Unpaid "creator's picks": Playo and Decathlon, subtle and in context
 
 **Date:** 2026-09-28 · **Status:** accepted

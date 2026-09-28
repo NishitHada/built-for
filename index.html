@@ -246,6 +246,7 @@ dialog#photoDlg::backdrop{background:rgba(10,14,22,.62)}
 .aside{font-size:13.5px;color:var(--muted);margin:10px 0 0}
 .aside a,.aside-link{color:var(--accent)}
 .aside-link{font-size:13.5px;margin-left:4px}
+.pcity{font:inherit;font-size:14px;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface-2);color:var(--ink);max-width:100%}
 .pstatus.busy{display:flex;align-items:center;gap:10px}
 .pstatus .spin{width:14px;height:14px;border-width:2px}
 .pstatus a{color:var(--accent)}
@@ -936,7 +937,7 @@ const PRESETS=[
 
 const IDS=['height','weight','span','sit','hand','foot','shoulder'];
 const KEYS={height:'h',weight:'w',span:'span',sit:'sit',hand:'hand',foot:'foot',shoulder:'shoulder'};
-let units='metric', example='example', pick='Football (soccer)', pickPos=null, legMode='sit', region=null, regionAuto=true, view='landing', tab='sports', listF=null, exAll=false, navDepth=0, resultsY=0;
+let units='metric', example='example', pick='Football (soccer)', pickPos=null, legMode='sit', region=null, regionAuto=true, playoCity='bangalore', view='landing', tab='sports', listF=null, exAll=false, navDepth=0, resultsY=0;
 
 // ---------- math ----------
 function erf(x){const s=Math.sign(x);x=Math.abs(x);const t=1/(1+.3275911*x);
@@ -1009,7 +1010,7 @@ function writeMetric(m){
     $('#'+id).value=ok(v)?String(+(v/(id==='weight'?kw:k)).toFixed(1)):''});
   if(m.sex) document.getElementById(m.sex==='f'?'s-f':'s-m').checked=true;
 }
-function save(){try{localStorage.setItem('builtfor',JSON.stringify({units,example,pick,pickPos,legMode,listF,region:regionAuto?null:region,est:[...estFields],m:readMetric()}))}catch(e){}}
+function save(){try{localStorage.setItem('builtfor',JSON.stringify({units,example,pick,pickPos,legMode,playoCity,listF,region:regionAuto?null:region,est:[...estFields],m:readMetric()}))}catch(e){}}
 function load(){try{return JSON.parse(localStorage.getItem('builtfor')||'null')}catch(e){return null}}
 
 // ---------- scoring ----------
@@ -1392,47 +1393,46 @@ function useEstimate(){
 }
 
 // ---------- next steps ----------
-const T=t=>`nwr["sport"~"(^|;)(${t})(;|$)"]`, LZ=(v,named)=>`nwr["leisure"="${v}"]${named?'["name"]':''}`;
 const START={
- 'Basketball':{s:['Play pickup games at a local court to learn the flow of the game.','Join a recreational league or club team. Most run adult beginner divisions.','Practise ball handling and shooting form for 15 minutes a day.'],g:'Basketball shoes with ankle support and a ball (size 7 for men, size 6 for women).',q:'basketball court',f:[T('basketball')]},
- 'Volleyball':{s:['Find a club or community centre with a beginners’ session.','Learn the three core contacts first: forearm pass, set and serve.','Try beach volleyball too. It builds movement and game sense fast.'],g:'Indoor court shoes and knee pads.',q:'volleyball club',f:[T('volleyball|beachvolleyball')]},
- 'Swimming':{s:['Book an adult stroke-improvement class at a local pool.','Join a masters or adult club squad. Most accept anyone who can swim 50 m.','Train technique before distance: body position and breathing first.'],g:'Swimsuit, goggles and a swim cap. Fins and a kickboard help with drills.',q:'swimming pool',f:[T('swimming'),LZ('swimming_pool',1)]},
- 'Water polo':{s:['Get comfortable treading water with the eggbeater kick for several minutes.','Find a club with a beginners’ or masters’ group. Many welcome strong swimmers new to polo.','Keep swimming 2–3 times a week alongside polo sessions.'],g:'Swimsuit and a mouthguard. Clubs usually lend caps.',q:'water polo club',f:[T('water_polo'),LZ('swimming_pool',1)]},
- 'Rowing':{s:['Sign up for a learn-to-row course at a rowing club. They provide boats and coaching.','Use an indoor rowing machine to learn the legs, back, arms sequence.','Test yourself over 2,000 m on the machine. It’s the standard fitness benchmark.'],g:'Close-fitting sports clothes that won’t catch in the seat slide. Clubs provide boats and oars.',q:'rowing club',f:[T('rowing')]},
- 'Coxswain':{s:['Ask a rowing club about coxing. Clubs are often short of coxes and train them.','Learn steering, commands and water-safety rules on a learn-to-cox session.','Sit in on crew training to learn race calls and how to read a crew.'],g:'Waterproof layers and a buoyancy aid. Clubs provide the headset and speaker.',q:'rowing club',f:[T('rowing')]},
- 'Distance running':{s:['Start with run–walk intervals three times a week.','Join a running club or a free weekly timed 5 km run to train with others.','Raise your weekly distance by no more than about 10% a week.'],g:'Running shoes fitted at a running shop.',q:'running club',f:[T('running|athletics'),LZ('track')]},
- 'Sprinting':{s:['Join an athletics club. Sprint groups teach starts, acceleration and form.','Train short, fast efforts with full recovery rather than long runs.','Add strength work such as squats and jumps twice a week.'],g:'Trainers to start. Track spikes once you train on a track.',q:'athletics track',f:[T('athletics'),LZ('track')]},
- 'High jump':{s:['Find an athletics club with a jumps coach. High jump needs supervised landing mats.','Learn the curved approach and the flop from low heights.','Build spring with skipping, bounding and jump training.'],g:'Trainers to start, then jumping spikes.',q:'athletics club',f:[T('athletics'),LZ('track')]},
- 'Long & triple jump':{s:['Join an athletics club and ask for the jumps group.','Get a consistent run-up first. Most beginner fouls come from it.','Develop sprint speed, since it drives your distance.'],g:'Trainers to start, then spikes with heel cushioning.',q:'athletics club',f:[T('athletics'),LZ('track')]},
- 'Shot put & discus':{s:['Join an athletics club with a throws coach. Throwing areas need supervision.','Learn a standing throw before adding the glide or spin.','Lift weights 2–3 times a week. Power drives throwing distance.'],g:'Flat-soled throwing shoes help with the spin. Clubs provide the implements.',q:'athletics club',f:[T('athletics'),LZ('track')]},
- 'Gymnastics':{s:['Look for adult or recreational gymnastics classes. Many clubs run them.','Build the basics first: handstands, bridges, rolls and core strength.','Stretch daily. Flexibility takes longest to improve.'],g:'Fitted sports clothes. Clubs provide all apparatus.',q:'gymnastics club',f:[T('gymnastics')]},
- 'Diving':{s:['Be a confident swimmer, then book a learn-to-dive class.','Start from the poolside and 1 m springboard before any platform.','Add trampoline and dryland sessions to learn somersaults safely.'],g:'Swimsuit and a small chamois towel. Pools provide the boards.',q:'diving pool',f:[T('diving'),LZ('swimming_pool',1)]},
- 'Figure skating':{s:['Take learn-to-skate group lessons at an ice rink.','Master forward and backward skating, stops and edges before jumps.','Skate public sessions between lessons to build hours on the ice.'],g:'Hire skates at first, then buy figure skates fitted by a specialist.',q:'ice rink',f:[T('skating|ice_skating|figure_skating'),LZ('ice_rink')]},
- 'Ski jumping':{s:['Find a ski club with a jumping programme. Jumps are rare, so check regional clubs.','Get solid at alpine or cross-country skiing first.','Start on small training hills under a coach.'],g:'Clubs usually lend jumping skis, suits and helmets to beginners.',q:'ski jumping club',f:[T('ski_jumping|skiing')]},
- 'Weightlifting':{s:['Find a weightlifting club or a gym with lifting platforms and a coach.','Learn the snatch and clean and jerk with a light bar or broomstick first.','Build a base with squats, pulls and mobility work.'],g:'Weightlifting shoes with a raised heel once you train regularly.',q:'weightlifting gym',f:[T('weightlifting|powerlifting'),LZ('fitness_centre',1)]},
- 'Sumo':{s:['Search for an amateur sumo club. They are rare outside Japan, so look regionally.','Wrestling or judo clubs build the same balance and pushing skills.','Train leg strength and hip mobility. The shiko stomp is the classic drill.'],g:'Clubs supply the belt (mawashi). Wear shorts to start.',q:'sumo club',f:[T('sumo|wrestling|judo')]},
- 'Rugby union':{s:['Contact a local rugby club. Most run adult beginner or social sessions.','Learn safe tackling and falling before contact games.','Play touch rugby first to learn the laws and passing.'],g:'Studded boots and a mouthguard. A scrum cap is optional.',q:'rugby club',f:[T('rugby_union|rugby')]},
- 'American football':{s:['Look for an adult amateur or flag football league.','Flag football is a no-contact way to learn routes and plays.','Build strength and sprint speed in the off-season.'],g:'Cleats and a mouthguard. Contact teams usually help with helmets and pads.',q:'american football team',f:[T('american_football')]},
- 'Wrestling & judo':{s:['Try a beginners’ class at a judo or wrestling club.','Learn to fall safely before learning throws.','Train grip strength and conditioning between sessions.'],g:'A judo suit (clubs often lend one) or wrestling shoes.',q:'judo club',f:[T('judo|wrestling|martial_arts')]},
- 'Boxing':{s:['Join a boxing club’s beginner or fitness class.','Learn stance, footwork and the jab before sparring.','Only spar under a coach, with proper gear.'],g:'Hand wraps, 12–16 oz gloves and a mouthguard.',q:'boxing gym',f:[T('boxing|kickboxing')]},
- 'Fencing':{s:['Book a beginners’ course at a fencing club. They lend all equipment.','Choose a weapon after the course: foil, épée or sabre.','Footwork drills make the biggest early difference.'],g:'Clubs lend mask, jacket and weapon at first. Bring trainers and long trousers.',q:'fencing club',f:[T('fencing')]},
- 'Rock climbing':{s:['Visit an indoor climbing or bouldering wall and take an intro session.','Start with bouldering. It needs no ropes or partner.','Climb 2–3 times a week. Technique improves faster than strength.'],g:'Climbing shoes (hire at first) and chalk. A harness for roped climbing.',q:'climbing gym',f:[T('climbing|bouldering')]},
- 'Road cycling (climbing)':{s:['Join a cycling club’s beginner group ride.','Learn to ride in a group: holding a line, signalling and drafting.','Add hill repeats to build climbing power.'],g:'A road bike, helmet, padded shorts, lights and a puncture kit.',q:'cycling club',f:[T('cycling|road_cycling'),'nwr["shop"="bicycle"]["name"]']},
- 'Tennis':{s:['Book group lessons at a local club or public court.','Learn the forehand, backhand and serve with a coach before habits set in.','Play social doubles for match practice.'],g:'Racquet, balls and court shoes.',q:'tennis court',f:[T('tennis')]},
- 'Badminton':{s:['Find a club night or pay-and-play court at a sports centre.','Learn the grips and the high serve first.','Shadow footwork drills build court coverage.'],g:'Racquet, shuttles and non-marking indoor shoes.',q:'badminton club',f:[T('badminton')]},
- 'Handball':{s:['Find a handball club. Many run adult beginner sessions.','Learn passing, catching and the jump shot.','Build shoulder strength and throwing power.'],g:'Indoor court shoes. Clubs provide balls.',q:'handball club',f:[T('handball')]},
- 'Football (soccer)':{s:['Join a casual 5-a-side or 7-a-side game to get touches on the ball.','Sign up with an amateur club. Most have adult and beginner teams.','Tell the coach which position you want to try. Your best fits are listed above.'],g:'Football boots (or turf shoes for artificial pitches) and shin pads.',q:'football club',f:[T('soccer')]},
- 'Baseball pitcher':{s:['Join an adult amateur baseball or softball league.','Learn pitching mechanics from a coach. Poor mechanics cause arm injuries.','Follow a throwing programme with rest days to protect your arm.'],g:'Glove, cleats and baseballs.',q:'baseball field',f:[T('baseball|softball')]},
- 'Cricket':{s:['Join a local cricket club or academy. Most run nets sessions for adults and juniors.','Work out whether you lean towards batting, pace, spin or keeping. Your best-fit role is listed above.','Bat against a bowling machine or bowl in the nets 2\u20133 times a week.'],g:'Bat, pads, gloves, helmet and a box for batting; spikes for bowling. Clubs often lend kit at first.',q:'cricket club',f:[T('cricket|cricket_nets')]},
- 'Kabaddi':{s:['Find a kabaddi club, akhada or school team. Many run free evening sessions.','Learn the rules and the breath-hold chant with touch practice before full contact.','Build leg strength, agility and grip. Raiders need escapes; defenders need holds.'],g:'Grippy shoes, fitted shorts and knee supports. Mats are provided.',q:'kabaddi club',f:[T('kabaddi')]},
- 'Field hockey':{s:['Join a hockey club or academy with beginner sessions.','Learn stick-handling, push passes and dribbling on turf or grass.','Build running fitness. Players cover 8\u201310 km a match.'],g:'A stick sized to your height, shin guards, a mouthguard and turf shoes.',q:'hockey club',f:[T('field_hockey|hockey')]},
- 'Table tennis':{s:['Play at a club or community centre with tables. Many have coaching nights.','Learn the forehand and backhand drive and a basic serve with a coach.','Play regular matches. Reactions improve fastest under game pressure.'],g:'A beginner all-round racket, balls and non-marking indoor shoes.',q:'table tennis club',f:[T('table_tennis')]},
- 'Ice hockey':{s:['Learn to skate first with rink lessons.','Join a learn-to-play programme. Many rinks run adult beginner leagues.','Build leg strength and conditioning off the ice.'],g:'Skates, a helmet with cage, gloves, pads and a stick. Rinks often rent starter kit.',q:'ice hockey rink',f:[T('ice_hockey'),LZ('ice_rink')]},
- 'Horse racing jockey':{s:['Take lessons at a riding school to build a secure seat.','Look into racing-school courses. They are the usual route to a licence.','Work in a racing yard to gain experience riding out.'],g:'Riding helmet, boots and a body protector.',q:'riding school',f:[T('equestrian|horse_racing')]}
+ 'Basketball':{s:['Play pickup games at a local court to learn the flow of the game.','Join a recreational league or club team. Most run adult beginner divisions.','Practise ball handling and shooting form for 15 minutes a day.'],g:'Basketball shoes with ankle support and a ball (size 7 for men, size 6 for women).',q:'basketball court'},
+ 'Volleyball':{s:['Find a club or community centre with a beginners’ session.','Learn the three core contacts first: forearm pass, set and serve.','Try beach volleyball too. It builds movement and game sense fast.'],g:'Indoor court shoes and knee pads.',q:'volleyball club'},
+ 'Swimming':{s:['Book an adult stroke-improvement class at a local pool.','Join a masters or adult club squad. Most accept anyone who can swim 50 m.','Train technique before distance: body position and breathing first.'],g:'Swimsuit, goggles and a swim cap. Fins and a kickboard help with drills.',q:'swimming pool'},
+ 'Water polo':{s:['Get comfortable treading water with the eggbeater kick for several minutes.','Find a club with a beginners’ or masters’ group. Many welcome strong swimmers new to polo.','Keep swimming 2–3 times a week alongside polo sessions.'],g:'Swimsuit and a mouthguard. Clubs usually lend caps.',q:'water polo club'},
+ 'Rowing':{s:['Sign up for a learn-to-row course at a rowing club. They provide boats and coaching.','Use an indoor rowing machine to learn the legs, back, arms sequence.','Test yourself over 2,000 m on the machine. It’s the standard fitness benchmark.'],g:'Close-fitting sports clothes that won’t catch in the seat slide. Clubs provide boats and oars.',q:'rowing club'},
+ 'Coxswain':{s:['Ask a rowing club about coxing. Clubs are often short of coxes and train them.','Learn steering, commands and water-safety rules on a learn-to-cox session.','Sit in on crew training to learn race calls and how to read a crew.'],g:'Waterproof layers and a buoyancy aid. Clubs provide the headset and speaker.',q:'rowing club'},
+ 'Distance running':{s:['Start with run–walk intervals three times a week.','Join a running club or a free weekly timed 5 km run to train with others.','Raise your weekly distance by no more than about 10% a week.'],g:'Running shoes fitted at a running shop.',q:'running club'},
+ 'Sprinting':{s:['Join an athletics club. Sprint groups teach starts, acceleration and form.','Train short, fast efforts with full recovery rather than long runs.','Add strength work such as squats and jumps twice a week.'],g:'Trainers to start. Track spikes once you train on a track.',q:'athletics track'},
+ 'High jump':{s:['Find an athletics club with a jumps coach. High jump needs supervised landing mats.','Learn the curved approach and the flop from low heights.','Build spring with skipping, bounding and jump training.'],g:'Trainers to start, then jumping spikes.',q:'athletics club'},
+ 'Long & triple jump':{s:['Join an athletics club and ask for the jumps group.','Get a consistent run-up first. Most beginner fouls come from it.','Develop sprint speed, since it drives your distance.'],g:'Trainers to start, then spikes with heel cushioning.',q:'athletics club'},
+ 'Shot put & discus':{s:['Join an athletics club with a throws coach. Throwing areas need supervision.','Learn a standing throw before adding the glide or spin.','Lift weights 2–3 times a week. Power drives throwing distance.'],g:'Flat-soled throwing shoes help with the spin. Clubs provide the implements.',q:'athletics club'},
+ 'Gymnastics':{s:['Look for adult or recreational gymnastics classes. Many clubs run them.','Build the basics first: handstands, bridges, rolls and core strength.','Stretch daily. Flexibility takes longest to improve.'],g:'Fitted sports clothes. Clubs provide all apparatus.',q:'gymnastics club'},
+ 'Diving':{s:['Be a confident swimmer, then book a learn-to-dive class.','Start from the poolside and 1 m springboard before any platform.','Add trampoline and dryland sessions to learn somersaults safely.'],g:'Swimsuit and a small chamois towel. Pools provide the boards.',q:'diving pool'},
+ 'Figure skating':{s:['Take learn-to-skate group lessons at an ice rink.','Master forward and backward skating, stops and edges before jumps.','Skate public sessions between lessons to build hours on the ice.'],g:'Hire skates at first, then buy figure skates fitted by a specialist.',q:'ice rink'},
+ 'Ski jumping':{s:['Find a ski club with a jumping programme. Jumps are rare, so check regional clubs.','Get solid at alpine or cross-country skiing first.','Start on small training hills under a coach.'],g:'Clubs usually lend jumping skis, suits and helmets to beginners.',q:'ski jumping club'},
+ 'Weightlifting':{s:['Find a weightlifting club or a gym with lifting platforms and a coach.','Learn the snatch and clean and jerk with a light bar or broomstick first.','Build a base with squats, pulls and mobility work.'],g:'Weightlifting shoes with a raised heel once you train regularly.',q:'weightlifting gym'},
+ 'Sumo':{s:['Search for an amateur sumo club. They are rare outside Japan, so look regionally.','Wrestling or judo clubs build the same balance and pushing skills.','Train leg strength and hip mobility. The shiko stomp is the classic drill.'],g:'Clubs supply the belt (mawashi). Wear shorts to start.',q:'sumo club'},
+ 'Rugby union':{s:['Contact a local rugby club. Most run adult beginner or social sessions.','Learn safe tackling and falling before contact games.','Play touch rugby first to learn the laws and passing.'],g:'Studded boots and a mouthguard. A scrum cap is optional.',q:'rugby club'},
+ 'American football':{s:['Look for an adult amateur or flag football league.','Flag football is a no-contact way to learn routes and plays.','Build strength and sprint speed in the off-season.'],g:'Cleats and a mouthguard. Contact teams usually help with helmets and pads.',q:'american football team'},
+ 'Wrestling & judo':{s:['Try a beginners’ class at a judo or wrestling club.','Learn to fall safely before learning throws.','Train grip strength and conditioning between sessions.'],g:'A judo suit (clubs often lend one) or wrestling shoes.',q:'judo club'},
+ 'Boxing':{s:['Join a boxing club’s beginner or fitness class.','Learn stance, footwork and the jab before sparring.','Only spar under a coach, with proper gear.'],g:'Hand wraps, 12–16 oz gloves and a mouthguard.',q:'boxing gym'},
+ 'Fencing':{s:['Book a beginners’ course at a fencing club. They lend all equipment.','Choose a weapon after the course: foil, épée or sabre.','Footwork drills make the biggest early difference.'],g:'Clubs lend mask, jacket and weapon at first. Bring trainers and long trousers.',q:'fencing club'},
+ 'Rock climbing':{s:['Visit an indoor climbing or bouldering wall and take an intro session.','Start with bouldering. It needs no ropes or partner.','Climb 2–3 times a week. Technique improves faster than strength.'],g:'Climbing shoes (hire at first) and chalk. A harness for roped climbing.',q:'climbing gym'},
+ 'Road cycling (climbing)':{s:['Join a cycling club’s beginner group ride.','Learn to ride in a group: holding a line, signalling and drafting.','Add hill repeats to build climbing power.'],g:'A road bike, helmet, padded shorts, lights and a puncture kit.',q:'cycling club'},
+ 'Tennis':{s:['Book group lessons at a local club or public court.','Learn the forehand, backhand and serve with a coach before habits set in.','Play social doubles for match practice.'],g:'Racquet, balls and court shoes.',q:'tennis court'},
+ 'Badminton':{s:['Find a club night or pay-and-play court at a sports centre.','Learn the grips and the high serve first.','Shadow footwork drills build court coverage.'],g:'Racquet, shuttles and non-marking indoor shoes.',q:'badminton club'},
+ 'Handball':{s:['Find a handball club. Many run adult beginner sessions.','Learn passing, catching and the jump shot.','Build shoulder strength and throwing power.'],g:'Indoor court shoes. Clubs provide balls.',q:'handball club'},
+ 'Football (soccer)':{s:['Join a casual 5-a-side or 7-a-side game to get touches on the ball.','Sign up with an amateur club. Most have adult and beginner teams.','Tell the coach which position you want to try. Your best fits are listed above.'],g:'Football boots (or turf shoes for artificial pitches) and shin pads.',q:'football club'},
+ 'Baseball pitcher':{s:['Join an adult amateur baseball or softball league.','Learn pitching mechanics from a coach. Poor mechanics cause arm injuries.','Follow a throwing programme with rest days to protect your arm.'],g:'Glove, cleats and baseballs.',q:'baseball field'},
+ 'Cricket':{s:['Join a local cricket club or academy. Most run nets sessions for adults and juniors.','Work out whether you lean towards batting, pace, spin or keeping. Your best-fit role is listed above.','Bat against a bowling machine or bowl in the nets 2\u20133 times a week.'],g:'Bat, pads, gloves, helmet and a box for batting; spikes for bowling. Clubs often lend kit at first.',q:'cricket club'},
+ 'Kabaddi':{s:['Find a kabaddi club, akhada or school team. Many run free evening sessions.','Learn the rules and the breath-hold chant with touch practice before full contact.','Build leg strength, agility and grip. Raiders need escapes; defenders need holds.'],g:'Grippy shoes, fitted shorts and knee supports. Mats are provided.',q:'kabaddi club'},
+ 'Field hockey':{s:['Join a hockey club or academy with beginner sessions.','Learn stick-handling, push passes and dribbling on turf or grass.','Build running fitness. Players cover 8\u201310 km a match.'],g:'A stick sized to your height, shin guards, a mouthguard and turf shoes.',q:'hockey club'},
+ 'Table tennis':{s:['Play at a club or community centre with tables. Many have coaching nights.','Learn the forehand and backhand drive and a basic serve with a coach.','Play regular matches. Reactions improve fastest under game pressure.'],g:'A beginner all-round racket, balls and non-marking indoor shoes.',q:'table tennis club'},
+ 'Ice hockey':{s:['Learn to skate first with rink lessons.','Join a learn-to-play programme. Many rinks run adult beginner leagues.','Build leg strength and conditioning off the ice.'],g:'Skates, a helmet with cage, gloves, pads and a stick. Rinks often rent starter kit.',q:'ice hockey rink'},
+ 'Horse racing jockey':{s:['Take lessons at a riding school to build a secure seat.','Look into racing-school courses. They are the usual route to a licence.','Work in a racing yard to gain experience riding out.'],g:'Riding helmet, boots and a body protector.',q:'riding school'}
 };
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let lastRes=null, lastCoords=null;
-const placesCache={}, nextState=new Map();
+let lastRes=null;
+const nextState=new Map();
 function focusText(r,cur,m,res){
   const {limits}=analyse(cur), Pc=Math.round(cur.score*100);
   const chg=limits.find(x=>CHANGEABLE[x.tr]), fix=limits.find(x=>!CHANGEABLE[x.tr]&&x.pts>=8);
@@ -1449,22 +1449,30 @@ function focusText(r,cur,m,res){
   return `Nothing in your build holds you back at ${Pc}%. Your progress will come down to skill and training.`;
 }
 // Creator's picks for visitors in India (unpaid): Playo for booking courts, Decathlon for beginner gear.
-// Shown only where they help: Playo after a places search near a city it serves, Decathlon beside the gear line.
+// Shown only where they help: Playo as the way to book for the sports it lists, Decathlon beside the gear line.
 const PICK_UTM='utm_source=builtfor&utm_medium=referral';
 const PLAYO={Badminton:'badminton','Football (soccer)':'football',Cricket:'cricket',Tennis:'tennis','Table tennis':'table_tennis',Basketball:'basketball',Volleyball:'volleyball',Swimming:'swimming'};
-const PLAYO_CITIES=[['bangalore',12.97,77.59],['mumbai',19.08,72.88],['delhi-ncr',28.61,77.21],['hyderabad',17.39,78.49],['chennai',13.08,80.27],['pune',18.52,73.86],['vijayawada',16.51,80.65],['guntur',16.31,80.44]];
+const PLAYO_CITIES={bangalore:'Bengaluru',mumbai:'Mumbai','delhi-ncr':'Delhi NCR',hyderabad:'Hyderabad',chennai:'Chennai',pune:'Pune',vijayawada:'Vijayawada',guntur:'Guntur'};
+const playoUrl=(sport,city)=>`https://playo.co/venues/${city}/sports/${PLAYO[sport]}?${PICK_UTM}`;
 const DECATHLON={Basketball:'basketball',Volleyball:'volleyball',Swimming:'swimming','Water polo':'water polo',Rowing:'rowing','Distance running':'running shoes',
  Sprinting:'running shoes','High jump':'athletics','Long & triple jump':'athletics','Shot put & discus':'athletics',Gymnastics:'gymnastics',Diving:'swimming',
  'Figure skating':'ice skates',Weightlifting:'weightlifting','Rugby union':'rugby','Wrestling & judo':'judo',Boxing:'boxing','Rock climbing':'climbing',
  'Road cycling (climbing)':'road cycling',Tennis:'tennis',Badminton:'badminton',Handball:'handball','Football (soccer)':'football','Baseball pitcher':'baseball',
  Cricket:'cricket','Field hockey':'hockey','Table tennis':'table tennis','Horse racing jockey':'horse riding'};
-function playoLine(sport,lat,lon){
-  if(region!=='IN'||!PLAYO[sport])return '';
-  let city=null,best=1e9;PLAYO_CITIES.forEach(([c,a,b])=>{const d=km(lat,lon,a,b);if(d<best){best=d;city=c}});
-  if(best>60)return '';
-  return `<p class="aside">Want to book a slot? Playo lists bookable ${esc(sport==='Football (soccer)'?'football':sport.toLowerCase())} venues near you: <a href="https://playo.co/venues/${city}/sports/${PLAYO[sport]}?${PICK_UTM}" target="_blank" rel="noopener">see them on Playo</a>.</p>`;
-}
 const decathlonLink=sport=>region==='IN'&&DECATHLON[sport]?` <a class="aside-link" href="https://www.decathlon.in/search?query=${encodeURIComponent(DECATHLON[sport])}&${PICK_UTM}" target="_blank" rel="noopener">Beginner options at Decathlon</a>`:'';
+// Playo (city picker, no location needed) for the sports it lists in India; a Google Maps search otherwise
+function whereToPlay(sport){
+  const S=START[sport], maps=`https://www.google.com/maps/search/?api=1&amp;query=${encodeURIComponent(S.q+' near me')}`;
+  if(region==='IN'&&PLAYO[sport]){
+    const id='pc-'+slug(sport), label=sport==='Football (soccer)'?'football':sport.toLowerCase();
+    return `<p class="nmuted" style="margin:0 0 10px">Book a court or join a game.</p>
+      <div class="nbtns"><label class="vh" for="${id}">City</label>
+        <select id="${id}" class="pcity" data-sport="${esc(sport)}">${Object.entries(PLAYO_CITIES).map(([c,n])=>`<option value="${c}"${c===playoCity?' selected':''}>${n}</option>`).join('')}</select>
+        <a class="btn primary" id="${id}-go" href="${playoUrl(sport,playoCity)}" target="_blank" rel="noopener">See ${esc(label)} venues on Playo</a></div>
+      <p class="fine">Not near these cities? <a href="${maps}" target="_blank" rel="noopener">Search Google Maps</a>.</p>`;
+  }
+  return `<div class="nbtns"><a class="btn" href="${maps}" target="_blank" rel="noopener">Search Google Maps</a></div>`;
+}
 // Collapsible "Next steps" block for one sport (and position, for team sports)
 function nextHTML(key,r,cur,m,res,defOpen){
   const S=START[r.sp.n], sport=esc(r.sp.n);
@@ -1474,73 +1482,8 @@ function nextHTML(key,r,cur,m,res,defOpen){
     <div class="next-grid">
       <div class="ncol"><h4>How to get started</h4><ol>${S.s.map(x=>`<li>${x}</li>`).join('')}</ol>
         <p class="gear"><b>Gear:</b> ${S.g}${decathlonLink(r.sp.n)}</p>${cur?`<div class="focus"><b>Your first focus</b><p>${focusText(r,cur,m,res)}</p></div>`:''}</div>
-      <div class="ncol"><h4>Places near you</h4>
-        <div class="nbtns"><button type="button" class="btn primary" data-places="${sport}">Find places near me</button>
-          <a class="btn" href="https://www.google.com/maps/search/?api=1&amp;query=${encodeURIComponent(S.q+' near me')}" target="_blank" rel="noopener">Search Google Maps</a></div>
-        <div class="placesOut" data-sport="${sport}">${placesCache[r.sp.n]||''}</div>
-        <p class="fine">Your approximate location (rounded to about 100 m) is sent to OpenStreetMap’s Overpass service to run the search. This app doesn’t store it.</p></div>
+      <div class="ncol"><h4>Where to play</h4>${whereToPlay(r.sp.n)}</div>
     </div></details>`;
-}
-// Public OpenStreetMap search servers, tried in turn: the free main server is sometimes overloaded or refuses requests
-const OVERPASS=['https://overpass-api.de/api/interpreter','https://overpass.kumi.systems/api/interpreter'];
-let overpassOk=0;   // start with whichever server answered last time
-async function overpass(filters,lat,lon,rad){
-  const q=`[out:json][timeout:15];(${filters.map(f=>`${f}(around:${rad},${lat},${lon});`).join('')});out center tags 80;`;
-  let lastErr;
-  const limits=[5000,3000];   // total wait stays around 8 s
-  for(let k=0;k<OVERPASS.length;k++){
-    const i=(overpassOk+k)%OVERPASS.length, ac=new AbortController(), t=setTimeout(()=>ac.abort(),limits[k]||3000);
-    try{const resp=await fetch(OVERPASS[i],{method:'POST',body:new URLSearchParams({data:q}),signal:ac.signal});
-      if(!resp.ok)throw new Error('http '+resp.status);
-      const els=(await resp.json()).elements||[];overpassOk=i;return els}
-    catch(e){lastErr=e}
-    finally{clearTimeout(t)}
-  }
-  throw lastErr;
-}
-function km(a,b,c,d){const R=6371,r=x=>x*Math.PI/180,dl=r(c-a),dn=r(d-b);
-  const h=Math.sin(dl/2)**2+Math.cos(r(a))*Math.cos(r(c))*Math.sin(dn/2)**2;return 2*R*Math.asin(Math.sqrt(h))}
-const KIND={pitch:'Pitch or court',sports_centre:'Sports centre',stadium:'Stadium',track:'Track',swimming_pool:'Pool',fitness_centre:'Gym',ice_rink:'Ice rink',sports_hall:'Sports hall'};
-async function findPlaces(sport){
-  const S=START[sport];
-  const sel=`[data-sport="${CSS.escape(sport)}"]`, bsel=`[data-places="${CSS.escape(sport)}"]`;
-  const put=html=>{placesCache[sport]=html;document.querySelectorAll('.placesOut'+sel).forEach(o=>o.innerHTML=html)};
-  const st=(msg,err)=>put(`<p class="pstatus${err?' err':''}">${msg}</p>`);
-  const mapsUrl=`https://www.google.com/maps/search/?api=1&amp;query=${encodeURIComponent(S.q+' near me')}`;
-  const spin=(msg,extra='')=>put(`<p class="pstatus busy"><span class="spin" aria-hidden="true"></span><span>${msg}</span></p>${extra}`);
-  const busy=b=>document.querySelectorAll(bsel).forEach(x=>x.disabled=b);
-  busy(true);
-  try{
-    if(!lastCoords){
-      spin('Finding your location\u2026');
-      const pos=await new Promise((res,rej)=>{if(!navigator.geolocation)return rej({code:9});
-        navigator.geolocation.getCurrentPosition(res,rej,{timeout:12000,maximumAge:600000})});
-      lastCoords={lat:+pos.coords.latitude.toFixed(3),lon:+pos.coords.longitude.toFixed(3)};
-    }
-    const {lat,lon}=lastCoords, pl=playoLine(sport,lat,lon);
-    track('places/'+slug(sport));spin('Searching the map for places near you\u2026',pl);
-    // If the search is slow, say so and point to the instant option rather than looking frozen
-    const slowT=setTimeout(()=>{if(/busy/.test(placesCache[sport]||''))spin(`Still searching\u2026 This can take a few seconds, or <a href="${mapsUrl}" target="_blank" rel="noopener">open Google Maps now</a>.`,pl)},3500);
-    let els;try{els=await overpass(S.f,lat,lon,15000)}finally{clearTimeout(slowT)}
-    const seen=new Set();let unnamed=0;
-    const list=els.map(e=>{const la=e.lat??e.center?.lat, lo=e.lon??e.center?.lon, t=e.tags||{};
-        const kind=KIND[t.leisure]||(t.club?'Club':t.shop==='bicycle'?'Bike shop':'Venue');
-        return {name:t.name,kind,la,lo,dist:km(lat,lon,la,lo)}})
-      .filter(p=>ok(p.la)&&ok(p.lo))
-      .sort((a,b)=>a.dist*(a.name?1:1.6)-b.dist*(b.name?1:1.6))
-      .filter(p=>{const k=(p.name||'')+p.la.toFixed(3)+p.lo.toFixed(3);if(seen.has(k))return false;seen.add(k);
-        if(!p.name){if(unnamed>=3)return false;unnamed++}return true})
-      .slice(0,8);
-    if(!list.length){track('places-none');put(`<p class="pstatus">No ${esc(sport.toLowerCase())} places are mapped within 25 km in OpenStreetMap. Try the Google Maps search.</p>${pl}`);return}
-    const fd=k=>units==='metric'?(k<1?`${Math.round(k*1000)} m`:`${k.toFixed(1)} km`):`${(k*.621).toFixed(1)} mi`;
-    track('places-found');put(`<ol class="places">${list.map(p=>`<li><div><b>${esc(p.name||'Unnamed '+p.kind.toLowerCase())}</b><span>${p.kind} · ${fd(p.dist)} away</span></div>
-      <a href="https://www.google.com/maps/dir/?api=1&amp;destination=${p.la.toFixed(5)},${p.lo.toFixed(5)}" target="_blank" rel="noopener">Directions</a></li>`).join('')}</ol>
-      <p class="fine">From OpenStreetMap. Check opening times and membership with the venue.</p>${pl}`);
-  }catch(err){
-    if(err&&err.code===1)st('Location access is blocked. Allow location for this site and try again, or use the Google Maps search.',true);
-    else if(err&&(err.code===2||err.code===3||err.code===9))st('Couldn’t get your location. Use the Google Maps search instead.',true);
-    else{track('places-error');put(`<p class="pstatus err">The map search isn\u2019t responding right now. <a href="${mapsUrl}" target="_blank" rel="noopener">Search Google Maps instead</a>.</p>${lastCoords?playoLine(sport,lastCoords.lat,lastCoords.lon):''}`)};
-  }finally{busy(false)}
 }
 async function shareResults(){
   const res=lastRes;if(!res)return;
@@ -1813,9 +1756,10 @@ $('#photoClose').addEventListener('click',()=>$('#photoDlg').close());
 $('#photoDlg').addEventListener('click',e=>{if(e.target.id==='photoDlg')e.target.close()});
 ['#photoFile','#photoCam'].forEach(id=>$(id).addEventListener('change',e=>{const f=e.target.files&&e.target.files[0];if(f)analysePhoto(f)}));
 $('#estUse').addEventListener('click',useEstimate);
-document.addEventListener('click',e=>{const b=e.target.closest('[data-places]');if(b)findPlaces(b.dataset.places)});
 document.addEventListener('toggle',e=>{const d=e.target;if(d.matches&&d.matches('details.nextd'))nextState.set(d.dataset.key,d.open)},true);
 $('#shareBtn').addEventListener('click',shareResults);
+document.addEventListener('change',e=>{const sel=e.target.closest('.pcity');if(!sel)return;playoCity=sel.value;
+  const go=document.getElementById(sel.id+'-go');if(go)go.href=playoUrl(sel.dataset.sport,playoCity);save()});
 $('#form').addEventListener('submit',e=>e.preventDefault());
 document.querySelectorAll('input[name=sex]').forEach(r=>r.addEventListener('change',()=>{render();save()}));
 // Both units switches (header and Basics card) stay in sync
@@ -1921,7 +1865,7 @@ if(ogKey){renderOG(ogKey);return}
 const saved=load();
 if(saved&&saved.m){
   if(saved.units==='imperial')units='imperial';
-  example=saved.example||null;if(saved.pick)pick=saved.pick;if(saved.region&&REGIONS[saved.region]){region=saved.region;regionAuto=false}(saved.est||[]).forEach(x=>estFields.add(x));if(saved.legMode==='inseam'){legMode='inseam';applyLegMode()}pickPos=saved.pickPos||null;writeMetric(saved.m);
+  example=saved.example||null;if(saved.pick)pick=saved.pick;if(saved.playoCity&&PLAYO_CITIES[saved.playoCity])playoCity=saved.playoCity;if(saved.region&&REGIONS[saved.region]){region=saved.region;regionAuto=false}(saved.est||[]).forEach(x=>estFields.add(x));if(saved.legMode==='inseam'){legMode='inseam';applyLegMode()}pickPos=saved.pickPos||null;writeMetric(saved.m);
 }else example=null;   // first visit: empty form; the example loads only on request
 if(!region)region=detectRegion();
 // New visitors in the US start in inches and pounds; everyone else in cm and kg
