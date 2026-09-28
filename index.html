@@ -246,6 +246,9 @@ dialog#photoDlg::backdrop{background:rgba(10,14,22,.62)}
 .aside{font-size:13.5px;color:var(--muted);margin:10px 0 0}
 .aside a,.aside-link{color:var(--accent)}
 .aside-link{font-size:13.5px;margin-left:4px}
+.pstatus.busy{display:flex;align-items:center;gap:10px}
+.pstatus .spin{width:14px;height:14px;border-width:2px}
+.pstatus a{color:var(--accent)}
 .pstatus{font-size:14px;color:var(--muted);margin:6px 0}
 .pstatus.err{color:var(--bad)}
 .fine{font-size:12px;color:var(--muted);margin:8px 0 0}
@@ -1484,8 +1487,9 @@ let overpassOk=0;   // start with whichever server answered last time
 async function overpass(filters,lat,lon,rad){
   const q=`[out:json][timeout:15];(${filters.map(f=>`${f}(around:${rad},${lat},${lon});`).join('')});out center tags 80;`;
   let lastErr;
+  const limits=[5000,3000];   // total wait stays around 8 s
   for(let k=0;k<OVERPASS.length;k++){
-    const i=(overpassOk+k)%OVERPASS.length, ac=new AbortController(), t=setTimeout(()=>ac.abort(),12000);
+    const i=(overpassOk+k)%OVERPASS.length, ac=new AbortController(), t=setTimeout(()=>ac.abort(),limits[k]||3000);
     try{const resp=await fetch(OVERPASS[i],{method:'POST',body:new URLSearchParams({data:q}),signal:ac.signal});
       if(!resp.ok)throw new Error('http '+resp.status);
       const els=(await resp.json()).elements||[];overpassOk=i;return els}
@@ -1502,19 +1506,22 @@ async function findPlaces(sport){
   const sel=`[data-sport="${CSS.escape(sport)}"]`, bsel=`[data-places="${CSS.escape(sport)}"]`;
   const put=html=>{placesCache[sport]=html;document.querySelectorAll('.placesOut'+sel).forEach(o=>o.innerHTML=html)};
   const st=(msg,err)=>put(`<p class="pstatus${err?' err':''}">${msg}</p>`);
+  const mapsUrl=`https://www.google.com/maps/search/?api=1&amp;query=${encodeURIComponent(S.q+' near me')}`;
+  const spin=(msg,extra='')=>put(`<p class="pstatus busy"><span class="spin" aria-hidden="true"></span><span>${msg}</span></p>${extra}`);
   const busy=b=>document.querySelectorAll(bsel).forEach(x=>x.disabled=b);
   busy(true);
   try{
     if(!lastCoords){
-      st('Finding your location…');
+      spin('Finding your location\u2026');
       const pos=await new Promise((res,rej)=>{if(!navigator.geolocation)return rej({code:9});
         navigator.geolocation.getCurrentPosition(res,rej,{timeout:12000,maximumAge:600000})});
       lastCoords={lat:+pos.coords.latitude.toFixed(3),lon:+pos.coords.longitude.toFixed(3)};
     }
     const {lat,lon}=lastCoords, pl=playoLine(sport,lat,lon);
-    track('places/'+slug(sport));st('Searching OpenStreetMap…');
-    let els=await overpass(S.f,lat,lon,8000);
-    if(els.length<3)els=await overpass(S.f,lat,lon,25000);
+    track('places/'+slug(sport));spin('Searching the map for places near you\u2026',pl);
+    // If the search is slow, say so and point to the instant option rather than looking frozen
+    const slowT=setTimeout(()=>{if(/busy/.test(placesCache[sport]||''))spin(`Still searching\u2026 This can take a few seconds, or <a href="${mapsUrl}" target="_blank" rel="noopener">open Google Maps now</a>.`,pl)},3500);
+    let els;try{els=await overpass(S.f,lat,lon,15000)}finally{clearTimeout(slowT)}
     const seen=new Set();let unnamed=0;
     const list=els.map(e=>{const la=e.lat??e.center?.lat, lo=e.lon??e.center?.lon, t=e.tags||{};
         const kind=KIND[t.leisure]||(t.club?'Club':t.shop==='bicycle'?'Bike shop':'Venue');
@@ -1532,7 +1539,7 @@ async function findPlaces(sport){
   }catch(err){
     if(err&&err.code===1)st('Location access is blocked. Allow location for this site and try again, or use the Google Maps search.',true);
     else if(err&&(err.code===2||err.code===3||err.code===9))st('Couldn’t get your location. Use the Google Maps search instead.',true);
-    else{track('places-error');put(`<p class="pstatus err">Couldn’t reach OpenStreetMap right now. Use the Google Maps search instead.</p>${lastCoords?playoLine(sport,lastCoords.lat,lastCoords.lon):''}`)};
+    else{track('places-error');put(`<p class="pstatus err">The map search isn\u2019t responding right now. <a href="${mapsUrl}" target="_blank" rel="noopener">Search Google Maps instead</a>.</p>${lastCoords?playoLine(sport,lastCoords.lat,lastCoords.lon):''}`)};
   }finally{busy(false)}
 }
 async function shareResults(){
