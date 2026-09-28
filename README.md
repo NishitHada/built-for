@@ -32,7 +32,7 @@ python3 scripts/make_share.py http://localhost:8123/
 
 ## How scoring works
 
-Sports are ranked by **advantage**: how much more common your build is among a sport's elite athletes than in the general population (e.g. "6.6× more common among Olympic badminton players than among men in general"). **Match %** (how closely you fit their typical build) is shown alongside and drives the limiting factors. Method and trade-offs: [DECISIONS.md](DECISIONS.md).
+Sports are ranked by **advantage**: how much more common your build is among a sport's elite athletes than in the general population (e.g. "13× more common among Olympic badminton players than among men worldwide"). **Match %** (how closely you fit their typical build) is shown alongside and drives the limiting factors. Method and trade-offs: [DECISIONS.md](DECISIONS.md).
 
 Each measurement is converted to a percentile against approximate adult population norms for the chosen sex. Arm span and leg length are taken relative to height. Each sport or position has target values with a direction (more is better, less is better, or a sweet spot), a tolerance and a weight. Missing measurements count as neutral. A team sport scores as its best position.
 

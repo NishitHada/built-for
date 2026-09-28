@@ -4,6 +4,28 @@ Short records of product and method decisions: what was decided, why, and what i
 
 ---
 
+## 011 — One worldwide baseline instead of regional ones
+
+**Date:** 2026-09-29 · **Status:** accepted (supersedes 010)
+
+### Context
+With regional baselines (010), Indian visitors' results shrank sharply: the owner's own coxswain result went from 8.1× (Western baseline) to 1.1× (India baseline), and most Indian builds landed at 1–3×.
+
+### Options compared (same builds, same ranking in every case)
+| Build | Western | India | Worldwide |
+|---|---|---|---|
+| 160 cm, 60 kg man | Gymnastics 17× | 2.5× | 5.3× |
+| Average Indian man | 7.1× | 3.1× | 3.9× |
+| 180 cm Indian man | Badminton 4.2× | 27× | 6.9× |
+
+### Decision
+Use **adults worldwide** for every visitor (men about 171 cm, women 159 cm, with a spread that includes differences between countries; BMI medians about 24). Wording: "…than among men worldwide". Region still controls which sports are highlighted, never the numbers.
+
+### Why
+Elite sport is a global pool; the numbers are neither inflated (Western) nor flattened (local); and the same build gets the same number in every country, which matters for a result people share.
+
+---
+
 ## 010 — Regional population baselines
 
 **Date:** 2026-09-29 · **Status:** accepted (amends 002)

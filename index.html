@@ -600,7 +600,7 @@ body.og{margin:0;background:var(--bg)}
               </div>
             </div>
             <div class="howto" id="how-adults" hidden>
-              <p style="color:var(--ink);font-size:14px"><b>Results compare you with adults:</b> adult men or women where you live (set by the region on the results page), and adult Olympic athletes.</p>
+              <p style="color:var(--ink);font-size:14px"><b>Results compare you with adults:</b> adult men or women worldwide, and adult Olympic athletes.</p>
               <p><b>Under 18?</b> Your body is still growing. Height, proportions and BMI change a lot through the teens, and puberty can come years earlier or later than for friends the same age. Treat the results as a rough guide, not a verdict. At this age, enjoying a sport and building skills matter far more than body shape.</p>
             </div>
 
@@ -770,7 +770,7 @@ body.og{margin:0;background:var(--bg)}
       <section class="panel method">
         <h2>How the scoring works</h2>
         <div class="mgrid2">
-          <div><h3>Advantage</h3><p>How much more common your build is among a sport’s elite athletes than among people in general. “6.6×” means people with your height and build turn up 6.6 times as often among Olympic badminton players as in the general population. Sports are ranked by this number.</p>
+          <div><h3>Advantage</h3><p>How much more common your build is among a sport’s elite athletes than among people worldwide. “13×” means people with your height and build turn up 13 times as often among Olympic badminton players as among people worldwide. Sports are ranked by this number.</p>
             <ul class="bands"><li><b>3× or more</b> strong natural advantage</li><li><b>1.5–3×</b> some advantage</li><li><b>0.67–1.5×</b> no clear advantage</li><li><b>Below 0.67×</b> built against it</li></ul></div>
           <div><h3>Match</h3><p>How closely you fit the typical athlete in that sport or position. Being inside the middle half of the athletes on a measurement scores full marks. Match drives the limiting factors in the deep dive.</p></div>
           <div><h3>Where the targets come from</h3><p>Height and BMI for 27 sports are fitted on <span class="heroN"></span> Olympic athletes from 1992 to 2016. Arm span, leg, hand, foot and shoulder targets, and sports without Olympic data (climbing, sumo, jockey, coxswain, rugby union, American football, cricket, kabaddi), use published sports-science findings. Team positions are placed around each sport’s real median.</p></div>
@@ -778,7 +778,7 @@ body.og{margin:0;background:var(--bg)}
         </div>
         <div><h3>Limits</h3>
           <ul><li>Build is one factor among many. Training, skill, aerobic capacity, muscle fibre type, coordination and nerve matter far more for most people, and plenty of champions have the “wrong” body for their sport.</li>
-            <li>\u201CPeople in general\u201D means adults where you live: Indian and South Asian averages for visitors there, Chinese and Japanese averages in East Asia, and Western averages elsewhere. This covers height and BMI; other proportions use Western references.</li>
+            <li>“People in general” means adults worldwide (average height about 171 cm for men and 159 cm for women), so results are comparable wherever you live. This covers height and BMI; other proportions use Western references.</li>
             <li>Which sports count as popular in each region is an editorial judgement.</li>
             <li>If you’re still growing, treat the results loosely.</li>
             <li>Links to Playo and Decathlon, shown to visitors in India, are the creator’s own picks. There’s no payment or partnership.</li>
@@ -1031,15 +1031,12 @@ function critScore(x,dir,t,tol,mode){
   const d=(x-t)/tol;return mode==='o'?Math.min(1,4*(1-cdf(Math.abs(d)))):Math.exp(-.5*d*d);
 }
 // ---- advantage: how over-represented your build is among the sport's athletes vs the population ----
-// "People in general" is the adult population where the visitor lives: height [mean, sd] in cm and BMI as
-// log-normal [log median, sd] (adult BMI is right-skewed). Approximate NCD-RisC figures. Athlete targets never change.
-const POP={
-  west:{m:{h:[175.5,7.3],b:[Math.log(25.2),.16]},f:{h:[162,6.9],b:[Math.log(24.7),.2]}},
-  sa:{m:{h:[165.5,7.0],b:[Math.log(22.0),.17]},f:{h:[152.5,6.5],b:[Math.log(22.5),.19]}},   // India, Pakistan, Bangladesh, Sri Lanka
-  ea:{m:{h:[171.5,6.5],b:[Math.log(23.8),.15]},f:{h:[159,6.0],b:[Math.log(22.8),.17]}}     // China, Japan
-};
-const popKey=()=>['IN','PK','BD','LK'].includes(region)?'sa':['CN','JP'].includes(region)?'ea':'west';
-const popWhere=()=>popKey()==='west'?'in general':`in ${regionInfo().name}`;
+// "People in general" is adults worldwide: height [mean, sd] in cm (the spread includes differences between
+// countries) and BMI as log-normal [log median, sd] (adult BMI is right-skewed). Approximate NCD-RisC figures.
+// The same baseline for every visitor keeps results comparable across countries. Athlete targets never change.
+const POP={world:{m:{h:[171,7.6],b:[Math.log(24.2),.17]},f:{h:[159,7.2],b:[Math.log(24.4),.2]}}};
+const popKey=()=>'world';
+const popWhere=()=>'worldwide';
 const popHz=(cm,sex)=>{const [mu,sd]=POP[popKey()][sex].h;return (cm-mu)/sd};   // height z against local adults
 const npdf=(x,mu,sd)=>Math.exp(-.5*((x-mu)/sd)**2)/(sd*2.5066282746);
 const lnBmiPop=(b,sex)=>Math.log(npdf(Math.log(b),...POP[popKey()][sex].b)/b);
@@ -1684,7 +1681,7 @@ function render(){
   const hz=popHz(m.h,m.sex);
   const std=[['height',hz],['arm span',T.ape],['leg length',L],['hand size',T.hand],['foot size',T.foot],['shoulder width',T.shoulder]]
     .filter(x=>x[1]!==undefined).sort((a,b)=>Math.abs(b[1])-Math.abs(a[1])).slice(0,2);
-  const stdTxt=std.length?`Your most distinctive traits: `+std.map(([k,z])=>`<b>${k}</b> (${ord(pctl(z))} percentile)`).join(' and ')+`, compared with adult ${sexWord}${popWhere()==='in general'?'':' '+popWhere()}.`:'';
+  const stdTxt=std.length?`Your most distinctive traits: `+std.map(([k,z])=>`<b>${k}</b> (${ord(pctl(z))} percentile)`).join(' and ')+`, compared with adult ${sexWord}.`:'';
   const ape=ok(m.span)?m.span-m.h:NaN;
   const bmi=T.bmi, bmiPos=Math.min(99.5,Math.max(.5,(bmi-15)/25*100));
   const gauges=[
@@ -1699,7 +1696,7 @@ function render(){
       <div class="scale"><span>15</span><span>lean endurance</span><span>power</span><span>40</span></div></div>`
   ].join('');
   $('#buildOut').innerHTML=`<section class="panel">
-      <div class="section-head"><h2>Your build</h2><p>Percentiles compared with adult ${sexWord}${popWhere()==='in general'?'':` (height: ${sexWord} ${popWhere()}; other measurements: Western references)`}. Dashed line = average.</p></div>
+      <div class="section-head"><h2>Your build</h2><p>Height compared with adult ${sexWord} worldwide; other measurements with Western references. Dashed line = average.</p></div>
       ${stdTxt?`<p class="standout">${stdTxt}</p>`:''}
       <div class="profile"><div class="figure">${figure(m)}</div><div class="gauges">${gauges}</div></div>
     </section>`;
