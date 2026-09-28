@@ -7,6 +7,7 @@ people into the app at #s-<slug>.
 
 Usage (with the site served locally, e.g. python3 -m http.server 8123):
     python3 scripts/make_share.py http://localhost:8123/
+    python3 scripts/make_share.py --pages-only   # share pages only, keep images
 
 Writes og/default.jpg, og/<slug>.jpg (1200x630) and s/<slug>/index.html.
 Needs Google Chrome for the headless screenshots.
@@ -79,6 +80,9 @@ PAGE = """<!doctype html>
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="Are you built for {label}? Built For compares your body with elite athletes.">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="robots" content="noindex, follow">
+<link rel="canonical" href="{site}">
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
 <script>location.replace("../../#s-{slug}")</script>
 </head>
 <body style="font-family:system-ui,sans-serif;padding:24px">
@@ -89,14 +93,18 @@ PAGE = """<!doctype html>
 
 
 def main():
-    base = sys.argv[1] if len(sys.argv) > 1 else "http://localhost:8123/"
+    args = [a for a in sys.argv[1:] if not a.startswith("--")]
+    pages_only = "--pages-only" in sys.argv  # rewrite share pages without re-capturing images
+    base = args[0] if args else "http://localhost:8123/"
     (ROOT / "og").mkdir(exist_ok=True)
-    shoot(base, "default", ROOT / "og" / "default.jpg")
-    print("og/default.jpg")
+    if not pages_only:
+        shoot(base, "default", ROOT / "og" / "default.jpg")
+        print("og/default.jpg")
     for name, cat, why in sports():
         s = slug(name)
         label = LABEL.get(name, name.lower())
-        shoot(base, s, ROOT / "og" / f"{s}.jpg")
+        if not pages_only:
+            shoot(base, s, ROOT / "og" / f"{s}.jpg")
         desc = f"{why} See how your build compares with elite athletes in about 2 minutes."
         page = ROOT / "s" / s / "index.html"
         page.parent.mkdir(parents=True, exist_ok=True)

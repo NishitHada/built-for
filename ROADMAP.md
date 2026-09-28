@@ -76,7 +76,9 @@ Source: *120 years of Olympic history* (`athlete_events.csv`, 271k rows, 1896–
 - [ ] Personal share image (your top 3 and advantage) drawn in the browser, for Instagram stories and WhatsApp status
 - [x] One page per sport at `#s-<sport>`, useful with or without measurements ([DECISIONS.md](DECISIONS.md) #006)
 - [x] Corrected body illustration: arm span fingertip to fingertip, shoulder width between the bony tips (supplied by owner)
-- [ ] Search-friendly sport pages: separate static URLs per sport (hash links aren't indexed)
+- [x] SEO basics: descriptive title and description, canonical, favicon and app icons, WebApplication structured data, sitemap.xml; share pages marked noindex until they carry content
+- [ ] **(you)** Add the site to Google Search Console and submit sitemap.xml
+- [ ] Search-friendly sport pages: turn s/<sport>/ into real content pages (ideal build per position, how to start), then drop their noindex
 - [ ] Phone-based ability tests: vertical jump from slow-motion video (flight time), 20 m sprint timer, sit-and-reach, plank; fold into scoring as a separate "ability" signal
 - [x] Note for under-18s in the Basics card (ⓘ next to "Compare with"): results compare you with adults
 - [ ] Youth mode: age-group norms and predicted adult height from parents' heights (Khamis–Roche), with careful framing for under-18s
