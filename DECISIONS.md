@@ -4,6 +4,27 @@ Short records of product and method decisions: what was decided, why, and what i
 
 ---
 
+## 008 — Unpaid "creator's picks": Playo and Decathlon, subtle and in context
+
+**Date:** 2026-09-28 · **Status:** accepted
+
+### Context
+The owner uses and likes Playo (court booking) and Decathlon (sports gear) and wanted them featured, without it reading as an ad or pushing users.
+
+### Decision
+- **Only where they help, only in India** (both are India-specific links; Playo operates only there).
+- **Decathlon:** a small "Beginner options at Decathlon" link at the end of each sport's Gear line, searching decathlon.in for that sport's gear. Skipped for sports it doesn't sensibly stock (coxing, ski jumping, sumo, kabaddi, fencing, ice hockey, American football).
+- **Playo:** one line under the venue results after "Find places near me", and only for the 8 sports Playo lists (badminton, football, cricket, tennis, table tennis, basketball, volleyball, swimming), and only when the visitor is within 60 km of a city Playo serves. It links to that city and sport. It also appears if the map search fails, when it's most useful.
+- Plain text links in the page's normal style: no logos, badges or buttons.
+- Links carry `utm_source=builtfor` so either brand can see referrals in its own analytics; clicks are counted as `evt/playo/<sport>` and `evt/decathlon/<sport>`.
+- Disclosed on the Methodology page: "the creator's own picks. There's no payment or partnership."
+- **Rule carried forward:** these links never affect rankings, scores or which sports are shown.
+
+### Related change
+Places search now tries a second public OpenStreetMap server (overpass.kumi.systems) with a 12-second limit per server, because the main server was refusing requests. A Russian mirror (maps.mail.ru) also works but was left out because it would receive visitors' approximate locations.
+
+---
+
 ## 007 — Deep dive is a results tab
 
 **Date:** 2026-09-27 · **Status:** accepted (amends 006)

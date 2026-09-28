@@ -243,6 +243,9 @@ dialog#photoDlg::backdrop{background:rgba(10,14,22,.62)}
 .places li b{display:block;overflow-wrap:anywhere}
 .places li span{display:block;font-size:12.5px;color:var(--muted)}
 .places a{color:var(--accent);font-weight:600;white-space:nowrap;font-size:13.5px}
+.aside{font-size:13.5px;color:var(--muted);margin:10px 0 0}
+.aside a,.aside-link{color:var(--accent)}
+.aside-link{font-size:13.5px;margin-left:4px}
 .pstatus{font-size:14px;color:var(--muted);margin:6px 0}
 .pstatus.err{color:var(--bad)}
 .fine{font-size:12px;color:var(--muted);margin:8px 0 0}
@@ -774,6 +777,7 @@ body.og{margin:0;background:var(--bg)}
             <li>“People in general” uses Western adult averages for now, so people from populations with shorter averages are understated in tall sports.</li>
             <li>Which sports count as popular in each region is an editorial judgement.</li>
             <li>If you’re still growing, treat the results loosely.</li>
+            <li>Links to Playo and Decathlon, shown to visitors in India, are the creator’s own picks. There’s no payment or partnership.</li>
             <li>The site counts visits and a few anonymous actions (like opening a sport) with GoatCounter, which uses no cookies. Your measurements, photo and location are never sent.</li></ul></div>
         <p class="fine">Full method, trade-offs and data sources: <a href="https://github.com/NishitHada/built-for/blob/main/DECISIONS.md" target="_blank" rel="noopener">decision log</a> · <a href="https://github.com/NishitHada/built-for" target="_blank" rel="noopener">source code</a>.</p>
       </section>
@@ -1441,6 +1445,23 @@ function focusText(r,cur,m,res){
   if(chg){const n=numeric(chg,m);return `Your ${lc(describe(chg,m).label)} is ${gapText(n,m)}. ${changeAdvice(n)}`}
   return `Nothing in your build holds you back at ${Pc}%. Your progress will come down to skill and training.`;
 }
+// Creator's picks for visitors in India (unpaid): Playo for booking courts, Decathlon for beginner gear.
+// Shown only where they help: Playo after a places search near a city it serves, Decathlon beside the gear line.
+const PICK_UTM='utm_source=builtfor&utm_medium=referral';
+const PLAYO={Badminton:'badminton','Football (soccer)':'football',Cricket:'cricket',Tennis:'tennis','Table tennis':'table_tennis',Basketball:'basketball',Volleyball:'volleyball',Swimming:'swimming'};
+const PLAYO_CITIES=[['bangalore',12.97,77.59],['mumbai',19.08,72.88],['delhi-ncr',28.61,77.21],['hyderabad',17.39,78.49],['chennai',13.08,80.27],['pune',18.52,73.86],['vijayawada',16.51,80.65],['guntur',16.31,80.44]];
+const DECATHLON={Basketball:'basketball',Volleyball:'volleyball',Swimming:'swimming','Water polo':'water polo',Rowing:'rowing','Distance running':'running shoes',
+ Sprinting:'running shoes','High jump':'athletics','Long & triple jump':'athletics','Shot put & discus':'athletics',Gymnastics:'gymnastics',Diving:'swimming',
+ 'Figure skating':'ice skates',Weightlifting:'weightlifting','Rugby union':'rugby','Wrestling & judo':'judo',Boxing:'boxing','Rock climbing':'climbing',
+ 'Road cycling (climbing)':'road cycling',Tennis:'tennis',Badminton:'badminton',Handball:'handball','Football (soccer)':'football','Baseball pitcher':'baseball',
+ Cricket:'cricket','Field hockey':'hockey','Table tennis':'table tennis','Horse racing jockey':'horse riding'};
+function playoLine(sport,lat,lon){
+  if(region!=='IN'||!PLAYO[sport])return '';
+  let city=null,best=1e9;PLAYO_CITIES.forEach(([c,a,b])=>{const d=km(lat,lon,a,b);if(d<best){best=d;city=c}});
+  if(best>60)return '';
+  return `<p class="aside">Want to book a slot? Playo lists bookable ${esc(sport==='Football (soccer)'?'football':sport.toLowerCase())} venues near you: <a href="https://playo.co/venues/${city}/sports/${PLAYO[sport]}?${PICK_UTM}" target="_blank" rel="noopener">see them on Playo</a>.</p>`;
+}
+const decathlonLink=sport=>region==='IN'&&DECATHLON[sport]?` <a class="aside-link" href="https://www.decathlon.in/search?query=${encodeURIComponent(DECATHLON[sport])}&${PICK_UTM}" target="_blank" rel="noopener">Beginner options at Decathlon</a>`:'';
 // Collapsible "Next steps" block for one sport (and position, for team sports)
 function nextHTML(key,r,cur,m,res,defOpen){
   const S=START[r.sp.n], sport=esc(r.sp.n);
@@ -1449,7 +1470,7 @@ function nextHTML(key,r,cur,m,res,defOpen){
     <summary><span>Next steps${cur&&r.positions?` as ${esc(cur.p.n.toLowerCase())}`:''}</span><span class="chev">›</span></summary>
     <div class="next-grid">
       <div class="ncol"><h4>How to get started</h4><ol>${S.s.map(x=>`<li>${x}</li>`).join('')}</ol>
-        <p class="gear"><b>Gear:</b> ${S.g}</p>${cur?`<div class="focus"><b>Your first focus</b><p>${focusText(r,cur,m,res)}</p></div>`:''}</div>
+        <p class="gear"><b>Gear:</b> ${S.g}${decathlonLink(r.sp.n)}</p>${cur?`<div class="focus"><b>Your first focus</b><p>${focusText(r,cur,m,res)}</p></div>`:''}</div>
       <div class="ncol"><h4>Places near you</h4>
         <div class="nbtns"><button type="button" class="btn primary" data-places="${sport}">Find places near me</button>
           <a class="btn" href="https://www.google.com/maps/search/?api=1&amp;query=${encodeURIComponent(S.q+' near me')}" target="_blank" rel="noopener">Search Google Maps</a></div>
@@ -1457,12 +1478,21 @@ function nextHTML(key,r,cur,m,res,defOpen){
         <p class="fine">Your approximate location (rounded to about 100 m) is sent to OpenStreetMap’s Overpass service to run the search. This app doesn’t store it.</p></div>
     </div></details>`;
 }
+// Public OpenStreetMap search servers, tried in turn: the free main server is sometimes overloaded or refuses requests
+const OVERPASS=['https://overpass-api.de/api/interpreter','https://overpass.kumi.systems/api/interpreter'];
+let overpassOk=0;   // start with whichever server answered last time
 async function overpass(filters,lat,lon,rad){
-  const q=`[out:json][timeout:20];(${filters.map(f=>`${f}(around:${rad},${lat},${lon});`).join('')});out center tags 80;`;
-  const ac=new AbortController(),t=setTimeout(()=>ac.abort(),25000);
-  try{const resp=await fetch('https://overpass-api.de/api/interpreter',{method:'POST',body:new URLSearchParams({data:q}),signal:ac.signal});
-    if(!resp.ok)throw new Error('http '+resp.status);return (await resp.json()).elements||[]}
-  finally{clearTimeout(t)}
+  const q=`[out:json][timeout:15];(${filters.map(f=>`${f}(around:${rad},${lat},${lon});`).join('')});out center tags 80;`;
+  let lastErr;
+  for(let k=0;k<OVERPASS.length;k++){
+    const i=(overpassOk+k)%OVERPASS.length, ac=new AbortController(), t=setTimeout(()=>ac.abort(),12000);
+    try{const resp=await fetch(OVERPASS[i],{method:'POST',body:new URLSearchParams({data:q}),signal:ac.signal});
+      if(!resp.ok)throw new Error('http '+resp.status);
+      const els=(await resp.json()).elements||[];overpassOk=i;return els}
+    catch(e){lastErr=e}
+    finally{clearTimeout(t)}
+  }
+  throw lastErr;
 }
 function km(a,b,c,d){const R=6371,r=x=>x*Math.PI/180,dl=r(c-a),dn=r(d-b);
   const h=Math.sin(dl/2)**2+Math.cos(r(a))*Math.cos(r(c))*Math.sin(dn/2)**2;return 2*R*Math.asin(Math.sqrt(h))}
@@ -1481,7 +1511,7 @@ async function findPlaces(sport){
         navigator.geolocation.getCurrentPosition(res,rej,{timeout:12000,maximumAge:600000})});
       lastCoords={lat:+pos.coords.latitude.toFixed(3),lon:+pos.coords.longitude.toFixed(3)};
     }
-    const {lat,lon}=lastCoords;
+    const {lat,lon}=lastCoords, pl=playoLine(sport,lat,lon);
     track('places/'+slug(sport));st('Searching OpenStreetMap…');
     let els=await overpass(S.f,lat,lon,8000);
     if(els.length<3)els=await overpass(S.f,lat,lon,25000);
@@ -1494,15 +1524,15 @@ async function findPlaces(sport){
       .filter(p=>{const k=(p.name||'')+p.la.toFixed(3)+p.lo.toFixed(3);if(seen.has(k))return false;seen.add(k);
         if(!p.name){if(unnamed>=3)return false;unnamed++}return true})
       .slice(0,8);
-    if(!list.length){track('places-none');st(`No ${esc(sport.toLowerCase())} places are mapped within 25 km in OpenStreetMap. Try the Google Maps search.`);return}
+    if(!list.length){track('places-none');put(`<p class="pstatus">No ${esc(sport.toLowerCase())} places are mapped within 25 km in OpenStreetMap. Try the Google Maps search.</p>${pl}`);return}
     const fd=k=>units==='metric'?(k<1?`${Math.round(k*1000)} m`:`${k.toFixed(1)} km`):`${(k*.621).toFixed(1)} mi`;
     track('places-found');put(`<ol class="places">${list.map(p=>`<li><div><b>${esc(p.name||'Unnamed '+p.kind.toLowerCase())}</b><span>${p.kind} · ${fd(p.dist)} away</span></div>
       <a href="https://www.google.com/maps/dir/?api=1&amp;destination=${p.la.toFixed(5)},${p.lo.toFixed(5)}" target="_blank" rel="noopener">Directions</a></li>`).join('')}</ol>
-      <p class="fine">From OpenStreetMap. Check opening times and membership with the venue.</p>`);
+      <p class="fine">From OpenStreetMap. Check opening times and membership with the venue.</p>${pl}`);
   }catch(err){
     if(err&&err.code===1)st('Location access is blocked. Allow location for this site and try again, or use the Google Maps search.',true);
     else if(err&&(err.code===2||err.code===3||err.code===9))st('Couldn’t get your location. Use the Google Maps search instead.',true);
-    else{track('places-error');st('Couldn’t reach OpenStreetMap right now. Use the Google Maps search instead.',true)};
+    else{track('places-error');put(`<p class="pstatus err">Couldn’t reach OpenStreetMap right now. Use the Google Maps search instead.</p>${lastCoords?playoLine(sport,lastCoords.lat,lastCoords.lon):''}`)};
   }finally{busy(false)}
 }
 async function shareResults(){
@@ -1816,6 +1846,7 @@ $('#editBtn').addEventListener('click',()=>show('measure'));
 $('#homeLink').addEventListener('click',e=>{e.preventDefault();show('landing')});
 $('#navMethod').addEventListener('click',()=>{track('methodology');show('method')});
 // Outbound map links from the places list
+document.addEventListener('click',e=>{const a=e.target.closest('a[href*="playo.co"],a[href*="decathlon.in"]');if(a)track((a.href.includes('playo.co')?'playo/':'decathlon/')+slug(pick))});
 document.addEventListener('click',e=>{const a=e.target.closest('a[href*="google.com/maps"]');if(a)track(a.href.includes('/dir/')?'directions':'maps')});
 $('#toResults').addEventListener('click',()=>{
   const m=readMetric(),bad=!ok(m.h)||m.h<120||m.h>245?'#height':!ok(m.w)||m.w<30||m.w>250?'#weight':null;
