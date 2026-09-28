@@ -191,6 +191,9 @@ dialog#photoDlg::backdrop{background:rgba(10,14,22,.62)}
 .dlg-step{font-family:var(--display);text-transform:uppercase;font-weight:700;font-size:16px;letter-spacing:.03em}
 .btn.off{opacity:.45;pointer-events:none}
 #pickHint{font-size:13px;color:var(--warn)}
+/* Phones get "Take a photo" (opens the rear camera) and "Choose from gallery"; mouse-driven computers get one "Choose a photo" */
+.fine-only{display:none}
+@media (pointer:fine){.cam-only,.touch-only{display:none!important}.fine-only{display:inline}#photoPick{background:var(--ink);color:var(--bg);border-color:var(--ink)}}
 .dlg-status{font-size:14px;padding:10px 12px;border-radius:8px;background:var(--surface-2);border:1px solid var(--line)}
 .ps-row{display:flex;gap:10px;align-items:center}
 .spin{width:16px;height:16px;flex:none;border-radius:50%;border:2px solid var(--line);border-top-color:var(--accent);animation:spin .8s linear infinite}
@@ -797,7 +800,8 @@ body.og{margin:0;background:var(--bg)}
         <li>Have someone take the photo from 2–3 m away, straight on, with the camera at waist height. Your whole body, head to feet, must be in the frame.</li>
       </ol>
       <p class="fine">The photo is analysed on your device and never uploaded. The pose model (about 9 MB) downloads the first time you use it.</p>
-      <div class="dlg-actions" style="align-items:center"><label class="btn primary" for="photoFile" id="photoPick">Take or choose a photo</label><input type="file" id="photoFile" accept="image/*" class="vh"><span id="pickHint" role="status"></span></div>
+      <div class="dlg-actions" style="align-items:center"><label class="btn primary cam-only" for="photoCam" id="photoCamBtn">Take a photo</label><input type="file" id="photoCam" accept="image/*" capture="environment" class="vh">
+        <label class="btn" for="photoFile" id="photoPick"><span class="touch-only">Choose from gallery</span><span class="fine-only">Choose a photo</span></label><input type="file" id="photoFile" accept="image/*" class="vh"><span id="pickHint" role="status"></span></div>
     </div>
     <div id="photoStatus" class="dlg-status" hidden>
       <div class="ps-row"><span class="spin" aria-hidden="true"></span><span id="psText" role="status"></span><span class="ps-num" id="psNum" aria-hidden="true"></span></div>
@@ -810,7 +814,7 @@ body.og{margin:0;background:var(--bg)}
       <ul class="est-list" id="estList"></ul>
       <ul class="warns" id="estWarn"></ul>
       <p class="fine">Estimates are usually within a few centimetres. If one looks wrong, measure it with a tape and type it in.</p>
-      <div class="dlg-actions"><button type="button" class="btn primary" id="estUse">Use these measurements</button><label class="btn" for="photoFile">Try another photo</label></div>
+      <div class="dlg-actions"><button type="button" class="btn primary" id="estUse">Use these measurements</button><label class="btn cam-only" for="photoCam">Retake photo</label><label class="btn" for="photoFile">Choose another photo</label></div>
       </div>
     </div>
   </div>
@@ -1356,7 +1360,7 @@ async function analysePhoto(file){
     pStatus('');$('#estBlock').hidden=false;
     $('#photoResult').scrollIntoView({block:'nearest'});
   }catch(err){pStatus('Something went wrong reading that photo. Try a different one.',{err:true})}
-  finally{$('#scan').hidden=true;pick.removeAttribute('aria-disabled');$('#photoFile').value=''}
+  finally{$('#scan').hidden=true;pick.removeAttribute('aria-disabled');$('#photoFile').value='';$('#photoCam').value=''}
 }
 function useEstimate(){
   const e=lastEst;if(!e)return;
@@ -1748,7 +1752,7 @@ $('#presets').addEventListener('click',e=>{const b=e.target.closest('button');if
 $('#form').addEventListener('input',e=>{example=null;if(estFields.delete(e.target.id))updateEst();render();save()});
 // The photo is scaled from height, so the dialog asks for it first and mirrors the form field
 function photoHeightOk(){const v=parseFloat($('#photoHeight').value),cm=units==='metric'?v:v*2.54;return isFinite(cm)&&cm>=120&&cm<=245}
-function syncPhotoGate(){const okH=photoHeightOk();$('#photoFile').disabled=!okH;$('#photoPick').classList.toggle('off',!okH);
+function syncPhotoGate(){const okH=photoHeightOk();$('#photoFile').disabled=$('#photoCam').disabled=!okH;$('#photoPick').classList.toggle('off',!okH);$('#photoCamBtn').classList.toggle('off',!okH);
   $('#pickHint').textContent=okH?'':'Enter your height in step 1 to continue.'}
 $('#photoOpen').addEventListener('click',()=>{pStatus(poser?'Pose model ready.':'',{done:true});$('#photoHeight').value=$('#height').value;syncPhotoGate();
   getPoser().catch(()=>{});   // preload while the user reads the steps; errors surface when a photo is chosen
@@ -1756,7 +1760,7 @@ $('#photoOpen').addEventListener('click',()=>{pStatus(poser?'Pose model ready.':
 $('#photoHeight').addEventListener('input',()=>{const h=$('#height');h.value=$('#photoHeight').value;h.dispatchEvent(new Event('input',{bubbles:true}));syncPhotoGate()});
 $('#photoClose').addEventListener('click',()=>$('#photoDlg').close());
 $('#photoDlg').addEventListener('click',e=>{if(e.target.id==='photoDlg')e.target.close()});
-$('#photoFile').addEventListener('change',e=>{const f=e.target.files&&e.target.files[0];if(f)analysePhoto(f)});
+['#photoFile','#photoCam'].forEach(id=>$(id).addEventListener('change',e=>{const f=e.target.files&&e.target.files[0];if(f)analysePhoto(f)}));
 $('#estUse').addEventListener('click',useEstimate);
 document.addEventListener('click',e=>{const b=e.target.closest('[data-places]');if(b)findPlaces(b.dataset.places)});
 document.addEventListener('toggle',e=>{const d=e.target;if(d.matches&&d.matches('details.nextd'))nextState.set(d.dataset.key,d.open)},true);
