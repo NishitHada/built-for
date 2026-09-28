@@ -600,7 +600,7 @@ body.og{margin:0;background:var(--bg)}
               </div>
             </div>
             <div class="howto" id="how-adults" hidden>
-              <p style="color:var(--ink);font-size:14px"><b>Results compare you with adults:</b> adult men or women in general, and adult Olympic athletes.</p>
+              <p style="color:var(--ink);font-size:14px"><b>Results compare you with adults:</b> adult men or women where you live (set by the region on the results page), and adult Olympic athletes.</p>
               <p><b>Under 18?</b> Your body is still growing. Height, proportions and BMI change a lot through the teens, and puberty can come years earlier or later than for friends the same age. Treat the results as a rough guide, not a verdict. At this age, enjoying a sport and building skills matter far more than body shape.</p>
             </div>
 
@@ -778,7 +778,7 @@ body.og{margin:0;background:var(--bg)}
         </div>
         <div><h3>Limits</h3>
           <ul><li>Build is one factor among many. Training, skill, aerobic capacity, muscle fibre type, coordination and nerve matter far more for most people, and plenty of champions have the “wrong” body for their sport.</li>
-            <li>“People in general” uses Western adult averages for now, so people from populations with shorter averages are understated in tall sports.</li>
+            <li>\u201CPeople in general\u201D means adults where you live: Indian and South Asian averages for visitors there, Chinese and Japanese averages in East Asia, and Western averages elsewhere. This covers height and BMI; other proportions use Western references.</li>
             <li>Which sports count as popular in each region is an editorial judgement.</li>
             <li>If you’re still growing, treat the results loosely.</li>
             <li>Links to Playo and Decathlon, shown to visitors in India, are the creator’s own picks. There’s no payment or partnership.</li>
@@ -1031,16 +1031,26 @@ function critScore(x,dir,t,tol,mode){
   const d=(x-t)/tol;return mode==='o'?Math.min(1,4*(1-cdf(Math.abs(d)))):Math.exp(-.5*d*d);
 }
 // ---- advantage: how over-represented your build is among the sport's athletes vs the population ----
-// Adult BMI is right-skewed, so the population is modelled as log-normal.
-const BMI_POP={m:[Math.log(25.2),.16],f:[Math.log(24.7),.2]};
+// "People in general" is the adult population where the visitor lives: height [mean, sd] in cm and BMI as
+// log-normal [log median, sd] (adult BMI is right-skewed). Approximate NCD-RisC figures. Athlete targets never change.
+const POP={
+  west:{m:{h:[175.5,7.3],b:[Math.log(25.2),.16]},f:{h:[162,6.9],b:[Math.log(24.7),.2]}},
+  sa:{m:{h:[165.5,7.0],b:[Math.log(22.0),.17]},f:{h:[152.5,6.5],b:[Math.log(22.5),.19]}},   // India, Pakistan, Bangladesh, Sri Lanka
+  ea:{m:{h:[171.5,6.5],b:[Math.log(23.8),.15]},f:{h:[159,6.0],b:[Math.log(22.8),.17]}}     // China, Japan
+};
+const popKey=()=>['IN','PK','BD','LK'].includes(region)?'sa':['CN','JP'].includes(region)?'ea':'west';
+const popWhere=()=>popKey()==='west'?'in general':`in ${regionInfo().name}`;
+const popHz=(cm,sex)=>{const [mu,sd]=POP[popKey()][sex].h;return (cm-mu)/sd};   // height z against local adults
 const npdf=(x,mu,sd)=>Math.exp(-.5*((x-mu)/sd)**2)/(sd*2.5066282746);
-const lnBmiPop=(b,sex)=>Math.log(npdf(Math.log(b),...BMI_POP[sex])/b);
+const lnBmiPop=(b,sex)=>Math.log(npdf(Math.log(b),...POP[popKey()][sex].b)/b);
+// Local adult height density, expressed on the same scale as the athlete targets (Western z)
+const lnHPop=(x,sex)=>{const [wm,ws]=NORMS[sex].h,cm=wm+x*ws,[mu,sd]=POP[popKey()][sex].h;return Math.log(npdf(cm,mu,sd)*ws)};
 function logRatio(tr,dir,x,t,tol,sex,T){
   // The athletes' real spread decides here; "taller is better" applies to match %, not to how
   // common your build is among them (a 200 cm player is rare among 186 cm centre-backs).
   const xa=x, sd=tr==='h'||tr==='bmi'||tr==='w'?tol:.8;
   let v;
-  if(tr==='h')v=Math.log(npdf(xa,t,sd))-Math.log(npdf(x,0,1));
+  if(tr==='h')v=Math.log(npdf(xa,t,sd))-lnHPop(x,sex);
   else if(tr==='bmi')v=Math.log(npdf(xa,t,sd))-lnBmiPop(x,sex);
   else if(tr==='w'){const h2=(T.hcm/100)**2;v=Math.log(npdf(xa,t,sd))-(lnBmiPop(x/h2,sex)-Math.log(h2))}
   else v=.5*(Math.log(npdf(xa,t,sd))-Math.log(npdf(x,0,1)));   // literature targets: half strength
@@ -1187,9 +1197,9 @@ const NOUN={'Basketball':'basketball players','Volleyball':'volleyball players',
 function advSentence(sp,pos,a,sex){
   const who=sex==='f'?'Women':'Men', gen=sex==='f'?'women':'men';
   const pre=!pos&&sp.oly&&sp.oly[sex]?'Olympic ':'elite ', noun=pre+NOUN[sp.n]+(pos?` playing ${pos.toLowerCase()}`:'');
-  if(a>=1.25)return `${who} with your build are ${fmtAdv(a)} more common among ${noun} than among ${gen} in general.`;
-  if(a<=.8)return `${who} with your build are ${fmtAdv(1/a)} less common among ${noun} than among ${gen} in general.`;
-  return `${who} with your build are about as common among ${noun} as among ${gen} in general.`;
+  if(a>=1.25)return `${who} with your build are ${fmtAdv(a)} more common among ${noun} than among ${gen} ${popWhere()}.`;
+  if(a<=.8)return `${who} with your build are ${fmtAdv(1/a)} less common among ${noun} than among ${gen} ${popWhere()}.`;
+  return `${who} with your build are about as common among ${noun} as among ${gen} ${popWhere()}.`;
 }
 function analyse(r){
   const known=r.rows.filter(x=>x.s!==null), sw=known.reduce((a,x)=>a+x.w,0);
@@ -1650,7 +1660,7 @@ function render(){
       ${olyNote(r.sp,m.sex)}
       <button type="button" class="btn explore" data-check="${esc(r.sp.n)}">Details and next steps &rarr;</button>
     </article>`).join('');
-  $('#out').innerHTML=`<p class="explain"><b>Advantage</b> is how much more common your build is among a sport’s elite athletes than among ${sexWord} in general. <b>Match</b> is how closely you fit their typical build. <button type="button" class="linkbtn" data-go="method">How it\u2019s calculated</button></p>
+  $('#out').innerHTML=`<p class="explain"><b>Advantage</b> is how much more common your build is among a sport’s elite athletes than among ${sexWord} ${popWhere()}. <b>Match</b> is how closely you fit their typical build. <button type="button" class="linkbtn" data-go="method">How it\u2019s calculated</button></p>
     <div class="podium">${pod}</div>`;
 
   // one ranked list with filters
@@ -1671,13 +1681,14 @@ function render(){
 
   // your build tab
   const L=T.shr===undefined?undefined:-T.shr;
-  const std=[['height',T.h],['arm span',T.ape],['leg length',L],['hand size',T.hand],['foot size',T.foot],['shoulder width',T.shoulder]]
+  const hz=popHz(m.h,m.sex);
+  const std=[['height',hz],['arm span',T.ape],['leg length',L],['hand size',T.hand],['foot size',T.foot],['shoulder width',T.shoulder]]
     .filter(x=>x[1]!==undefined).sort((a,b)=>Math.abs(b[1])-Math.abs(a[1])).slice(0,2);
-  const stdTxt=std.length?`Your most distinctive traits: `+std.map(([k,z])=>`<b>${k}</b> (${ord(pctl(z))} percentile)`).join(' and ')+`, compared with adult ${sexWord}.`:'';
+  const stdTxt=std.length?`Your most distinctive traits: `+std.map(([k,z])=>`<b>${k}</b> (${ord(pctl(z))} percentile)`).join(' and ')+`, compared with adult ${sexWord}${popWhere()==='in general'?'':' '+popWhere()}.`:'';
   const ape=ok(m.span)?m.span-m.h:NaN;
   const bmi=T.bmi, bmiPos=Math.min(99.5,Math.max(.5,(bmi-15)/25*100));
   const gauges=[
-    gauge('Height',T.h,fmtH(m.h)),
+    gauge('Height',hz,fmtH(m.h)),
     gauge('Arm span vs height',T.ape,ok(ape)?`${ape>=0?'+':'−'}${fmtL(Math.abs(ape))}`:''),
     gauge('Leg length vs height',L,ok(m.sit)?fmtL(m.h-m.sit):''),
     gauge('Hand length',T.hand,fmtL(m.hand)),
@@ -1688,7 +1699,7 @@ function render(){
       <div class="scale"><span>15</span><span>lean endurance</span><span>power</span><span>40</span></div></div>`
   ].join('');
   $('#buildOut').innerHTML=`<section class="panel">
-      <div class="section-head"><h2>Your build</h2><p>Percentiles compared with adult ${sexWord}. Dashed line = average.</p></div>
+      <div class="section-head"><h2>Your build</h2><p>Percentiles compared with adult ${sexWord}${popWhere()==='in general'?'':` (height: ${sexWord} ${popWhere()}; other measurements: Western references)`}. Dashed line = average.</p></div>
       ${stdTxt?`<p class="standout">${stdTxt}</p>`:''}
       <div class="profile"><div class="figure">${figure(m)}</div><div class="gauges">${gauges}</div></div>
     </section>`;

@@ -36,7 +36,7 @@ Source: *120 years of Olympic history* (`athlete_events.csv`, 271k rows, 1896–
 - [x] Fix score saturation: rank by **advantage ratio** ("6.6× more common among Olympic badminton players than among men in general"), match % secondary. See [DECISIONS.md](DECISIONS.md) #002
 - [x] Region-popular sports: detect region from time zone, "Popular in <region>" section, badges; add cricket, kabaddi, field hockey, table tennis, ice hockey (35 sports). See [DECISIONS.md](DECISIONS.md) #004
 - [ ] **(you)** Review the popularity lists for regions you know; ask friends abroad to sanity-check theirs
-- [ ] Population selector for "people in general": Western norms (current) vs India (men ~166 cm, women ~153 cm) vs global; default from the detected region
+- [x] Regional "people in general" baselines (South Asia, East Asia, Western), following the region picker ([DECISIONS.md](DECISIONS.md) #010)
 - [ ] Model height–BMI correlation instead of treating them as independent
 - [x] Show "compared with N Olympic athletes" on sports that use fitted data
 - [x] Regression check: the example builds (swimmer, marathoner, gymnast, lineman, volleyball, climber) still rank their own sport near the top

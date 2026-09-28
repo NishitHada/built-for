@@ -4,6 +4,24 @@ Short records of product and method decisions: what was decided, why, and what i
 
 ---
 
+## 010 — Regional population baselines
+
+**Date:** 2026-09-29 · **Status:** accepted (amends 002)
+
+### Context
+"People in general" used Western adult averages everywhere. For Indian visitors (most early users) this inflated advantages in short-athlete sports: an average Indian man (166 cm, 65 kg) read "7.1× more common among Olympic gymnasts than among men in general".
+
+### Decision
+- Height and BMI population baselines by region, from approximate NCD-RisC adult averages: South Asia (India, Pakistan, Bangladesh, Sri Lanka) men 165.5 cm, women 152.5 cm; East Asia (China, Japan) men 171.5 cm, women 159 cm; Western elsewhere. BMI stays log-normal with regional medians.
+- Athlete targets are unchanged; only the population side of the advantage ratio uses the regional baseline (converted to the same scale).
+- Wording follows the baseline: "…than among men in India". The height gauge on Your build uses the local baseline; other proportions keep Western references (noted on the page).
+
+### What it changes, and what it doesn't
+- Magnitudes and verdicts become honest locally: the average Indian man's top result falls from 7.1× to 3.1×; a 180 cm Indian man, who is rare locally, rises from about 4× to about 27×.
+- **It cannot change the ranking of sports for a given person.** The population term is the same for every sport, so it cancels when sports are compared. The average Indian man still ranks gymnastics first, because Olympic male gymnasts average 167 cm. An earlier quick simulation suggested otherwise; it was wrong because it also shifted the athlete targets.
+
+---
+
 ## 009 — Remove the in-app venue search; keep Playo
 
 **Date:** 2026-09-28 · **Status:** accepted (amends 008)
